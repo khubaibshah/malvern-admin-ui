@@ -4,6 +4,7 @@ import loginformVue from '@/app/public/pages/loginform.vue'
 import DashboardVue from '@/app/secure/pages/Dashboard.vue'
 import UserHome from '@/app/secure/pages/UserHome.vue'
 import Bookings from '@/app/secure/pages/Bookings.vue'
+import Create from '@/app/secure/pages/createBooking.vue'
 import { useAuthStore } from '../stores/authStore'
 
 // const checkAuth = async (to, from, next) => {
@@ -35,6 +36,12 @@ const router = createRouter({
           path: '/dashboard/bookings', // This represents the default child route of /test
           name: 'booking',
           component: Bookings,
+          meta: { requiresAuth: true } 
+        },
+        {
+          path: '/dashboard/create', // This represents the default child route of /test
+          name: 'Create',
+          component: Create,
           meta: { requiresAuth: true } 
         }
       ],

@@ -23,7 +23,7 @@ const token = authStore.getToken();
 
     console.log('User logged out successfully', response.data)
     authStore.clearToken(); // Clear token from store
-    authStore.setUserAuthenticated(false); // Set user authentication status to false
+    authStore.setAuthenticated(false); // Set user authentication status to false
     router.push({ name: 'login' }) // Redirect to home page
   } catch (error) {
     console.error('Login failed', error)
@@ -61,7 +61,7 @@ onMounted(async () => {
                                 ></i>
                                 <span
                                     class="font-medium inline text-base lg:text-xs lg:block"
-                                    >Home</span
+                                    >Dashboard</span
                                 >
                             </a>
                         </li>
@@ -69,7 +69,7 @@ onMounted(async () => {
                             <a
                                 v-ripple
                                 class="flex flex-row lg:flex-column align-items-center cursor-pointer p-3 lg:justify-content-center hover:bg-gray-800 border-round text-gray-300 hover:text-white transition-duration-150 transition-colors p-ripple"
-                                @click="router.push({name: 'booking'})"
+                                @click="router.push({name: 'Create'})"
                             >
                                 <i
                                     class="pi pi-calendar-times mr-2 lg:mr-0 mb-0 lg:mb-2 text-base lg:text-lg"
@@ -84,13 +84,14 @@ onMounted(async () => {
                             <a
                                 v-ripple
                                 class="flex flex-row lg:flex-column align-items-center cursor-pointer p-3 lg:justify-content-center hover:bg-gray-800 border-round text-gray-300 hover:text-white transition-duration-150 transition-colors p-ripple"
+                                @click="router.push({name: 'booking'})"
                                 >
                                 <i
                                     class="pi pi-users mr-2 lg:mr-0 mb-0 lg:mb-2 text-base lg:text-lg"
                                 ></i>
                                 <span
                                     class="font-medium inline text-base lg:text-xs lg:block"
-                                    >Team</span
+                                    >Bookings</span
                                 >
                             </a>
                         </li>
@@ -328,12 +329,12 @@ onMounted(async () => {
                     </li>
                 </ul>
             </div>
-            <div class="p-4 flex flex-column flex-auto">
-                
-                <slot>
-                    
-                </slot>
-            </div>
+            <div class="p-4 flex flex-column flex-auto" style="max-height: 93vh; overflow-y: auto;">
+    <!-- <div class="scroll"> -->
+    <slot>
+    </slot>
+    <!-- </div> -->
+</div>
         </div>
     </div>
 </template>

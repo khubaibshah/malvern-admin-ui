@@ -1,4 +1,5 @@
 <template>
+  <div id="particles-js"></div>
   <div class="login-bg surface-ground px-4 py-8 md:px-6 lg:px-8">
   <div class="flex flex-wrap shadow-2">
     <div class="w-full lg:w-6 px-0 py-4 lg:p-7 bg-blue-50">
@@ -89,7 +90,7 @@
   <script lang="ts" setup>
   import { useRouter } from 'vue-router';
   import { useAuthStore } from '../../../stores/authStore';
-  import { ref } from 'vue'
+  import { ref, onMounted } from 'vue'
 
   import axios from 'axios'
 
@@ -157,69 +158,35 @@
       console.error('Login failed', error)
     }
   }
+  onMounted(async () =>{
+    if (window.particlesJS) {
+            window.particlesJS.load('particles-js', '../../../../particlesjs-config.json', function () {
+                console.log('callback - particles.js config loaded');
+            });
+        } else {
+            console.log("particlesJS is not defined");
+        }
+  })
   </script>
   
-  <style scoped>
-  header {
-    line-height: 1.5;
-    max-height: 100vh;
+  <style>
+  .login-bg {
+    background-color: #071155;
+    -webkit-background-size: cover;
+    -moz-background-size: cover;
+    -o-background-size: cover;
+    background-size: cover;
+    min-height: 100vh;
+    min-width: 100% !important;
+    background-repeat: no-repeat;
+    background-size: cover;
   }
-  
-  .logo {
-    display: block;
-    margin: 0 auto 2rem;
-  }
-  
-  nav {
+  #particles-js {
+    position: fixed;
+    top: 0;
+    left: 0;
     width: 100%;
-    font-size: 12px;
-    text-align: center;
-    margin-top: 2rem;
-  }
-  
-  nav a.router-link-exact-active {
-    color: var(--color-text);
-  }
-  
-  nav a.router-link-exact-active:hover {
-    background-color: transparent;
-  }
-  
-  nav a {
-    display: inline-block;
-    padding: 0 1rem;
-    border-left: 1px solid var(--color-border);
-  }
-  
-  nav a:first-of-type {
-    border: 0;
-  }
-  
-  @media (min-width: 1024px) {
-    header {
-      display: flex;
-      place-items: center;
-      padding-right: calc(var(--section-gap) / 2);
-    }
-  
-    .logo {
-      margin: 0 2rem 0 0;
-    }
-  
-    header .wrapper {
-      display: flex;
-      place-items: flex-start;
-      flex-wrap: wrap;
-    }
-  
-    nav {
-      text-align: left;
-      margin-left: -1rem;
-      font-size: 1rem;
-  
-      padding: 1rem 0;
-      margin-top: 1rem;
-    }
-  }
+    height: 100%;
+    pointer-events: none;
+}
   </style>
-  

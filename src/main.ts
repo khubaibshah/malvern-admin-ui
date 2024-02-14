@@ -1,5 +1,5 @@
 import './assets/style.css'
-import 'primevue/resources/themes/aura-light-green/theme.css'
+import 'primevue/resources/themes/aura-light-lime/theme.css'
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
 import PrimeVue from 'primevue/config';
@@ -22,6 +22,8 @@ import Message from 'primevue/message';
 import Checkbox from 'primevue/checkbox';
 import Divider from 'primevue/divider';
 import Carousel from 'primevue/carousel';
+import VirtualScroller from 'primevue/virtualscroller';
+
 
 
 import Toast from 'primevue/toast';
@@ -55,6 +57,7 @@ app.component('PrimeToast', Toast);
 app.component('PrimeCheckbox', Checkbox);
 app.component('PrimeDivider', Divider);
 app.component('PrimeCarousel', Carousel);
+app.component('VirtualScroller', VirtualScroller);
 
 
 app.mount('#app')
