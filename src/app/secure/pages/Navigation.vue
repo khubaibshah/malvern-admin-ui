@@ -3,12 +3,12 @@ import axios from 'axios'
 import { ref, onMounted } from 'vue';
 import { useRouter } from "vue-router";
 import { useAuthStore } from '@/stores/authStore';
+import { useUserStore } from '@/stores/userStore';
 
-
-
+const userStore = useUserStore();
 const router = useRouter();
 const authStore = useAuthStore();
-
+const me = userStore.getUser()
 // Access the token
 const token = authStore.getToken();
   const logout = async () => {
@@ -24,6 +24,7 @@ const token = authStore.getToken();
     console.log('User logged out successfully', response.data)
     authStore.clearToken(); // Clear token from store
     authStore.setAuthenticated(false); // Set user authentication status to false
+    userStore.clearUser();
     router.push({ name: 'login' }) // Redirect to home page
   } catch (error) {
     console.error('Login failed', error)
@@ -42,7 +43,7 @@ onMounted(async () => {
         >
             <div class="flex flex-column h-full">
                 <div
-                    class="flex align-items-center justify-content-center flex-shrink-0 bg-orange-500"
+                    class="flex align-items-center justify-content-center flex-shrink-0 bg-blue-500"
                     style="height: 60px"
                 >
                     <img src="../../../assets/img/favicon.png" alt="Image" height="30">
@@ -76,7 +77,7 @@ onMounted(async () => {
                                 ></i>
                                 <span
                                     class="font-medium inline text-base lg:text-xs lg:block"
-                                    >Bookings</span
+                                    >Create</span
                                 >
                             </a>
                         </li>
@@ -107,12 +108,12 @@ onMounted(async () => {
                                 }"
                             >
                                 <i
-                                    class="pi pi-chart-line mr-2 lg:mr-0 mb-0 lg:mb-2 text-base lg:text-lg"
+                                    class="pi pi-users mr-2 lg:mr-0 mb-0 lg:mb-2 text-base lg:text-lg"
                                     v-badge.danger
                                 ></i>
                                 <span
                                     class="font-medium inline text-base lg:text-xs lg:block"
-                                    >Reports</span
+                                    >Users</span
                                 >
                                 <i
                                     class="pi pi-chevron-down ml-auto lg:hidden"
@@ -121,7 +122,7 @@ onMounted(async () => {
                             <ul
                                 class="list-none pl-3 pr-0 py-0 lg:p-3 m-0 lg:ml-3 hidden overflow-y-hidden transition-all transition-duration-400 transition-ease-in-out static border-round-right lg:absolute left-100 top-0 z-1 bg-gray-900 shadow-none lg:shadow-2 w-full lg:w-15rem"
                             >
-                                <li>
+                                <!-- <li>
                                     <a
                                         v-ripple
                                         class="flex align-items-center cursor-pointer p-3 hover:bg-gray-800 border-round text-gray-300 hover:text-white transition-duration-150 transition-colors p-ripple"
@@ -130,8 +131,8 @@ onMounted(async () => {
                                             toggleClass: 'hidden',
                                         }"
                                     >
-                                        <i class="pi pi-chart-line mr-2"></i>
-                                        <span class="font-medium">Revenue</span>
+                                        <i class="pi pi-user mr-2"></i>
+                                        <span class="font-medium">Search</span>
                                         <i
                                             class="pi pi-chevron-down ml-auto"
                                         ></i>
@@ -164,15 +165,27 @@ onMounted(async () => {
                                             </a>
                                         </li>
                                     </ul>
-                                </li>
+                                </li> -->
                                 <li>
                                     <a
                                         v-ripple
                                         class="flex align-items-center cursor-pointer p-3 hover:bg-gray-800 border-round text-gray-300 hover:text-white transition-duration-150 transition-colors p-ripple"
                                     >
-                                        <i class="pi pi-chart-line mr-2"></i>
+                                        <i class="pi pi-search mr-2"></i>
                                         <span class="font-medium"
-                                            >Expenses</span
+                                            >Search</span
+                                        >
+                                    </a>
+                                </li>
+                                <li>
+                                    <a
+                                        v-ripple
+                                        class="flex align-items-center cursor-pointer p-3 hover:bg-gray-800 border-round text-gray-300 hover:text-white transition-duration-150 transition-colors p-ripple"
+                                        @click="router.push({name: 'Users'})"                                    
+                                        >
+                                        <i class="pi pi-users mr-2"></i>
+                                        <span class="font-medium"
+                                            >User Accounts</span
                                         >
                                     </a>
                                 </li>
@@ -270,6 +283,19 @@ onMounted(async () => {
                 <ul
                     class="list-none p-0 m-0 hidden lg:flex lg:align-items-center select-none lg:flex-row surface-section border-1 lg:border-none surface-border right-0 top-100 z-1 shadow-2 lg:shadow-none absolute lg:static"
                 >
+                <li class="border-top-1 surface-border lg:border-top-none">
+                        <!-- <PrimeTag icon="pi pi-user" :value="me?.name" class="tag"></PrimeTag> -->
+                        <PrimeButton icon="pi pi-user" :label="me?.name" severity="primary" raised />
+                            <div class="block lg:hidden">
+                                <div class="text-900 font-medium">
+                                    Josephine Lillard
+                                </div>
+                                <span class="text-600 font-medium text-sm"
+                                    >Marketing Specialist</span
+                                >
+                            </div>
+                        <!-- </a> -->
+                    </li>
                     <li>
                         <a
                             v-ripple
@@ -311,22 +337,7 @@ onMounted(async () => {
                             >
                         </a>
                     </li>
-                    <li class="border-top-1 surface-border lg:border-top-none">
-                        <a
-                            v-ripple
-                            class="flex p-3 lg:px-3 lg:py-2 align-items-center hover:surface-100 font-medium border-round cursor-pointer transition-duration-150 transition-colors p-ripple"
-                        >
-                            <!-- <img src="images/blocks/avatars/circle/avatar-f-1.png" class="mr-3 lg:mr-0" style="width: 32px; height: 32px"/> -->
-                            <div class="block lg:hidden">
-                                <div class="text-900 font-medium">
-                                    Josephine Lillard
-                                </div>
-                                <span class="text-600 font-medium text-sm"
-                                    >Marketing Specialist</span
-                                >
-                            </div>
-                        </a>
-                    </li>
+                    
                 </ul>
             </div>
             <div class="p-4 flex flex-column flex-auto" style="max-height: 93vh; overflow-y: auto;">

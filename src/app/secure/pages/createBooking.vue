@@ -1,5 +1,8 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
+import { useToast } from 'primevue/usetoast';
+import { useAuthStore } from '@/stores/authStore';
+
 import axios from 'axios'
 
 const name = ref('')
@@ -13,6 +16,12 @@ const formattedDate = ref('')
 const successMessage = ref('')
 const errorMessage = ref('')
 
+
+const authStore = useAuthStore();
+// Access the token
+const token = authStore.getToken();
+const toast = useToast();
+
 const createBooking = async () => {
   try {
     const userBooking = {
@@ -24,7 +33,13 @@ const createBooking = async () => {
       notes: notes.value // Format the date before sending
     }
 
-    const response = await axios.post('http://127.0.0.1:8000/api/bookings', userBooking)
+    const response = await axios.post('http://127.0.0.1:8000/api/bookings', userBooking, {
+        headers: {
+          'Authorization': 'Bearer ' + token,
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*'
+        }
+      })
     console.log('Booking response:', response.data)
 
     // Optionally, you can reset the form fields after successful submission
@@ -36,16 +51,13 @@ const createBooking = async () => {
     notes.value = ''
 
     // Set success message
-    successMessage.value = 'Booking created successfully'
+    toast.add({ severity: 'success', summary: 'Info', detail: 'Booking created successfully', life: 3000 });
     // Clear any previous error message
-    errorMessage.value = ''
   } catch (error) {
     console.error('Error creating booking:', error)
-
     // Set error message
-    errorMessage.value = "Booking couldn't be created. Please try again."
-    // Clear any previous success message
-    successMessage.value = ''
+    toast.add({ severity: 'error', summary: 'Info', detail: 'Booking couldnt be created. Please try again', life: 3000 });
+
   }
 }
 
@@ -70,15 +82,8 @@ onMounted(async () =>{
 </script>
 <template>
   <div>
+    <PrimeToast />
     <div class="surface-section px-4 py-5 md:px-6 lg:px-8 mt-3">
-      <div v-if="successMessage" class="mb-5">
-        <PrimeMessage severity="success">{{ successMessage }}</PrimeMessage>
-      </div>
-
-      <!-- Error Message -->
-      <div v-if="errorMessage" class="mb-5">
-        <PrimeMessage severity="error">{{ errorMessage }}</PrimeMessage>
-      </div>
       <div
         class="flex md:align-items-center md:justify-content-between flex-column md:flex-row pb-4 border-bottom-1 surface-border"
       >

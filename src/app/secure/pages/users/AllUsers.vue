@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import axios from 'axios'
-import { useAuthStore } from '@/stores/authStore';
+import { useAuthStore } from '../../../../stores/authStore';
 const authStore = useAuthStore();
 
 // Access the token
@@ -10,7 +10,7 @@ const bookings = ref()
 
 const getAllUsers = async () => {
   try {
-    const response = await axios.get('http://127.0.0.1:8000/api/bookings',{
+    const response = await axios.get('http://127.0.0.1:8000/api/users',{
       headers: {
         'Authorization': "Bearer "+token,
         'Content-Type': 'application/json',
@@ -27,16 +27,15 @@ onMounted(async () => {
 })
 </script>
 
-<!-- resources/js/components/About.vue -->
 <template>
-  <div>
+    <div>
     <div class="surface-section px-4 py-5 md:px-6 lg:px-8 mt-3">
       <div
         class="flex md:align-items-center md:justify-content-between flex-column md:flex-row pb-4 border-bottom-1 surface-border"
       >
         <div class="mb-3 lg:mb-0">
-          <div class="text-3xl font-medium text-900 mb-3">Bookings</div>
-          <div class="text-500 mr-0 md:mr-3">Below are all the bookings created</div>
+          <div class="text-3xl font-medium text-900 mb-3">Users</div>
+          <div class="text-500 mr-0 md:mr-3">Below are all the Users </div>
         </div>
         <span class="p-input-icon-left w-full md:w-auto">
           <i class="pi pi-search"></i>
@@ -62,12 +61,7 @@ onMounted(async () => {
         <PrimeColumn field="id" header="User Id" style="width: 8%" sortable ></PrimeColumn>
         <PrimeColumn field="name" header="Name" sortable></PrimeColumn>
         <PrimeColumn field="email" header="Email" sortable></PrimeColumn>
-        <PrimeColumn field="phone_number" header="Phone" sortable></PrimeColumn>
-        <PrimeColumn field="vehicle_make_model" header="Vehicle" sortable></PrimeColumn>
-        <PrimeColumn field="notes" header="Notes" sortable></PrimeColumn>
-        <PrimeColumn field="booking_datetime" header="Booking Time" sortable></PrimeColumn>
-        <PrimeColumn field="created_at" header="Booking created" sortable></PrimeColumn>
-        <PrimeColumn field="updated_at" header="Booking updated" sortable></PrimeColumn>
+        <PrimeColumn field="created_at" header="Created" sortable></PrimeColumn>
       </DataTable>
     </div>
   </div>

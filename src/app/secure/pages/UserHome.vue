@@ -4,13 +4,22 @@
                 <div class="col-12">
                     <div class="grid">
                         <div class="col-12 md:col-6 lg:col-3 p-3">
-                            <div class="p-3 text-center bg-blue-500 border-round">
-                                <span class="inline-flex justify-content-center align-items-center bg-blue-600 border-circle mb-3 p-3">
-                                    <i class="pi pi-inbox text-xl text-white"></i>
+                            <a
+                                v-ripple
+                                class="flex flex-row lg:flex-column align-items-center cursor-pointer
+                                 p-3 lg:justify-content-center bg-blue-500 hover:bg-blue-600 border-round text-gray-300 
+                                hover:text-black transition-duration-150 transition-colors p-ripple"
+                            >
+                                <span
+                                    class="font-medium inline text-base lg:text-xs lg:block"
+                                    ><span class="inline-flex justify-content-center align-items-center bg-blue-600 border-circle mb-3 p-3">
+                                    <i class="pi pi-car text-xl text-white"></i>
                                 </span>
                                 <div class="text-2xl font-medium text-white mb-2">123K</div>
-                                <span class="text-blue-100 font-medium">Messages</span>
-                            </div>
+                                <span class="text-blue-100 font-large">Bookings</span>
+                            </span>
+                            </a>
+
                         </div>
                         <div class="col-12 md:col-6 lg:col-3 p-3">
                             <div class="p-3 text-center bg-purple-500 border-round">
@@ -41,7 +50,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-12 lg:col-6">
+                <!-- <div class="col-12 lg:col-6">
                     <div class="shadow-2 surface-card border-round p-3">
                         <div class="flex align-items-center justify-content-between">
                             <span class="text-xl font-medium text-900">Traffic Distribution</span>
@@ -93,7 +102,7 @@
                             </div>
                         </div>
                     </div>
-                </div>
+                </div> -->
                 </div>
                 </div>
 </template>

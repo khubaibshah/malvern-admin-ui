@@ -25,3 +25,8 @@
     overflow: scroll;
 
   }
+  .tag{
+    width: 15vh;
+    height: 4vh;
+    font-size: medium;
+  }

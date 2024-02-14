@@ -90,11 +90,14 @@
   <script lang="ts" setup>
   import { useRouter } from 'vue-router';
   import { useAuthStore } from '../../../stores/authStore';
+  import { useUserStore } from '@/stores/userStore';
   import { ref, onMounted } from 'vue'
 
   import axios from 'axios'
 
   const authStore = useAuthStore();
+  const userStore = useUserStore();
+
   const router = useRouter()
 
 
@@ -151,6 +154,8 @@
         }
       })
       user.value = data
+      userStore.setUser(user.value);
+      console.log('user details',user.value)
       if (user.value) {
         router.push({name: 'Userhome'}); // Push to the correct route
       }

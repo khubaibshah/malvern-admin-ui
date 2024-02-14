@@ -1,5 +1,5 @@
 import './assets/style.css'
-import 'primevue/resources/themes/aura-light-lime/theme.css'
+import 'primevue/resources/themes/aura-light-indigo/theme.css';
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
 import PrimeVue from 'primevue/config';
@@ -23,6 +23,7 @@ import Checkbox from 'primevue/checkbox';
 import Divider from 'primevue/divider';
 import Carousel from 'primevue/carousel';
 import VirtualScroller from 'primevue/virtualscroller';
+import Tag from 'primevue/tag';
 
 
 
@@ -58,6 +59,7 @@ app.component('PrimeCheckbox', Checkbox);
 app.component('PrimeDivider', Divider);
 app.component('PrimeCarousel', Carousel);
 app.component('VirtualScroller', VirtualScroller);
+app.component('PrimeTag', Tag);
 
 
 app.mount('#app')
