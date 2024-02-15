@@ -37,31 +37,16 @@ const getBookings = async () => {
   }
 }
 
-const getBookingsToday = async () => {
-  const bookingsDate = bookings.value
-
-  const today = new Date(new Date().toDateString())
-  const tomorrow = new Date(today)
+const setBookingDateTimeForTomorrow = () => {
+  const tomorrow = new Date()
   tomorrow.setDate(tomorrow.getDate() + 1)
-  tomorrow.setHours(0, 0, 0, 0) // Set time to midnight
-
-  // Filter bookings for tomorrow
-  bookingsForTomorrow.value = bookingsDate.filter((element) => {
-    let bookingDate
-    if (typeof element.booking_datetime === 'string') {
-      bookingDate = new Date(element.booking_datetime)
-    } else if (element.booking_datetime instanceof Date) {
-      bookingDate = element.booking_datetime
-    }
-    // Remove time part and compare
-    bookingDate = new Date(bookingDate.toDateString())
-    return bookingDate.getTime() === tomorrow.getTime()
-  })
-
-  // Set the display flag to true to show tomorrow's bookings
-  displayTomorrowBookings.value = true
+  filters.value.booking_datetime.value = tomorrow.toISOString().substring(0, 10)
 }
-
+const clearFilter = () => {
+    for (const key in filters.value) {
+        filters.value[key].value = null;
+    }
+};
 // Load bookings when component is mounted
 onMounted(async () => {
   await getBookings()
@@ -77,7 +62,7 @@ onMounted(async () => {
             <a
               v-ripple
               class="flex flex-row lg:flex-column align-items-center cursor-pointer p-3 lg:justify-content-center bg-blue-500 hover:bg-blue-600 border-round text-gray-300 hover:text-black transition-duration-150 transition-colors p-ripple"
-              @click="getBookingsToday"
+              @click="setBookingDateTimeForTomorrow"
             >
               <div class="p-2 text-center border-round">
                 <span class="font-medium inline text-base lg:text-xs lg:block"
@@ -129,7 +114,7 @@ onMounted(async () => {
     </div>
 
     <PrimeCard class="mb-1">
-      <template #title>Simple PrimeCard</template>
+      <template #title>Bookings</template>
       <template #content>
         <DataTable
           v-model:filters="filters"
@@ -141,6 +126,11 @@ onMounted(async () => {
           :rows="6"
           :globalFilterFields="['name', 'email']"
         >
+        <template #header>
+                <div class="flex justify-content-between">
+                    <PrimeButton type="button" icon="pi pi-filter-slash" label="Clear" outlined @click="clearFilter()" />
+                </div>
+            </template>
           <PrimeColumn field="name" header="Name" style="width: 15%" sortable>
             <template #body="{ data }">
               {{ data.name }}

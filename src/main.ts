@@ -26,6 +26,9 @@ import VirtualScroller from 'primevue/virtualscroller';
 import Tag from 'primevue/tag';
 import Fieldset from 'primevue/fieldset';
 import Card from 'primevue/card';
+import IconField from 'primevue/iconfield';
+import InputIcon from 'primevue/inputicon';
+
 
 
 
@@ -66,6 +69,8 @@ app.component('VirtualScroller', VirtualScroller);
 app.component('PrimeTag', Tag);
 app.component('PrimeFieldset', Fieldset);
 app.component('PrimeCard', Card);
+app.component('IconField', IconField);
+app.component('InputIcon', InputIcon);
 
 app.config.globalProperties.$filters = {
     currencyGBP(value: number | string) {
