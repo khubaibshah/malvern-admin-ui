@@ -181,6 +181,18 @@ onMounted(async () => {
                                     <a
                                         v-ripple
                                         class="flex align-items-center cursor-pointer p-3 hover:bg-gray-800 border-round text-gray-300 hover:text-white transition-duration-150 transition-colors p-ripple"
+                                        @click="router.push({name: 'User'})"
+                                        >
+                                        <i class="pi pi-user mr-2"></i>
+                                        <span class="font-medium"
+                                            >User</span
+                                        >
+                                    </a>
+                                </li>
+                                <li>
+                                    <a
+                                        v-ripple
+                                        class="flex align-items-center cursor-pointer p-3 hover:bg-gray-800 border-round text-gray-300 hover:text-white transition-duration-150 transition-colors p-ripple"
                                         @click="router.push({name: 'Users'})"                                    
                                         >
                                         <i class="pi pi-users mr-2"></i>
@@ -285,7 +297,7 @@ onMounted(async () => {
                 >
                 <li class="border-top-1 surface-border lg:border-top-none">
                         <!-- <PrimeTag icon="pi pi-user" :value="me?.name" class="tag"></PrimeTag> -->
-                        <PrimeButton icon="pi pi-user" :label="me?.name" severity="primary" raised />
+                        <PrimeButton icon="pi pi-user" :label="me?.name" severity="primary" raised @click="router.push({name: 'User'})"/>
                             <div class="block lg:hidden">
                                 <div class="text-900 font-medium">
                                     Josephine Lillard

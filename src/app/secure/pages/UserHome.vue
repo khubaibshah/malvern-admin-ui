@@ -190,7 +190,7 @@ onMounted(async () => {
           <PrimeColumn field="notes" header="Notes" sortable></PrimeColumn>
           <PrimeColumn field="booking_datetime" header="Booking Time" sortable style="width: 10%">
         <template v-slot:body="rowData">
-          {{ $filters.formatDateTime(rowData.data.booking_datetime) }}
+          {{ $filters.formatDate(rowData.data.booking_datetime) }}
         </template>
         <template #filter="{ filterModel, filterCallback }">
           <InputText
@@ -201,9 +201,6 @@ onMounted(async () => {
             placeholder="dd-mm-yyyy"
           />
         </template>
-            <!-- <template v-slot:body="rowData">
-              {{ $filters.formatDate(rowData.data.booking_datetime) }}
-            </template> -->
           </PrimeColumn>
           <PrimeColumn field="created_at" header="Booking created" sortable style="width: 12%">
             <template v-slot:body="rowData">
@@ -219,11 +216,6 @@ onMounted(async () => {
           />
         </template>
           </PrimeColumn>
-          <!-- <PrimeColumn field="updated_at" header="Booking updated" sortable>
-            <template v-slot:body="rowData">
-              {{ $filters.formatDateTime(rowData.data.updated_at) }}
-            </template>
-          </PrimeColumn> -->
         </DataTable>
       </template>
     </PrimeCard>

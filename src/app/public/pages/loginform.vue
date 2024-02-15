@@ -88,13 +88,16 @@
 </div>
 </template>
   <script lang="ts" setup>
+  import { ref, onMounted } from 'vue'
+
   import { useRouter } from 'vue-router';
   import { useAuthStore } from '../../../stores/authStore';
   import { useUserStore } from '@/stores/userStore';
-  import { ref, onMounted } from 'vue'
+  import { useToast } from 'primevue/usetoast';
 
   import axios from 'axios'
 
+  const toast = useToast();
   const authStore = useAuthStore();
   const userStore = useUserStore();
 
@@ -142,7 +145,12 @@
           'Access-Control-Allow-Origin': '*'
         }
       })
-  
+      console.log(response)
+      if(response.data.token){
+        toast.add({ severity: 'success', summary: 'Info', detail: 'Logged in successfully', life: 3000 });
+      }else{
+        toast.add({ severity: 'error', summary: 'Info', detail: 'Login failed', life: 3000 });
+      }
       authStore.setAuthenticated(true)
       const token = response.data.token
       authStore.setToken(response.data.token); // Store token in authStore
@@ -156,10 +164,13 @@
       user.value = data
       userStore.setUser(user.value);
       console.log('user details',user.value)
+      toast.add({ severity: 'success', summary: 'Info', detail: 'Logged in successfully', life: 3000 });
       if (user.value) {
+        toast.add({ severity: 'success', summary: 'Info', detail: 'Logged in successfully', life: 3000 });
         router.push({name: 'Userhome'}); // Push to the correct route
       }
     } catch (error) {
+      toast.add({ severity: 'error', summary: 'Info', detail: 'Login failed', life: 3000 });
       console.error('Login failed', error)
     }
   }

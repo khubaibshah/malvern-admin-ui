@@ -61,7 +61,11 @@ onMounted(async () => {
         <PrimeColumn field="id" header="User Id" style="width: 8%" sortable ></PrimeColumn>
         <PrimeColumn field="name" header="Name" sortable></PrimeColumn>
         <PrimeColumn field="email" header="Email" sortable></PrimeColumn>
-        <PrimeColumn field="created_at" header="Created" sortable></PrimeColumn>
+        <PrimeColumn field="created_at" header="Created" sortable>
+          <template v-slot:body="rowData">
+          {{ $filters.formatDateTime(rowData.data.created_at) }}
+        </template>
+        </PrimeColumn>
       </DataTable>
     </div>
   </div>
