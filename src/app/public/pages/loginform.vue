@@ -163,7 +163,7 @@
       })
       user.value = data
       userStore.setUser(user.value);
-      console.log('user details',user.value)
+      // console.log('user details',user.value)
       toast.add({ severity: 'success', summary: 'Info', detail: 'Logged in successfully', life: 3000 });
       if (user.value) {
         toast.add({ severity: 'success', summary: 'Info', detail: 'Logged in successfully', life: 3000 });

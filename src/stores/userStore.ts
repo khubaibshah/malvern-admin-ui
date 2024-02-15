@@ -13,7 +13,6 @@ export const useUserStore = defineStore('user', {
   actions: {
     setUser(user: User | null) {
       this.user = user;
-      console.log('from store',this.user)
     },
     clearUser() {
       this.user = null;
