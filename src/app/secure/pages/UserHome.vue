@@ -1,108 +1,243 @@
-<template>
-    <div class="p-5 flex flex-column flex-auto">
-            <div class="grid">
-                <div class="col-12">
-                    <div class="grid">
-                        <div class="col-12 md:col-6 lg:col-3 p-3">
-                            <a
-                                v-ripple
-                                class="flex flex-row lg:flex-column align-items-center cursor-pointer
-                                 p-3 lg:justify-content-center bg-blue-500 hover:bg-blue-600 border-round text-gray-300 
-                                hover:text-black transition-duration-150 transition-colors p-ripple"
-                            >
-                                <span
-                                    class="font-medium inline text-base lg:text-xs lg:block"
-                                    ><span class="inline-flex justify-content-center align-items-center bg-blue-600 border-circle mb-3 p-3">
-                                    <i class="pi pi-car text-xl text-white"></i>
-                                </span>
-                                <div class="text-2xl font-medium text-white mb-2">123K</div>
-                                <span class="text-blue-100 font-large">Bookings</span>
-                            </span>
-                            </a>
+<script setup lang="ts">
+import TodaysBookings from './bookingsToday/TodayBooking.vue'
+import { ref, onMounted } from 'vue'
+import axios from 'axios'
+import { useAuthStore } from '@/stores/authStore'
+import { useBookingsStore } from '@/stores/bookingsStore'
+import { FilterMatchMode } from 'primevue/api'
+const authStore = useAuthStore()
+const bookingsStore = useBookingsStore()
 
-                        </div>
-                        <div class="col-12 md:col-6 lg:col-3 p-3">
-                            <div class="p-3 text-center bg-purple-500 border-round">
-                                <span class="inline-flex justify-content-center align-items-center bg-purple-600 border-circle mb-3 p-3">
-                                    <i class="pi pi-map-marker text-xl text-white"></i>
-                                </span>
-                                <div class="text-2xl font-medium text-white mb-2">23K</div>
-                                <span class="text-purple-100 font-medium">Check-ins</span>
-                            </div>
-                        </div>
-                        <div class="col-12 md:col-6 lg:col-3 p-3">
-                            <div class="p-3 text-center bg-indigo-500 border-round">
-                                <span class="inline-flex justify-content-center align-items-center bg-indigo-600 border-circle mb-3 p-3">
-                                    <i class="pi pi-file text-xl text-white"></i>
-                                </span>
-                                <div class="text-2xl font-medium text-white mb-2">23K</div>
-                                <span class="text-indigo-100 font-medium">Files</span>
-                            </div>
-                        </div>
-                        <div class="col-12 md:col-6 lg:col-3 p-3">
-                            <div class="p-3 text-center bg-orange-500 border-round">
-                                <span class="inline-flex justify-content-center align-items-center bg-orange-600 border-circle mb-3 p-3">
-                                    <i class="pi pi-users text-xl text-white"></i>
-                                </span>
-                                <div class="text-2xl font-medium text-white mb-2">40K</div>
-                                <span class="text-orange-100 font-medium">Users</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <!-- <div class="col-12 lg:col-6">
-                    <div class="shadow-2 surface-card border-round p-3">
-                        <div class="flex align-items-center justify-content-between">
-                            <span class="text-xl font-medium text-900">Traffic Distribution</span>
-                        </div>
-                        <div class="mt-3">
-                            <div class="grid">
-                                <div class="col-12 md:col-6">
-                                    <div class="text-center border-1 surface-border border-round p-4">
-                                        <i class="pi pi-twitter text-5xl text-blue-500"></i>
-                                        <div class="text-900 text-2xl font-700 my-3 font-bold">12.40K</div>
-                                        <span class="font-medium text-600">Twitter</span>
-                                    </div>
-                                </div>
-                                <div class="col-12 md:col-6 text-center">
-                                    <div class="text-center border-1 surface-border border-round p-4">
-                                        <i class="pi pi-vimeo text-5xl text-blue-500"></i>
-                                        <div class="text-900 text-2xl font-700 my-3 font-bold">10.20K</div>
-                                        <span class="font-medium text-600">Vimeo</span>
-                                    </div>
-                                </div>
-                                <div class="col-12 md:col-6 text-center">
-                                    <div class="text-center border-1 surface-border border-round p-4">
-                                        <i class="pi pi-facebook text-5xl text-blue-500"></i>
-                                        <div class="text-900 text-2xl font-700 my-3 font-bold">5.60K</div>
-                                        <span class="font-medium text-600">Facebook</span>
-                                    </div>
-                                </div>
-                                <div class="col-12 md:col-6 text-center">
-                                    <div class="text-center border-1 surface-border border-round p-4">
-                                        <i class="pi pi-discord text-5xl text-indigo-500"></i>
-                                        <div class="text-900 text-2xl font-700 my-3 font-bold">23.53K</div>
-                                        <span class="font-medium text-600">Discord</span>
-                                    </div>
-                                </div>
-                                <div class="col-12 md:col-6 text-center">
-                                    <div class="text-center border-1 surface-border border-round p-4">
-                                        <i class="pi pi-github text-5xl text-purple-500"></i>
-                                        <div class="text-900 text-2xl font-700 my-3 font-bold">16.70K</div>
-                                        <span class="font-medium text-600">GitHub</span>
-                                    </div>
-                                </div>
-                                <div class="col-12 md:col-6 text-center">
-                                    <div class="text-center border-1 surface-border border-round p-4">
-                                        <i class="pi pi-google text-5xl text-pink-500"></i>
-                                        <div class="text-900 text-2xl font-700 my-3 font-bold">16.50K</div>
-                                        <span class="font-medium text-600">Google</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div> -->
-                </div>
-                </div>
+const token = authStore.getToken()
+const bookings = ref([])
+const bookingsForTomorrow = ref([])
+const displayTomorrowBookings = ref(false) // Reactive variable to toggle between today's and tomorrow's bookings
+// const loading = ref(true);
+const filters = ref({
+  name: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+  email: { value: null, matchMode: FilterMatchMode.CONTAINS  },
+  phone_number: { value: null, matchMode: FilterMatchMode.CONTAINS  },
+  booking_datetime: { value: null, matchMode: FilterMatchMode.CONTAINS  },
+  created_at: { value: null, matchMode: FilterMatchMode.CONTAINS  },
+  vehicle_make_model: { value: null, matchMode: FilterMatchMode.CONTAINS  },
+})
+const getBookings = async () => {
+  try {
+    const response = await axios.get('http://127.0.0.1:8000/api/bookings', {
+      headers: {
+        Authorization: 'Bearer ' + token,
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*'
+      }
+    })
+    bookings.value = response.data
+    bookingsStore.setBookings(bookings.value)
+  } catch (error) {
+    console.error('Error fetching bookings:', error)
+  }
+}
+
+const getBookingsToday = async () => {
+  const bookingsDate = bookings.value
+
+  const today = new Date(new Date().toDateString())
+  const tomorrow = new Date(today)
+  tomorrow.setDate(tomorrow.getDate() + 1)
+  tomorrow.setHours(0, 0, 0, 0) // Set time to midnight
+
+  // Filter bookings for tomorrow
+  bookingsForTomorrow.value = bookingsDate.filter((element) => {
+    let bookingDate
+    if (typeof element.booking_datetime === 'string') {
+      bookingDate = new Date(element.booking_datetime)
+    } else if (element.booking_datetime instanceof Date) {
+      bookingDate = element.booking_datetime
+    }
+    // Remove time part and compare
+    bookingDate = new Date(bookingDate.toDateString())
+    return bookingDate.getTime() === tomorrow.getTime()
+  })
+
+  // Set the display flag to true to show tomorrow's bookings
+  displayTomorrowBookings.value = true
+}
+
+// Load bookings when component is mounted
+onMounted(async () => {
+  await getBookings()
+})
+</script>
+
+<template>
+  <div class="p-5 flex flex-column flex-auto">
+    <div class="grid">
+      <div class="col-12">
+        <div class="grid">
+          <div class="col-12 md:col-6 lg:col-3 p-3">
+            <a
+              v-ripple
+              class="flex flex-row lg:flex-column align-items-center cursor-pointer p-3 lg:justify-content-center bg-blue-500 hover:bg-blue-600 border-round text-gray-300 hover:text-black transition-duration-150 transition-colors p-ripple"
+              @click="getBookingsToday"
+            >
+              <div class="p-2 text-center border-round">
+                <span class="font-medium inline text-base lg:text-xs lg:block"
+                  ><span
+                    class="inline-flex justify-content-center align-items-center bg-blue-600 border-circle mb-3 p-3"
+                  >
+                    <i class="pi pi-car text-xl text-white"></i>
+                  </span>
+                  <div class="text-2xl font-medium text-white mb-2">Todays Bookings</div>
+                </span>
+              </div>
+            </a>
+          </div>
+          <div class="col-12 md:col-6 lg:col-3 p-3">
+            <div class="p-3 text-center bg-purple-500 border-round">
+              <span
+                class="inline-flex justify-content-center align-items-center bg-purple-600 border-circle mb-3 p-3"
+              >
+                <i class="pi pi-map-marker text-xl text-white"></i>
+              </span>
+              <div class="text-2xl font-medium text-white mb-2">23K</div>
+              <span class="text-purple-100 font-medium">Check-ins</span>
+            </div>
+          </div>
+          <div class="col-12 md:col-6 lg:col-3 p-3">
+            <div class="p-3 text-center bg-indigo-500 border-round">
+              <span
+                class="inline-flex justify-content-center align-items-center bg-indigo-600 border-circle mb-3 p-3"
+              >
+                <i class="pi pi-file text-xl text-white"></i>
+              </span>
+              <div class="text-2xl font-medium text-white mb-2">23K</div>
+              <span class="text-indigo-100 font-medium">Files</span>
+            </div>
+          </div>
+          <div class="col-12 md:col-6 lg:col-3 p-3">
+            <div class="p-3 text-center bg-orange-500 border-round">
+              <span
+                class="inline-flex justify-content-center align-items-center bg-orange-600 border-circle mb-3 p-3"
+              >
+                <i class="pi pi-users text-xl text-white"></i>
+              </span>
+              <div class="text-2xl font-medium text-white mb-2">40K</div>
+              <span class="text-orange-100 font-medium">Users</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <PrimeCard class="mb-1">
+      <template #title>Simple PrimeCard</template>
+      <template #content>
+        <DataTable
+          v-model:filters="filters"
+          :value="displayTomorrowBookings ? bookingsForTomorrow : bookings"
+          filterDisplay="row"
+          sortField="id"
+          :sortOrder="-1"
+          paginator
+          :rows="6"
+          :globalFilterFields="['name', 'email']"
+        >
+          <PrimeColumn field="name" header="Name" style="width: 15%" sortable>
+            <template #body="{ data }">
+              {{ data.name }}
+            </template>
+            <template #filter="{ filterModel, filterCallback }">
+              <InputText
+                v-model="filterModel.value"
+                type="text"
+                @input="filterCallback()"
+                class="p-column-filter"
+                placeholder="Name"
+              />
+            </template>
+          </PrimeColumn>
+          <PrimeColumn field="email" header="Email" sortable>
+            <template #body="{ data }">
+              {{ data.email }}
+            </template>
+            <template #filter="{ filterModel, filterCallback }">
+              <InputText
+                v-model="filterModel.value"
+                type="text"
+                @input="filterCallback()"
+                class="p-column-filter"
+                placeholder="Email"
+              />
+            </template>
+          </PrimeColumn>
+          <PrimeColumn field="phone_number" header="Phone" sortable>
+            <template #body="{ data }">
+              {{ data.phone_number }}
+            </template>
+            <template #filter="{ filterModel, filterCallback }">
+              <InputText
+                v-model="filterModel.value"
+                type="text"
+                @input="filterCallback()"
+                class="p-column-filter"
+                placeholder="Phone"
+              />
+            </template>
+          </PrimeColumn>
+          <PrimeColumn field="vehicle_make_model" header="Vehicle" sortable style="width: 12%">
+            <template v-slot:body="rowData">
+          {{ rowData.data.vehicle_make_model }}
+        </template>
+        <template #filter="{ filterModel, filterCallback }">
+          <InputText
+            v-model="filterModel.value"
+            type="text"
+            @input="filterCallback()"
+            class="p-column-filter"
+             
+          />
+        </template>
+          </PrimeColumn>
+          <PrimeColumn field="notes" header="Notes" sortable></PrimeColumn>
+          <PrimeColumn field="booking_datetime" header="Booking Time" sortable style="width: 10%">
+        <template v-slot:body="rowData">
+          {{ $filters.formatDateTime(rowData.data.booking_datetime) }}
+        </template>
+        <template #filter="{ filterModel, filterCallback }">
+          <InputText
+            v-model="filterModel.value"
+            type="date"
+            @input="filterCallback()"
+            class="p-column-filter"
+            placeholder="dd-mm-yyyy"
+          />
+        </template>
+            <!-- <template v-slot:body="rowData">
+              {{ $filters.formatDate(rowData.data.booking_datetime) }}
+            </template> -->
+          </PrimeColumn>
+          <PrimeColumn field="created_at" header="Booking created" sortable style="width: 12%">
+            <template v-slot:body="rowData">
+              {{ $filters.formatDateTime(rowData.data.created_at) }}
+            </template>
+            <template #filter="{ filterModel, filterCallback }">
+          <InputText
+            v-model="filterModel.value"
+            type="date"
+            @input="filterCallback()"
+            class="p-column-filter"
+            placeholder="dd-mm-yyyy"
+          />
+        </template>
+          </PrimeColumn>
+          <!-- <PrimeColumn field="updated_at" header="Booking updated" sortable>
+            <template v-slot:body="rowData">
+              {{ $filters.formatDateTime(rowData.data.updated_at) }}
+            </template>
+          </PrimeColumn> -->
+        </DataTable>
+      </template>
+    </PrimeCard>
+
+    <!-- <TodaysBookings /> -->
+  </div>
 </template>

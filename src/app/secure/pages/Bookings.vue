@@ -1,30 +1,7 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
-import axios from 'axios'
-import { useAuthStore } from '@/stores/authStore';
-const authStore = useAuthStore();
-
-// Access the token
-const token = authStore.getToken();
-const bookings = ref()
-
-const getAllUsers = async () => {
-  try {
-    const response = await axios.get('http://127.0.0.1:8000/api/bookings',{
-      headers: {
-        'Authorization': "Bearer "+token,
-        'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': '*'
-      }
-    })
-    bookings.value = response.data
-  } catch (error) {
-    console.error('Error fetching bookings:', error)
-  }
-}
-onMounted(async () => {
-  getAllUsers()
-})
+import { useBookingsStore } from '@/stores/bookingsStore';
+const bookingsStore = useBookingsStore();
+const allbookings = bookingsStore.getBookings;
 </script>
 
 <!-- resources/js/components/About.vue -->
@@ -48,7 +25,7 @@ onMounted(async () => {
     <div class="surface-section md:px-7 lg:px-8">
       <!-- <router-link to="/">Go to Home</router-link> -->
 
-      <DataTable :value="bookings" sortField="id" :sortOrder="-1" paginator :rows="6" >
+      <DataTable :value="allbookings" sortField="id" :sortOrder="-1" paginator :rows="6" >
         <!-- <template #header>
                 <div class="flex justify-content-end">
                     <IconField iconPosition="left">
@@ -65,9 +42,22 @@ onMounted(async () => {
         <PrimeColumn field="phone_number" header="Phone" sortable></PrimeColumn>
         <PrimeColumn field="vehicle_make_model" header="Vehicle" sortable></PrimeColumn>
         <PrimeColumn field="notes" header="Notes" sortable></PrimeColumn>
-        <PrimeColumn field="booking_datetime" header="Booking Time" sortable></PrimeColumn>
-        <PrimeColumn field="created_at" header="Booking created" sortable></PrimeColumn>
-        <PrimeColumn field="updated_at" header="Booking updated" sortable></PrimeColumn>
+        <PrimeColumn field="booking_datetime" header="Booking Time" sortable>
+          <template v-slot:body="rowData">
+                        {{ $filters.formatDateTime(rowData.data.booking_datetime) }}
+                        </template>
+
+        </PrimeColumn>
+        <PrimeColumn field="created_at" header="Booking created" sortable>
+          <template v-slot:body="rowData">
+                        {{ $filters.formatDateTime(rowData.data.created_at) }}
+                        </template>
+        </PrimeColumn>
+        <PrimeColumn field="updated_at" header="Booking updated" sortable>
+          <template v-slot:body="rowData">
+                        {{ $filters.formatDateTime(rowData.data.updated_at) }}
+                        </template>
+        </PrimeColumn>
       </DataTable>
     </div>
   </div>

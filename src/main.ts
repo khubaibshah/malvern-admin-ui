@@ -24,6 +24,10 @@ import Divider from 'primevue/divider';
 import Carousel from 'primevue/carousel';
 import VirtualScroller from 'primevue/virtualscroller';
 import Tag from 'primevue/tag';
+import Fieldset from 'primevue/fieldset';
+import Card from 'primevue/card';
+
+
 
 
 
@@ -60,6 +64,30 @@ app.component('PrimeDivider', Divider);
 app.component('PrimeCarousel', Carousel);
 app.component('VirtualScroller', VirtualScroller);
 app.component('PrimeTag', Tag);
+app.component('PrimeFieldset', Fieldset);
+app.component('PrimeCard', Card);
 
+app.config.globalProperties.$filters = {
+    currencyGBP(value: number | string) {
+        return Intl.NumberFormat("en-GB", {
+            style: "currency",
+            currency: import.meta.env.VITE_APP_REGION === 'UK' ? 'GBP' : 'EUR',
+            currencyDisplay: 'symbol',
+        }).format(Number(value))
+    },
+    formatDate: (value: string) => {
+        return new Intl.DateTimeFormat('en-GB').format(new Date(value));
+    },
+    formatDateTime: (value: string) => {
+        const options = {
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+            hour: '2-digit',
+            minute: '2-digit',
+        };
+        return new Intl.DateTimeFormat('en-GB', options).format(new Date(value));
+    },
+};
 
 app.mount('#app')
