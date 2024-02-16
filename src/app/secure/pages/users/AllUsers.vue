@@ -2,6 +2,7 @@
 import { ref, onMounted } from 'vue'
 import axios from 'axios'
 import { useAuthStore } from '../../../../stores/authStore';
+import userService from '@/services/userService';
 const authStore = useAuthStore();
 
 // Access the token
@@ -12,14 +13,8 @@ const bookings = ref()
 
 const getAllUsers = async () => {
   try {
-    const response = await axios.get('http://127.0.0.1:8000/api/users',{
-      headers: {
-        'Authorization': "Bearer "+seshId,
-        'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': '*'
-      }
-    })
-    bookings.value = response.data
+    const response = await userService.getAllUsers(seshId)
+    bookings.value = response
   } catch (error) {
     console.error('Error fetching bookings:', error)
   }

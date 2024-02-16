@@ -74,6 +74,23 @@ class UserService {
       console.error('Login failed', error)
     }
   }
+  getAllUsers = async (token: string | null) => {
+    try {
+      const apiCall = 'http://127.0.0.1:8000/api/users'
+      const config = {
+        headers: {
+          'Authorization': "Bearer "+token,
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*'
+        }
+      }
+      const response = await axios.get(apiCall, config)
+      return response.data
+      console.log('all users from service', response.data)
+    } catch (error) {
+      console.error('Error fetching bookings:', error)
+    }
+  }
 //   register = async () =>{
 //     const apiCall = 'http://127.0.0.1:8000/api/register'
 //         const config = {

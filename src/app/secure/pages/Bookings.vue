@@ -1,9 +1,29 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { onMounted, ref } from 'vue';
 import { useBookingsStore } from '@/stores/bookingsStore';
 import { FilterMatchMode } from 'primevue/api'
+
+import BookingService from './../../../services/bookingService'
+
 const bookingsStore = useBookingsStore();
-const allbookings = bookingsStore.getBookings;
+const allbookings = ref()
+const seshId = sessionStorage.getItem('token')
+
+const getBookings = async () => {
+  try {
+    if (!bookingsStore.hasBooking()) {
+      const response = await BookingService.getBookings(seshId);
+      allbookings.value = response;
+      bookingsStore.setBookings(allbookings.value);
+      console.log('no booking data stored, should only show on first load and reload.')
+    }else{
+      allbookings.value = bookingsStore.getBookings;
+      console.log('booking data from store, should show everytime i nav away and back')
+    }
+  } catch (error) {
+    console.error('Error fetching bookings:', error);
+  }
+};
 const filters = ref({
   global: { value: null, matchMode: FilterMatchMode.CONTAINS },
   name: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
@@ -18,6 +38,10 @@ const clearFilter = () => {
         filters.value[key].value = null;
     }
 };
+
+onMounted(async () => {
+  getBookings();
+});
 </script>
 
 <!-- resources/js/components/About.vue -->

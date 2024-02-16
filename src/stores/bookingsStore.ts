@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
 
-interface Booking {
+export interface Booking {
   id: number;
   date: string;
   // Add other booking properties here

@@ -30,6 +30,7 @@ import Fieldset from 'primevue/fieldset';
 import Card from 'primevue/card';
 import IconField from 'primevue/iconfield';
 import InputIcon from 'primevue/inputicon';
+import ProgressBar from 'primevue/progressbar';
 
 
 
@@ -74,6 +75,7 @@ app.component('PrimeFieldset', Fieldset);
 app.component('PrimeCard', Card);
 app.component('IconField', IconField);
 app.component('InputIcon', InputIcon);
+app.component('ProgressBar', ProgressBar);
 
 app.config.globalProperties.$filters = {
     currencyGBP(value: number | string) {

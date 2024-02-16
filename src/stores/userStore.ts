@@ -9,10 +9,14 @@ export interface User {
 export const useUserStore = defineStore('user', {
   state: () => ({
     user: [] as User[],
+    users: [],
   }),
   getters: {
     hasUser(): boolean {
       return this.user.length > 0;
+    },
+    hasUsers(): boolean {
+      return this.users.length > 0;
     },
   },
   actions: {
@@ -24,6 +28,16 @@ export const useUserStore = defineStore('user', {
     },
     getUser() {
       return this.user;
+    },
+    //allusers
+    setUsers(user) {
+      this.users = users;
+    },
+    clearUsers() {
+      this.users = [];
+    },
+    getUsers() {
+      return this.users;
     },
   },
 });

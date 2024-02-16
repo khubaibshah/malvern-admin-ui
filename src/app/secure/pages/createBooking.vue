@@ -2,7 +2,7 @@
 import { ref, onMounted } from 'vue'
 import { useToast } from 'primevue/usetoast'
 import { useAuthStore } from '@/stores/authStore'
-
+import BookingService from '@/services/bookingService'
 import axios from 'axios'
 import router from '@/router'
 
@@ -19,8 +19,7 @@ const errorMessage = ref('')
 
 const authStore = useAuthStore()
 // Access the token
-// const token = authStore.getToken();
-// const token = localStorage.getItem('token')
+
 const seshId = sessionStorage.getItem('token')
 const toast = useToast()
 
@@ -33,24 +32,18 @@ const createBooking = async () => {
       vehicle_make_model: vehicleMakeModel.value,
       booking_datetime: formatDate(date.value), // Format the date before sending
       notes: notes.value // Format the date before sending
-    }
+    };
 
-    const response = await axios.post('http://127.0.0.1:8000/api/bookings', userBooking, {
-      headers: {
-        Authorization: 'Bearer ' + seshId,
-        'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': '*'
-      }
-    })
-    console.log('Booking response:', response.data)
+    // Call the createBooking method from BookingService
+    await BookingService.createBooking(userBooking, seshId);
 
     // Optionally, you can reset the form fields after successful submission
-    name.value = ''
-    email.value = ''
-    phoneNumber.value = ''
-    vehicleMakeModel.value = ''
-    date.value = null
-    notes.value = ''
+    name.value = '';
+    email.value = '';
+    phoneNumber.value = '';
+    vehicleMakeModel.value = '';
+    date.value = null;
+    notes.value = '';
 
     // Set success message
     toast.add({
@@ -58,20 +51,21 @@ const createBooking = async () => {
       summary: 'Info',
       detail: 'Booking created successfully',
       life: 3000
-    })
+    });
+
     // Clear any previous error message
-    router.push({ name: 'UserBooking' })
+    router.push({ name: 'UserBooking' });
   } catch (error) {
-    console.error('Error creating booking:', error)
+    console.error('Error creating booking:', error);
     // Set error message
     toast.add({
       severity: 'error',
       summary: 'Info',
-      detail: 'Booking couldnt be created. Please try again',
+      detail: 'Booking couldn\'t be created. Please try again',
       life: 3000
-    })
+    });
   }
-}
+};
 
 const formatDate = (date: any) => {
   if (date) {

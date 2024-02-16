@@ -1,5 +1,4 @@
 <script setup lang="ts">
-
 import { ref, onMounted } from 'vue'
 import { useBookingsStore } from '@/stores/bookingsStore'
 import { FilterMatchMode } from 'primevue/api'
@@ -11,15 +10,15 @@ const seshId = sessionStorage.getItem('token')
 const bookings = ref()
 const bookingsForTomorrow = ref([])
 const displayTomorrowBookings = ref(false) // Reactive variable to toggle between today's and tomorrow's bookings
-
+const isRefreshing = ref(false); // Reactive variable to control the visibility of the progress bar
 
 const filters = ref({
   name: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
-  email: { value: null, matchMode: FilterMatchMode.CONTAINS  },
-  phone_number: { value: null, matchMode: FilterMatchMode.CONTAINS  },
-  booking_datetime: { value: null, matchMode: FilterMatchMode.CONTAINS  },
-  created_at: { value: null, matchMode: FilterMatchMode.CONTAINS  },
-  vehicle_make_model: { value: null, matchMode: FilterMatchMode.CONTAINS  },
+  email: { value: null, matchMode: FilterMatchMode.CONTAINS },
+  phone_number: { value: null, matchMode: FilterMatchMode.CONTAINS },
+  booking_datetime: { value: null, matchMode: FilterMatchMode.CONTAINS },
+  created_at: { value: null, matchMode: FilterMatchMode.CONTAINS },
+  vehicle_make_model: { value: null, matchMode: FilterMatchMode.CONTAINS }
 })
 
 const setBookingDateTimeForTomorrow = () => {
@@ -28,30 +27,39 @@ const setBookingDateTimeForTomorrow = () => {
   filters.value.booking_datetime.value = tomorrow.toISOString().substring(0, 10)
 }
 const clearFilter = () => {
-    for (const key in filters.value) {
-        filters.value[key].value = null;
-    }
-};
+  for (const key in filters.value) {
+    filters.value[key].value = null
+  }
+}
 
-const getBookings = async () => {
+const refreshBookingData = async () => {
+  try {
+    isRefreshing.value = true; // Show the progress bar
+    const response = await BookingService.getBookings(seshId)
+    bookings.value = response
+    bookingsStore.setBookings(bookings.value)
+    isRefreshing.value = false; // Hide the progress bar after data has been updated
+  } catch (error) {
+    console.error('Error fetching bookings:', error)
+  }
+}
+const getDashboardBookings = async () => {
   try {
     if (!bookingsStore.hasBooking()) {
-      const response = await BookingService.getBookings(seshId);
-      bookings.value = response;
-      bookingsStore.setBookings(bookings.value);
+      refreshBookingData()
       console.log('no booking data stored, should only show on first load and reload.')
-    }else{
-      bookings.value = bookingsStore.getBookings;
+    } else {
+      bookings.value = bookingsStore.getBookings
       console.log('booking data from store, should show everytime i nav away and back')
     }
   } catch (error) {
-    console.error('Error fetching bookings:', error);
+    console.error('Error fetching bookings:', error)
   }
-};
- 
+}
+
 onMounted(async () => {
-  getBookings();
-});
+  getDashboardBookings()
+})
 </script>
 
 <template>
@@ -113,9 +121,11 @@ onMounted(async () => {
         </div>
       </div>
     </div>
+    <ProgressBar mode="indeterminate" style="height: 4px" v-show="isRefreshing"></ProgressBar>
     <PrimeCard class="mb-1">
       <template #title>Bookings</template>
       <template #content>
+        
         <DataTable
           v-model:filters="filters"
           :value="displayTomorrowBookings ? bookingsForTomorrow : bookings"
@@ -126,11 +136,19 @@ onMounted(async () => {
           :rows="6"
           :globalFilterFields="['name', 'email']"
         >
-        <template #header>
-                <div class="flex justify-content-between">
-                    <PrimeButton type="button" icon="pi pi-filter-slash" label="Clear" outlined @click="clearFilter()" />
-                </div>
-            </template>
+          <template #header>
+            <div class="flex justify-content-between">
+              <PrimeButton
+                type="button"
+                icon="pi pi-filter-slash"
+                label="Clear"
+                outlined
+                @click="clearFilter()"
+              />
+
+              <PrimeButton icon="pi pi-refresh" rounded aria-label="Filter" @click="refreshBookingData()" />
+            </div>
+          </template>
           <PrimeColumn field="name" header="Name" style="width: 15%" sortable>
             <template #body="{ data }">
               {{ data.name }}
@@ -175,46 +193,45 @@ onMounted(async () => {
           </PrimeColumn>
           <PrimeColumn field="vehicle_make_model" header="Vehicle" sortable style="width: 12%">
             <template v-slot:body="rowData">
-          {{ rowData.data.vehicle_make_model }}
-        </template>
-        <template #filter="{ filterModel, filterCallback }">
-          <InputText
-            v-model="filterModel.value"
-            type="text"
-            @input="filterCallback()"
-            class="p-column-filter"
-             
-          />
-        </template>
+              {{ rowData.data.vehicle_make_model }}
+            </template>
+            <template #filter="{ filterModel, filterCallback }">
+              <InputText
+                v-model="filterModel.value"
+                type="text"
+                @input="filterCallback()"
+                class="p-column-filter"
+              />
+            </template>
           </PrimeColumn>
           <PrimeColumn field="notes" header="Notes" sortable></PrimeColumn>
           <PrimeColumn field="booking_datetime" header="Booking Time" sortable style="width: 10%">
-        <template v-slot:body="rowData">
-          {{ $filters.formatDate(rowData.data.booking_datetime) }}
-        </template>
-        <template #filter="{ filterModel, filterCallback }">
-          <InputText
-            v-model="filterModel.value"
-            type="date"
-            @input="filterCallback()"
-            class="p-column-filter"
-            placeholder="dd-mm-yyyy"
-          />
-        </template>
+            <template v-slot:body="rowData">
+              {{ $filters.formatDate(rowData.data.booking_datetime) }}
+            </template>
+            <template #filter="{ filterModel, filterCallback }">
+              <InputText
+                v-model="filterModel.value"
+                type="date"
+                @input="filterCallback()"
+                class="p-column-filter"
+                placeholder="dd-mm-yyyy"
+              />
+            </template>
           </PrimeColumn>
           <PrimeColumn field="created_at" header="Booking created" sortable style="width: 12%">
             <template v-slot:body="rowData">
               {{ $filters.formatDateTime(rowData.data.created_at) }}
             </template>
             <template #filter="{ filterModel, filterCallback }">
-          <InputText
-            v-model="filterModel.value"
-            type="date"
-            @input="filterCallback()"
-            class="p-column-filter"
-            placeholder="dd-mm-yyyy"
-          />
-        </template>
+              <InputText
+                v-model="filterModel.value"
+                type="date"
+                @input="filterCallback()"
+                class="p-column-filter"
+                placeholder="dd-mm-yyyy"
+              />
+            </template>
           </PrimeColumn>
         </DataTable>
       </template>
