@@ -1,6 +1,6 @@
 <!-- eslint-disable vue/multi-word-component-names -->
 <template>
-  <div id="particles-js"></div>
+  <!-- <div id="particles-js"></div> -->
   
   <div class="login-bg surface-ground px-4 py-8 md:px-6 lg:px-8">
     
@@ -17,11 +17,9 @@
           </template>
         </PrimeCarousel>
       </div> -->
-      <div>
-        
-      </div>
+
       <div class="w-full lg:w-6 p-4 lg:p-7 surface-card">
-        <PrimeToast />
+        
         <div v-if="!showRegisterForm">
           <div class="flex align-items-center justify-content-between mb-7">
           <span class="text-2xl font-medium text-900">Login to Stanley Garage</span>
@@ -32,6 +30,7 @@
             >Sign up</a
           >
         </div>
+        <PrimeToast />
         <div class="flex justify-content-between">
           <PrimeButton
             class="mr-2 w-6 font-medium border-1 surface-border surface-100 py-3 px-2 p-component hover:surface-200 active:surface-300 text-900 cursor-pointer transition-colors transition-duration-150 inline-flex align-items-center justify-content-center"

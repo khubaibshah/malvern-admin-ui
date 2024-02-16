@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
-import { useToast } from 'primevue/usetoast';
-import { useAuthStore } from '@/stores/authStore';
+import { useToast } from 'primevue/usetoast'
+import { useAuthStore } from '@/stores/authStore'
 
 import axios from 'axios'
-import router from '@/router';
+import router from '@/router'
 
 const name = ref('')
 const email = ref('')
@@ -17,13 +17,12 @@ const formattedDate = ref('')
 const successMessage = ref('')
 const errorMessage = ref('')
 
-
-const authStore = useAuthStore();
+const authStore = useAuthStore()
 // Access the token
 // const token = authStore.getToken();
 // const token = localStorage.getItem('token')
 const seshId = sessionStorage.getItem('token')
-const toast = useToast();
+const toast = useToast()
 
 const createBooking = async () => {
   try {
@@ -37,12 +36,12 @@ const createBooking = async () => {
     }
 
     const response = await axios.post('http://127.0.0.1:8000/api/bookings', userBooking, {
-        headers: {
-          'Authorization': 'Bearer ' + seshId,
-          'Content-Type': 'application/json',
-          'Access-Control-Allow-Origin': '*'
-        }
-      })
+      headers: {
+        Authorization: 'Bearer ' + seshId,
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*'
+      }
+    })
     console.log('Booking response:', response.data)
 
     // Optionally, you can reset the form fields after successful submission
@@ -54,14 +53,23 @@ const createBooking = async () => {
     notes.value = ''
 
     // Set success message
-    toast.add({ severity: 'success', summary: 'Info', detail: 'Booking created successfully', life: 3000 });
+    toast.add({
+      severity: 'success',
+      summary: 'Info',
+      detail: 'Booking created successfully',
+      life: 3000
+    })
     // Clear any previous error message
-    router.push({name: 'UserBooking'})
+    router.push({ name: 'UserBooking' })
   } catch (error) {
     console.error('Error creating booking:', error)
     // Set error message
-    toast.add({ severity: 'error', summary: 'Info', detail: 'Booking couldnt be created. Please try again', life: 3000 });
-
+    toast.add({
+      severity: 'error',
+      summary: 'Info',
+      detail: 'Booking couldnt be created. Please try again',
+      life: 3000
+    })
   }
 }
 
@@ -80,9 +88,7 @@ const formatDate = (date: any) => {
   return ''
 }
 
-onMounted(async () =>{
-
-})
+onMounted(async () => {})
 </script>
 <template>
   <div>
@@ -129,11 +135,7 @@ onMounted(async () =>{
             </div>
             <div class="field">
               <label for="message" class="font-medium">Notes</label>
-              <PrimeTextarea
-                v-model="notes"
-                id="notes"
-                class="pb-3"
-              ></PrimeTextarea>
+              <PrimeTextarea v-model="notes" id="notes" class="pb-3"></PrimeTextarea>
             </div>
           </div>
         </div>
@@ -142,12 +144,12 @@ onMounted(async () =>{
           <PrimeCalendar v-model="date" inline showTime hourFormat="12" />
         </div>
         <div class="col-12 md:col-6">
-            <PrimeButton
-              label="Create Booking"
-              icon="pi pi-send"
-              class="w-auto"
-              @click="createBooking"
-            ></PrimeButton>
+          <PrimeButton
+            label="Create Booking"
+            icon="pi pi-send"
+            class="w-auto"
+            @click="createBooking"
+          ></PrimeButton>
         </div>
       </div>
     </div>

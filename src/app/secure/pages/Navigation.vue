@@ -195,7 +195,7 @@ try {
                                         >
                                         <i class="pi pi-user mr-2"></i>
                                         <span class="font-medium"
-                                            >User</span
+                                            >{{ name }}</span
                                         >
                                     </a>
                                 </li>
