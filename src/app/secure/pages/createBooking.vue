@@ -4,6 +4,7 @@ import { useToast } from 'primevue/usetoast';
 import { useAuthStore } from '@/stores/authStore';
 
 import axios from 'axios'
+import router from '@/router';
 
 const name = ref('')
 const email = ref('')
@@ -55,6 +56,7 @@ const createBooking = async () => {
     // Set success message
     toast.add({ severity: 'success', summary: 'Info', detail: 'Booking created successfully', life: 3000 });
     // Clear any previous error message
+    router.push({name: 'UserBooking'})
   } catch (error) {
     console.error('Error creating booking:', error)
     // Set error message

@@ -1,16 +1,14 @@
+<!-- eslint-disable vue/multi-word-component-names -->
 <template>
   <div id="particles-js"></div>
+  
   <div class="login-bg surface-ground px-4 py-8 md:px-6 lg:px-8">
+    
     <div class="flex flex-wrap shadow-2">
-      <div class="w-full lg:w-6 px-0 py-4 lg:p-7 bg-blue-50">
+      <!-- <div class="w-full lg:w-6 px-0 py-4 lg:p-7 bg-blue-50">
         <PrimeCarousel :value="features">
           <template #item="slotProps">
             <div class="text-center mb-8">
-              <!-- <img
-              :src="'images/blocks/illustration/' + slotProps.data.image"
-              alt="Image"
-              class="mb-6 w-6"
-            /> -->
               <div class="mx-auto font-medium text-xl mb-4 text-blue-900">
                 {{ slotProps.data.title }}
               </div>
@@ -18,8 +16,12 @@
             </div>
           </template>
         </PrimeCarousel>
+      </div> -->
+      <div>
+        
       </div>
       <div class="w-full lg:w-6 p-4 lg:p-7 surface-card">
+        <PrimeToast />
         <div v-if="!showRegisterForm">
           <div class="flex align-items-center justify-content-between mb-7">
           <span class="text-2xl font-medium text-900">Login to Stanley Garage</span>
@@ -151,6 +153,7 @@ const submitForm = async () => {
         'Access-Control-Allow-Origin': '*'
       }
     })
+    toast.add({ severity: 'success', summary: 'Info', detail: 'Logged in successfully', life: 3000 });
     authStore.setAuthenticated(true)
     authStore.setToken(response.data.token) // Store token in authStore
     sessionStorage.setItem('token', response.data.token)
@@ -158,11 +161,12 @@ const submitForm = async () => {
     const data = await UserService.getUser(seshId)
     user.value = data
     userStore.setUser(user.value)
-    toast.add({ severity: 'success', summary: 'Info', detail: 'Logged in successfully', life: 3000 });
+    
     if (user.value) {
       router.push({ name: 'Userhome' }) // Push to the correct route
     }
   } catch (error) {
+    toast.add({ severity: 'error', summary: 'Info', detail: 'Logged in failed', life: 3000 });
     console.error('Login failed', error)
   }
 }

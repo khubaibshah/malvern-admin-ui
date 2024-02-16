@@ -1,11 +1,31 @@
+<!-- eslint-disable vue/multi-word-component-names -->
 <script setup lang="ts">
-import { useUserStore } from '@/stores/userStore';
-const userStore = useUserStore();
-const me = userStore.getUser()
+import { ref, onMounted } from 'vue';
+import { useRouter } from "vue-router";
+
+import UserService from '@/services/userService';
+
+const router = useRouter();
+
+const seshId = sessionStorage.getItem('token')
+const name = ref();
+const email = ref();
+const getUser = () =>{
+        UserService.getUser(seshId).then(me => {
+        console.log('me', me);
+        name.value = me.name 
+        email.value = me.email 
+    }).catch(error => {
+        console.error('Error fetching user data:', error);
+    });
+    }
+    onMounted(() => {
+        getUser()
+});
 </script>
 
 <template>
-    
+    <!-- {{ name }} -->
 <div class="surface-section px-4 py-4 md:px-6 lg:px-8 mt-3">
     <div class="mb-3 lg:mb-0 ">
           <div class="text-3xl font-medium text-900 mb-3">User Account</div>
@@ -18,6 +38,13 @@ const me = userStore.getUser()
                 <a v-ripple class="flex align-items-center cursor-pointer p-3 border-round text-800 hover:surface-hover transition-duration-150 transition-colors p-ripple">
                     <i class="pi pi-user md:mr-2"></i>
                     <span class="font-medium hidden md:block">Profile</span>
+                </a>
+            </li>
+            <li>
+                <a v-ripple class="flex align-items-center cursor-pointer p-3 border-round text-800 hover:surface-hover transition-duration-150 transition-colors p-ripple"
+                @click="router.push({name: 'UserBooking'})">
+                    <i class="pi pi-calendar md:mr-2"></i>
+                    <span class="font-medium hidden md:block">Your Bookings</span>
                 </a>
             </li>
             <li>
@@ -52,11 +79,11 @@ const me = userStore.getUser()
                 <div class="flex-auto p-fluid">
                     <div class="mb-4">
                         <label for="name" class="block font-medium text-900 mb-2">Name</label>
-                        <InputText id="name" type="text" v-model="me.name" readonly />
+                        <InputText id="name" type="text" v-model="name" readonly />
                     </div>
                     <div class="mb-4">
                         <label for="email" class="block font-medium text-900 mb-2">Email</label>
-                        <InputText id="email" type="text" v-model="me.email" readonly />
+                        <InputText id="email" type="text" v-model="email" readonly />
                     </div>
                     <div class="mb-4">
                         <label for="bio" class="block font-medium text-900 mb-2">Bio</label>

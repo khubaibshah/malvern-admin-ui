@@ -7,6 +7,7 @@ import Bookings from '@/app/secure/pages/Bookings.vue'
 import Create from '@/app/secure/pages/createBooking.vue'
 import Users from '../app/secure/pages/users/AllUsers.vue'
 import User from '../app/secure/pages/users/User.vue'
+import UserBooking from '../app/secure/pages/users/UserBooking.vue'
 import { useAuthStore } from '../stores/authStore'
 import { useUserStore } from '@/stores/userStore'
 
@@ -57,6 +58,12 @@ const router = createRouter({
           path: '/dashboard/user', // This represents the default child route of /test
           name: 'User',
           component: User,
+          meta: { requiresAuth: true } 
+        },
+        {
+          path: '/dashboard/booking', // This represents the default child route of /test
+          name: 'UserBooking',
+          component: UserBooking,
           meta: { requiresAuth: true } 
         }
       ],

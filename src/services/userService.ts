@@ -18,26 +18,26 @@ class UserService {
       throw error.response.data
     }
   }
-  getLogin = async (userDetails) => {
-    const apiCall = 'http://127.0.0.1:8000/api/login'
-    const config = {
-      headers: {
-        'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': '*'
-      }
-    }
-    try {
-      const response = await axios.post(apiCall, userDetails, config)
-      authStore.setAuthenticated(true)
-      authStore.setToken(response.data.token) // Store token in authStore
-      sessionStorage.setItem('token', response.data.token)
-      user.value = data
-      userStore.setUser(user.value)
-    } catch (error) {
-      console.log(error)
-      throw error.response.data
-    }
-  }
+//   getLogin = async (userDetails) => {
+//     const apiCall = 'http://127.0.0.1:8000/api/login'
+//     const config = {
+//       headers: {
+//         'Content-Type': 'application/json',
+//         'Access-Control-Allow-Origin': '*'
+//       }
+//     }
+//     try {
+//       const response = await axios.post(apiCall, userDetails, config)
+//       authStore.setAuthenticated(true)
+//       authStore.setToken(response.data.token) // Store token in authStore
+//       sessionStorage.setItem('token', response.data.token)
+//       user.value = data
+//       userStore.setUser(user.value)
+//     } catch (error) {
+//       console.log(error)
+//       throw error.response.data
+//     }
+//   }
   getUser = async (token: string | null) => {
     const apiCall = 'http://127.0.0.1:8000/api/user'
     const config = {

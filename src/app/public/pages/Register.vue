@@ -1,4 +1,4 @@
-
+<!-- eslint-disable vue/multi-word-component-names -->
 <script setup lang="ts">
 import { ref } from 'vue';
 import { useToast } from 'primevue/usetoast';
@@ -37,16 +37,17 @@ const register = async () => {
     email.value = ''
     password.value = ''
     confirmPassword.value = ''
-    toast.add({ severity: 'success', summary: 'Info', detail: 'User successfully created', life: 3000 });
+    toast.add({ severity: 'success', summary: 'Success!', detail: 'User successfully created', life: 3000 });
     showRegistrationForm()
     } catch (error) {
       console.error('Error creating booking:', error)
     // Set error message
-      toast.add({ severity: 'error', summary: 'Info', detail: 'User couldnt be created. Please try again', life: 3000 });
+      toast.add({ severity: 'error', summary: 'Failed', detail: error.message, life: 3000 });
     }
 }
 </script>
 <template>
+  <PrimeToast />
      <div class="flex align-items-center justify-content-between mb-7">
           <span class="text-2xl font-medium text-900">Register to Stanley Garage</span>
           <a
@@ -110,6 +111,6 @@ const register = async () => {
               >Forgot password?</a
             >
           </div>
-          <PrimeButton label="Sign In" class="w-full py-3 font-medium" type="submit"></PrimeButton>
+          <PrimeButton label="Register" class="w-full py-3 font-medium" type="submit"></PrimeButton>
         </form>
 </template>
