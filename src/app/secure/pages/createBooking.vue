@@ -19,7 +19,9 @@ const errorMessage = ref('')
 
 const authStore = useAuthStore();
 // Access the token
-const token = authStore.getToken();
+// const token = authStore.getToken();
+// const token = localStorage.getItem('token')
+const seshId = sessionStorage.getItem('token')
 const toast = useToast();
 
 const createBooking = async () => {
@@ -35,7 +37,7 @@ const createBooking = async () => {
 
     const response = await axios.post('http://127.0.0.1:8000/api/bookings', userBooking, {
         headers: {
-          'Authorization': 'Bearer ' + token,
+          'Authorization': 'Bearer ' + seshId,
           'Content-Type': 'application/json',
           'Access-Control-Allow-Origin': '*'
         }

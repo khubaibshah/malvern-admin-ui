@@ -8,7 +8,9 @@ import { FilterMatchMode } from 'primevue/api'
 const authStore = useAuthStore()
 const bookingsStore = useBookingsStore()
 
-const token = authStore.getToken()
+// const token = authStore.getToken()
+// const token = localStorage.getItem('token')
+const seshId = sessionStorage.getItem('token')
 const bookings = ref([])
 const bookingsForTomorrow = ref([])
 const displayTomorrowBookings = ref(false) // Reactive variable to toggle between today's and tomorrow's bookings
@@ -25,7 +27,7 @@ const getBookings = async () => {
   try {
     const response = await axios.get('http://127.0.0.1:8000/api/bookings', {
       headers: {
-        Authorization: 'Bearer ' + token,
+        Authorization: 'Bearer ' + seshId,
         'Content-Type': 'application/json',
         'Access-Control-Allow-Origin': '*'
       }

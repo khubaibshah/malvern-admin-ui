@@ -5,14 +5,16 @@ import { useAuthStore } from '../../../../stores/authStore';
 const authStore = useAuthStore();
 
 // Access the token
-const token = authStore.getToken();
+// const token = authStore.getToken();
+// const token = localStorage.getItem('token')
+const seshId = sessionStorage.getItem('token')
 const bookings = ref()
 
 const getAllUsers = async () => {
   try {
     const response = await axios.get('http://127.0.0.1:8000/api/users',{
       headers: {
-        'Authorization': "Bearer "+token,
+        'Authorization': "Bearer "+seshId,
         'Content-Type': 'application/json',
         'Access-Control-Allow-Origin': '*'
       }

@@ -1,7 +1,9 @@
 import './assets/style.css'
 import 'primevue/resources/themes/aura-light-indigo/theme.css';
+import piniaPluginPersistedState from "pinia-plugin-persistedstate"
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
+const pinia = createPinia();
 import PrimeVue from 'primevue/config';
 
 import "primeflex/primeflex.css"
@@ -45,6 +47,7 @@ const app = createApp(App)
 app.use(ToastService);
 app.use(PrimeVue, { ripple: true, style: true });
 app.use(createPinia())
+pinia.use(piniaPluginPersistedState)
 app.use(router)
 
 app.directive('badge', BadgeDirective);

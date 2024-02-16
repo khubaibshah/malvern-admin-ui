@@ -4,35 +4,45 @@ import { ref, onMounted } from 'vue';
 import { useRouter } from "vue-router";
 import { useAuthStore } from '@/stores/authStore';
 import { useUserStore } from '@/stores/userStore';
+import { useToast } from 'primevue/usetoast';
+import UserService from '../../../services/userService'
 
+const toast = useToast();
 const userStore = useUserStore();
 const router = useRouter();
 const authStore = useAuthStore();
-const me = userStore.getUser()
-// Access the token
-const token = authStore.getToken();
-  const logout = async () => {
-  try {
-    const response = await axios.post('http://127.0.0.1:8000/api/logout',null,{
-      headers: {
-        'Authorization': 'Bearer ' + token,
-        'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': '*'
-      }
-    })
+const seshId = sessionStorage.getItem('token')
+const name = ref();
+console.log('push to userhome if authed already', seshId)
 
-    console.log('User logged out successfully', response.data)
+const logout = async () => {
+try {
+    const response = await UserService.logout(seshId);
+    console.log('logout successful', response.data);
+    sessionStorage.clear()
     authStore.clearToken(); // Clear token from store
     authStore.setAuthenticated(false); // Set user authentication status to false
     userStore.clearUser();
     router.push({ name: 'login' }) // Redirect to home page
-  } catch (error) {
-    console.error('Login failed', error)
-  }
+} catch (error) {
+    console.error('logout failed', error);
+
+}
 }
 
-onMounted(async () => {
-})
+    const getUser = () =>{
+        UserService.getUser(seshId).then(me => {
+        console.log('me', me);
+        name.value = me.name 
+        toast.add({ severity: 'success', summary: 'Info', detail: 'Logged in successfully', life: 3000 });
+    }).catch(error => {
+        console.error('Error fetching user data:', error);
+    });
+    }
+    onMounted(() => {
+        getUser()
+});
+
 </script>
 
 <template>
@@ -297,7 +307,7 @@ onMounted(async () => {
                 >
                 <li class="border-top-1 surface-border lg:border-top-none">
                         <!-- <PrimeTag icon="pi pi-user" :value="me?.name" class="tag"></PrimeTag> -->
-                        <PrimeButton icon="pi pi-user" :label="me?.name" severity="primary" raised @click="router.push({name: 'User'})"/>
+                        <PrimeButton icon="pi pi-user" :label="name" severity="primary" raised @click="router.push({name: 'User'})"/>
                             <div class="block lg:hidden">
                                 <div class="text-900 font-medium">
                                     Josephine Lillard

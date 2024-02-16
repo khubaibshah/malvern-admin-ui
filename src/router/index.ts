@@ -8,6 +8,7 @@ import Create from '@/app/secure/pages/createBooking.vue'
 import Users from '../app/secure/pages/users/AllUsers.vue'
 import User from '../app/secure/pages/users/User.vue'
 import { useAuthStore } from '../stores/authStore'
+import { useUserStore } from '@/stores/userStore'
 
 // const checkAuth = async (to, from, next) => {
 //     if (authStore.isAuthenticated) next();
@@ -78,22 +79,40 @@ const router = createRouter({
   ]
 })
 // Add navigation guard to check authentication status before navigating to each route
+// router.beforeEach((to, from, next) => {
+//   console.log('to',to)
+//   console.log('from', from)
+//   const authStore = useAuthStore()
+
+//   // Check if the route requires authentication
+//   if (to.meta.requiresAuth) {
+//     // If authentication is required and user is not authenticated, redirect to login page
+//     if (!authStore.isAuthenticated) {
+//       next({ name: 'login' }) // Redirect to login page
+//     } else {
+//       next() // Continue navigating to the requested route
+//     }
+//   } else {
+//     next() // No authentication required, continue navigating to the requested route
+//   }
+
+// })
+// const authStore = useAuthStore()
+// const  authToken = authStore.token
+
+
+// const userStore = useUserStore();
+// const user = userStore.getUser()
+
+
 router.beforeEach((to, from, next) => {
-  console.log('to',to)
-  console.log('from', from)
-  const authStore = useAuthStore()
-
-  // Check if the route requires authentication
-  if (to.meta.requiresAuth) {
-    // If authentication is required and user is not authenticated, redirect to login page
-    if (!authStore.isAuthenticated) {
-      next({ name: 'home' }) // Redirect to login page
-    } else {
-      next() // Continue navigating to the requested route
-    }
+  if (from.name === 'dashboard' && to.name === null && from.name !== to.name) {
+    // console.log('token here', authToken)
+    // console.log('user here', user)
+    // User is going back from home page, redirect to home page
+    next({ name: 'dashboard' });
   } else {
-    next() // No authentication required, continue navigating to the requested route
+    next();
   }
-
-})
+});
 export default router
