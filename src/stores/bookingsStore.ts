@@ -20,6 +20,9 @@ export const useBookingsStore = defineStore('bookings', {
     clearBookings() {
       this.bookings = [];
     },
+    hasBooking(): boolean {
+      return this.bookings.length > 0;
+    },
   },
   getters: {
     getBookings(): Booking[] {

@@ -1,24 +1,26 @@
 import { defineStore } from 'pinia';
 
-// interface User {
-//   id: number;
-//   name: string;
-//   email: string;
-// }
+export interface User {
+  id: number;
+  name: string;
+  email: string;
+}
 
 export const useUserStore = defineStore('user', {
   state: () => ({
-    user: [],
+    user: [] as User[],
   }),
   getters: {
-    hasUser: (state) => state.user.length > 0,
+    hasUser(): boolean {
+      return this.user.length > 0;
+    },
   },
   actions: {
-    setUser(user: User | null) {
+    setUser(user: User[]) {
       this.user = user;
     },
     clearUser() {
-      this.user = null;
+      this.user = [];
     },
     getUser() {
       return this.user;

@@ -1,32 +1,33 @@
 <!-- eslint-disable vue/multi-word-component-names -->
 <script setup lang="ts">
+
 import { ref, onMounted } from 'vue';
 import { useRouter } from "vue-router";
+import { useUserStore } from '@/stores/userStore';
 
-import UserService from '@/services/userService';
+// Importing User type using type-only import syntax
+import type { User } from '@/stores/userStore';
 
 const router = useRouter();
+const userStore = useUserStore()
+//annotate it as an array of users:
+const me = ref<User[]>([]);
 
-const seshId = sessionStorage.getItem('token')
-const name = ref();
-const email = ref();
-const getUser = () =>{
-        UserService.getUser(seshId).then(me => {
-        console.log('me', me);
-        name.value = me.name 
-        email.value = me.email 
-    }).catch(error => {
-        console.error('Error fetching user data:', error);
-    });
-    }
+const getUser = async () => {
+  try {
+    me.value = userStore.getUser()
+    console.log('user data from store, this is the user account so should only load from store')
+  } catch (error) {
+    console.error('Error fetching user:', error);
+  }
+}
     onMounted(() => {
         getUser()
 });
 </script>
 
 <template>
-    <!-- {{ name }} -->
-<div class="surface-section px-4 py-4 md:px-6 lg:px-8 mt-3">
+    <div class="surface-section px-4 py-4 md:px-6 lg:px-8 mt-3">
     <div class="mb-3 lg:mb-0 ">
           <div class="text-3xl font-medium text-900 mb-3">User Account</div>
           <div class="text-500 mr-0 md:mr-3">Your user details</div>
@@ -79,11 +80,11 @@ const getUser = () =>{
                 <div class="flex-auto p-fluid">
                     <div class="mb-4">
                         <label for="name" class="block font-medium text-900 mb-2">Name</label>
-                        <InputText id="name" type="text" v-model="name" readonly />
+                        <InputText id="name" type="text" v-model="me.name" readonly />
                     </div>
                     <div class="mb-4">
                         <label for="email" class="block font-medium text-900 mb-2">Email</label>
-                        <InputText id="email" type="text" v-model="email" readonly />
+                        <InputText id="email" type="text" v-model="me.email" readonly />
                     </div>
                     <div class="mb-4">
                         <label for="bio" class="block font-medium text-900 mb-2">Bio</label>

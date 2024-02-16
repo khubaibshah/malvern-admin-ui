@@ -13,6 +13,7 @@ const router = useRouter();
 const authStore = useAuthStore();
 const seshId = sessionStorage.getItem('token')
 const name = ref();
+const me = ref();
 console.log('push to userhome if authed already', seshId)
 
 const logout = async () => {
@@ -30,15 +31,21 @@ try {
 }
 }
 
-    const getUser = () =>{
-        UserService.getUser(seshId).then(me => {
-        console.log('me', me);
-        name.value = me.name 
-        toast.add({ severity: 'success', summary: 'Info', detail: 'Logged in successfully', life: 3000 });
-    }).catch(error => {
-        console.error('Error fetching user data:', error);
-    });
+const getUser = async () => {
+  try {
+    if (!userStore.hasUser) {
+        const user = await UserService.getUser(seshId);
+        me.value = user;
+        userStore.setUser(me.value)
+        console.log('no user data stored, should only show on first load and reload.')
+    } else {
+        me.value = UserService.getUser(seshId)
+        console.log('user data from store, should show everytime i nav away and back')
     }
+  } catch (error) {
+    console.error('Error fetching user:', error);
+  }
+}
     onMounted(() => {
         getUser()
 });
@@ -46,6 +53,7 @@ try {
 </script>
 
 <template>
+    <!-- {{ me }} -->
     <div class="min-h-screen flex relative lg:static surface-ground">
         <div
             id="app-sidebar-5"
@@ -195,7 +203,7 @@ try {
                                         >
                                         <i class="pi pi-user mr-2"></i>
                                         <span class="font-medium"
-                                            >{{ name }}</span
+                                            >{{ me?.name }}</span
                                         >
                                     </a>
                                 </li>
@@ -307,7 +315,7 @@ try {
                 >
                 <li class="border-top-1 surface-border lg:border-top-none">
                         <!-- <PrimeTag icon="pi pi-user" :value="me?.name" class="tag"></PrimeTag> -->
-                        <PrimeButton icon="pi pi-user" :label="name" severity="primary" raised @click="router.push({name: 'User'})"/>
+                        <PrimeButton icon="pi pi-user" :label="me?.name" severity="primary" raised @click="router.push({name: 'User'})"/>
                             <div class="block lg:hidden">
                                 <div class="text-900 font-medium">
                                     Josephine Lillard

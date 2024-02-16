@@ -1,20 +1,18 @@
 <script setup lang="ts">
-import TodaysBookings from './bookingsToday/TodayBooking.vue'
+
 import { ref, onMounted } from 'vue'
-import axios from 'axios'
-import { useAuthStore } from '@/stores/authStore'
 import { useBookingsStore } from '@/stores/bookingsStore'
 import { FilterMatchMode } from 'primevue/api'
-const authStore = useAuthStore()
-const bookingsStore = useBookingsStore()
 
-// const token = authStore.getToken()
-// const token = localStorage.getItem('token')
+import BookingService from '../../../services/bookingService'
+
+const bookingsStore = useBookingsStore()
 const seshId = sessionStorage.getItem('token')
-const bookings = ref([])
+const bookings = ref()
 const bookingsForTomorrow = ref([])
 const displayTomorrowBookings = ref(false) // Reactive variable to toggle between today's and tomorrow's bookings
-// const loading = ref(true);
+
+
 const filters = ref({
   name: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
   email: { value: null, matchMode: FilterMatchMode.CONTAINS  },
@@ -23,21 +21,6 @@ const filters = ref({
   created_at: { value: null, matchMode: FilterMatchMode.CONTAINS  },
   vehicle_make_model: { value: null, matchMode: FilterMatchMode.CONTAINS  },
 })
-const getBookings = async () => {
-  try {
-    const response = await axios.get('http://127.0.0.1:8000/api/bookings', {
-      headers: {
-        Authorization: 'Bearer ' + seshId,
-        'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': '*'
-      }
-    })
-    bookings.value = response.data
-    bookingsStore.setBookings(bookings.value)
-  } catch (error) {
-    console.error('Error fetching bookings:', error)
-  }
-}
 
 const setBookingDateTimeForTomorrow = () => {
   const tomorrow = new Date()
@@ -49,10 +32,26 @@ const clearFilter = () => {
         filters.value[key].value = null;
     }
 };
-// Load bookings when component is mounted
+
+const getBookings = async () => {
+  try {
+    if (!bookingsStore.hasBooking()) {
+      const response = await BookingService.getBookings(seshId);
+      bookings.value = response;
+      bookingsStore.setBookings(bookings.value);
+      console.log('no booking data stored, should only show on first load and reload.')
+    }else{
+      bookings.value = bookingsStore.getBookings;
+      console.log('booking data from store, should show everytime i nav away and back')
+    }
+  } catch (error) {
+    console.error('Error fetching bookings:', error);
+  }
+};
+ 
 onMounted(async () => {
-  await getBookings()
-})
+  getBookings();
+});
 </script>
 
 <template>
@@ -114,7 +113,6 @@ onMounted(async () => {
         </div>
       </div>
     </div>
-
     <PrimeCard class="mb-1">
       <template #title>Bookings</template>
       <template #content>

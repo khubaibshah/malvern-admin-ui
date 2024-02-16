@@ -50,7 +50,6 @@ class UserService {
 
     try {
       const response = await axios.get(apiCall, config)
-      console.log('from service', response)
       return response.data
     } catch (error) {
       console.log(error)
