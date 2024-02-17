@@ -49,7 +49,7 @@ const register = async () => {
 <template>
   <PrimeToast />
      <div class="flex align-items-center justify-content-between mb-7">
-          <span class="text-2xl font-medium text-900">Register to Stanley Garage</span>
+          <span class="text-2xl font-medium text-900">Register to Malvern Autos</span>
           <a
             tabindex="0"
             class="font-medium text-blue-500 hover:text-blue-700 cursor-pointer transition-colors transition-duration-150"

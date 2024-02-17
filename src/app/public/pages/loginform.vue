@@ -18,11 +18,10 @@
         </PrimeCarousel>
       </div> -->
 
-      <div class="w-full lg:w-6 p-4 lg:p-7 surface-card">
-        
+      <div class="w-full lg:w-6 p-4 lg:p-7 surface-card" style="border-radius: 25px;">
         <div v-if="!showRegisterForm">
           <div class="flex align-items-center justify-content-between mb-7">
-          <span class="text-2xl font-medium text-900">Login to Stanley Garage</span>
+          <span class="text-2xl font-medium text-900">Login to Malvern Autos</span>
           <a
             tabindex="0"
             class="font-medium text-blue-500 hover:text-blue-700 cursor-pointer transition-colors transition-duration-150"
@@ -165,7 +164,7 @@ const submitForm = async () => {
       router.push({ name: 'Userhome' }) // Push to the correct route
     }
   } catch (error) {
-    toast.add({ severity: 'error', summary: 'Info', detail: 'Logged in failed', life: 3000 });
+    toast.add({ severity: 'error', summary: 'Info', detail: 'Logged in failed because '+ error, life: 10000 });
     console.error('Login failed', error)
   }
 }
