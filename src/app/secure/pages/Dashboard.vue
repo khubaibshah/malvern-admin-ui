@@ -3,8 +3,7 @@
     
     <template v-slot:default>
       <div
-        class="pb-5 flex flex-column flex-auto surface-ground border-round overflow-y-auto"
-        style="background-color: #ffffff !important"
+        class="surface-section flex flex-column flex-auto border-round overflow-y-auto"
       >
         <RouterView />
       </div>

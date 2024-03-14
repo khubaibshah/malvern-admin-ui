@@ -47,7 +47,7 @@ onMounted(async () => {
 <!-- resources/js/components/About.vue -->
 <template>
   <div>
-    <div class="surface-section px-4 py-5 md:px-6 lg:px-8 mt-3">
+    <div class="surface-section px-4 py-5 md:px-6 lg:px-8">
       <div
         class="flex md:align-items-center md:justify-content-between flex-column md:flex-row pb-4 border-bottom-1 surface-border"
       >

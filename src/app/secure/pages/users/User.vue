@@ -27,7 +27,7 @@ const getUser = async () => {
 </script>
 
 <template>
-    <div class="surface-section px-4 py-4 md:px-6 lg:px-8 mt-3">
+    <div class="surface-section px-4 py-4 md:px-6 lg:px-8">
     <div class="mb-3 lg:mb-0 ">
           <div class="text-3xl font-medium text-900 mb-3">User Account</div>
           <div class="text-500 mr-0 md:mr-3">Your user details</div>

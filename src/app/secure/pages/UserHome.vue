@@ -63,7 +63,7 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div class="p-5 flex flex-column flex-auto">
+  <div class="surface-section p-5 flex flex-column flex-auto">
     <div class="grid">
       <div class="col-12">
         <div class="grid">

@@ -3,7 +3,7 @@ import axios from 'axios';
 class BookingService {
      getBookings = async (token: string | null) => {
         try {
-          const response = await axios.get('http://127.0.0.1:8000/api/bookings', {
+          const response = await axios.get('http://127.0.0.1:8000/api/admin-bookings', {
             headers: {
               Authorization: 'Bearer ' + token,
               'Content-Type': 'application/json',
@@ -18,7 +18,7 @@ class BookingService {
       // New method to create a booking
   createBooking = async (userBooking: any, token: string | null) => {
     try {
-      const response = await axios.post('http://127.0.0.1:8000/api/bookings', userBooking, {
+      const response = await axios.post('http://127.0.0.1:8000/api/admin-bookings', userBooking, {
         headers: {
           Authorization: 'Bearer ' + token,
           'Content-Type': 'application/json',
