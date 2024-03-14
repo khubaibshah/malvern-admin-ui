@@ -2,7 +2,7 @@ import axios from 'axios'
 
 class UserService {
   getCookie = async () => {
-    const apiCall = 'http://127.0.0.1:8000/sanctum/csrf-cookie'
+    const apiCall = 'https://malvern-api-production.up.railway.app/sanctum/csrf-cookie'
     const config = {
       headers: {
         'Content-Type': 'application/json',
@@ -19,7 +19,7 @@ class UserService {
     }
   }
 //   getLogin = async (userDetails) => {
-//     const apiCall = 'http://127.0.0.1:8000/api/login'
+//     const apiCall = 'https://malvern-api-production.up.railway.app/api/login'
 //     const config = {
 //       headers: {
 //         'Content-Type': 'application/json',
@@ -39,7 +39,7 @@ class UserService {
 //     }
 //   }
   getUser = async (token: string | null) => {
-    const apiCall = 'http://127.0.0.1:8000/api/user'
+    const apiCall = 'https://malvern-api-production.up.railway.app/api/user'
     const config = {
       headers: {
         Authorization: 'Bearer ' + token,
@@ -57,7 +57,7 @@ class UserService {
     }
   }
   logout = async (token: string | null) => {
-    const apiCall = 'http://127.0.0.1:8000/api/logout'
+    const apiCall = 'https://malvern-api-production.up.railway.app/api/logout'
     const config = {
       headers: {
         Authorization: 'Bearer ' + token,
@@ -76,7 +76,7 @@ class UserService {
   }
   getAllUsers = async (token: string | null) => {
     try {
-      const apiCall = 'http://127.0.0.1:8000/api/users'
+      const apiCall = 'https://malvern-api-production.up.railway.app/api/users'
       const config = {
         headers: {
           'Authorization': "Bearer "+token,
@@ -92,7 +92,7 @@ class UserService {
     }
   }
 //   register = async () =>{
-//     const apiCall = 'http://127.0.0.1:8000/api/register'
+//     const apiCall = 'https://malvern-api-production.up.railway.app/api/register'
 //         const config = {
 //           headers: {
 //             'Content-Type': 'application/json',
