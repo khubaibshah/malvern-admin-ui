@@ -145,7 +145,7 @@ const submitForm = async () => {
 
   try {
     await UserService.getCookie()
-    const response = await axios.post('http://127.0.0.1:8000/api/login', userDetails, {
+    const response = await axios.post(`${process.env.APP_URL}/api/login`, userDetails, {
       headers: {
         'Content-Type': 'application/json',
         'Access-Control-Allow-Origin': '*'

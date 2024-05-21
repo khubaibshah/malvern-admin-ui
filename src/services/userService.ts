@@ -2,7 +2,7 @@ import axios from 'axios'
 
 class UserService {
   getCookie = async () => {
-    const apiCall = 'http://127.0.0.1:8000/sanctum/csrf-cookie'
+    const apiCall = `${process.env.APP_URL}/sanctum/csrf-cookie`;
     const config = {
       headers: {
         'Content-Type': 'application/json',
@@ -39,7 +39,7 @@ class UserService {
 //     }
 //   }
   getUser = async (token: string | null) => {
-    const apiCall = 'http://127.0.0.1:8000/api/user'
+    const apiCall = `${process.env.APP_URL}/api/user`;
     const config = {
       headers: {
         Authorization: 'Bearer ' + token,
@@ -57,7 +57,7 @@ class UserService {
     }
   }
   logout = async (token: string | null) => {
-    const apiCall = 'http://127.0.0.1:8000/api/logout'
+    const apiCall = `${process.env.APP_URL}/api/logout`;
     const config = {
       headers: {
         Authorization: 'Bearer ' + token,
@@ -76,7 +76,7 @@ class UserService {
   }
   getAllUsers = async (token: string | null) => {
     try {
-      const apiCall = 'http://127.0.0.1:8000/api/users'
+      const apiCall = `${process.env.APP_URL}/api/users`;
       const config = {
         headers: {
           'Authorization': "Bearer "+token,

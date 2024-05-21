@@ -25,7 +25,7 @@ const register = async () => {
     password: password.value,
     password_confirmation: confirmPassword.value
   }
-  const response = await axios.post('http://127.0.0.1:8000/api/register', userDetails, {
+  const response = await axios.post(`${process.env.APP_URL}/api/register`, userDetails, {
       headers: {
         'Content-Type': 'application/json',
         'Access-Control-Allow-Origin': '*'
