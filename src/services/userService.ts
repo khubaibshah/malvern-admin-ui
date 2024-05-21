@@ -1,8 +1,8 @@
 import axios from 'axios'
-require('dotenv').config();
+// require('dotenv').config();
 class UserService {
   getCookie = async () => {
-    const apiCall = `${process.env.APP_URL}/sanctum/csrf-cookie`;
+    const apiCall = `${import.meta.env.APP_URL}/sanctum/csrf-cookie`;
     const config = {
       headers: {
         'Content-Type': 'application/json',
