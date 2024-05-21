@@ -1,8 +1,8 @@
 import axios from 'axios'
-// require('dotenv').config();
+
 class UserService {
   getCookie = async () => {
-    const apiCall = `/sanctum/csrf-cookie`;
+    const apiCall = 'https://malvern-api-production.up.railway.app/sanctum/csrf-cookie'
     const config = {
       headers: {
         'Content-Type': 'application/json',
@@ -39,7 +39,7 @@ class UserService {
 //     }
 //   }
   getUser = async (token: string | null) => {
-    const apiCall = `${process.env.APP_URL}/api/user`;
+    const apiCall = 'http://127.0.0.1:8000/api/user'
     const config = {
       headers: {
         Authorization: 'Bearer ' + token,
@@ -57,7 +57,7 @@ class UserService {
     }
   }
   logout = async (token: string | null) => {
-    const apiCall = `${process.env.APP_URL}/api/logout`;
+    const apiCall = 'http://127.0.0.1:8000/api/logout'
     const config = {
       headers: {
         Authorization: 'Bearer ' + token,
@@ -76,7 +76,7 @@ class UserService {
   }
   getAllUsers = async (token: string | null) => {
     try {
-      const apiCall = `${process.env.APP_URL}/api/users`;
+      const apiCall = 'http://127.0.0.1:8000/api/users'
       const config = {
         headers: {
           'Authorization': "Bearer "+token,
