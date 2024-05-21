@@ -1,5 +1,5 @@
 import axios from 'axios'
-
+require('dotenv').config();
 class UserService {
   getCookie = async () => {
     const apiCall = `${process.env.APP_URL}/sanctum/csrf-cookie`;
