@@ -15,6 +15,8 @@ import Ripple from 'primevue/ripple';
 
 import Button from "primevue/button"
 import InputText from 'primevue/inputtext';
+import DropDown from 'primevue/dropdown';
+import Slider from 'primevue/slider';
 import DataTable from 'primevue/datatable';
 import Column from 'primevue/column';
 import Textarea from 'primevue/textarea';
@@ -31,7 +33,7 @@ import Card from 'primevue/card';
 import IconField from 'primevue/iconfield';
 import InputIcon from 'primevue/inputicon';
 import ProgressBar from 'primevue/progressbar';
-
+import FileUpload from 'primevue/fileupload';
 
 
 
@@ -59,6 +61,8 @@ app.directive('ripple', Ripple);
 
 app.component('InputText', InputText);
 app.component('PrimeButton', Button);
+app.component('PrimeDropDown', DropDown);
+app.component('PrimeSlider', Slider);
 app.component('DataTable', DataTable);
 app.component('PrimeColumn', Column);
 app.component('PrimeTextarea', Textarea);
@@ -76,6 +80,7 @@ app.component('PrimeCard', Card);
 app.component('IconField', IconField);
 app.component('InputIcon', InputIcon);
 app.component('ProgressBar', ProgressBar);
+app.component('FileUpload', FileUpload);
 
 app.config.globalProperties.$filters = {
     currencyGBP(value: number | string) {

@@ -119,14 +119,14 @@ const router = createRouter({
 // const user = userStore.getUser()
 
 
-router.beforeEach((to, from, next) => {
-  if (from.name === 'dashboard' && to.name === null && from.name !== to.name) {
-    // console.log('token here', authToken)
-    // console.log('user here', user)
-    // User is going back from home page, redirect to home page
-    next({ name: 'dashboard' });
-  } else {
-    next();
-  }
-});
+// router.beforeEach((to, from, next) => {
+//   if (from.name === 'dashboard' && to.name === null && from.name !== to.name) {
+//     // console.log('token here', authToken)
+//     // console.log('user here', user)
+//     // User is going back from home page, redirect to home page
+//     next({ name: 'dashboard' });
+//   } else {
+//     next();
+//   }
+// });
 export default router

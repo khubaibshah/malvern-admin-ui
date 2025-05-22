@@ -3,7 +3,7 @@ import axios from 'axios';
 class BookingService {
      getBookings = async (token: string | null) => {
         try {
-          const response = await axios.get(`https://malvern-api-production.up.railway.app/api/admin-bookings`, {
+          const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/admin-bookings`, {
             headers: {
               Authorization: 'Bearer ' + token,
               'Content-Type': 'application/json',
@@ -18,7 +18,7 @@ class BookingService {
       // New method to create a booking
   createBooking = async (userBooking: any, token: string | null) => {
     try {
-      const response = await axios.post(`https://malvern-api-production.up.railway.app/api/admin-bookings`, userBooking, {
+      const response = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/admin-bookings`, userBooking, {
         headers: {
           Authorization: 'Bearer ' + token,
           'Content-Type': 'application/json',
