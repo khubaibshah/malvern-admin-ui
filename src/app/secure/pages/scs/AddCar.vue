@@ -1,10 +1,16 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
 import axios from 'axios';
 import { useToast } from 'primevue/usetoast';
+import VehicleService from "@/services/VehicleService";
+import { useVehicleStore } from "@/stores/vehicleData";
 
 const toast = useToast();
+const vehicleStore = useVehicleStore();
+const vehicleData = ref();
 
+const registrationNumber = ref("");
+const reg = ref('');
 const make = ref('');
 const model = ref('');
 const variant = ref('');
@@ -17,11 +23,12 @@ const fuel_type = ref('');
 const body_style = ref('');
 const colour = ref('');
 const doors = ref('');
-const veh_type = ref('');
+const veh_type = ref('Car');
 const subtitle = ref('');
 const description = ref('');
 const previewUrls = ref<string[]>([]);
 const mileageRange = ref(50000);
+const registrationSuccess = ref(false);
 
 const onUpload = (event: any) => {
   const newFiles: File[] = event.files;
@@ -37,8 +44,59 @@ const onUpload = (event: any) => {
   });
 };
 
+const clearImages = () => {
+  images.value = [];
+  previewUrls.value = [];
+  toast.add({
+    severity: 'info',
+    summary: 'Cleared',
+    detail: 'Images have been cleared',
+    life: 3000
+  });
+};
+
+const normalizeFuelType = (type: string) => {
+  const val = type.toLowerCase();
+  if (val.includes('diesel')) return 'Diesel';
+  if (val.includes('petrol') || val.includes('gasoline')) return 'Petrol';
+  if (val.includes('hybrid')) return 'Hybrid';
+  if (val.includes('electric')) return 'Electric';
+  return '';
+};
+
+const populateVehicleFields = () => {
+  if (!vehicleData.value) return;
+  reg.value = vehicleData.value.registration;
+  make.value = vehicleData.value.make;
+  model.value = vehicleData.value.model;
+  year.value = vehicleData.value.manufactureDate?.split("-")[0] || '';
+  fuel_type.value = normalizeFuelType(vehicleData.value.fuelType || '');
+  colour.value = vehicleData.value.primaryColour;
+  registrationNumber.value = vehicleData.value.registration;
+  mileage.value = vehicleData.value.motTests?.[0]?.odometerValue?.replace(/[^0-9]/g, '') || '';
+  mileageRange.value = parseInt(mileage.value) || 0;
+};
+
+const handleRegistrationNumberChange = async () => {
+  try {
+    const res = await VehicleService.getDvsaVehicleByReg(registrationNumber.value);
+    vehicleData.value = res;
+    vehicleStore.setVehicleData(res);
+    registrationSuccess.value = true;
+    populateVehicleFields();
+  } catch (error) {
+    toast.add({
+      severity: "warn",
+      summary: "Please Check Registration Entered",
+      detail: "Error fetching vehicle data",
+      life: 4000,
+    });
+    registrationSuccess.value = false;
+  }
+};
+
 const submitCar = async () => {
-  if (!make.value || !model.value || !price.value || images.value.length === 0) {
+  if (!reg.value || !make.value || !model.value || !price.value || images.value.length === 0) {
     toast.add({
       severity: 'warn',
       summary: 'Missing Fields',
@@ -49,33 +107,32 @@ const submitCar = async () => {
   }
 
   const formData = new FormData();
+  formData.append('reg', reg.value);
   formData.append('make', make.value);
   formData.append('model', model.value);
   formData.append('variant', variant.value);
   formData.append('year', year.value);
   formData.append('price', price.value);
   formData.append('was_price', was_price.value);
-  formData.append('mileage', mileage.value);
+  formData.append('mileage', mileageRange.value.toString());
   formData.append('fuel_type', fuel_type.value);
   formData.append('body_style', body_style.value);
   formData.append('colour', colour.value);
   formData.append('doors', doors.value);
   formData.append('veh_type', veh_type.value);
-  formData.append('subtitle', subtitle.value);
   formData.append('description', description.value);
+  formData.append('registration', registrationNumber.value);
 
   images.value.forEach((file) => {
     formData.append('car_images[]', file);
   });
 
-
   try {
     const response = await axios.post('http://127.0.0.1:8000/api/upload-scs-car', formData);
     if (response.status === 201) {
       toast.add({ severity: 'success', summary: 'Success', detail: 'Car added successfully', life: 3000 });
-      make.value = model.value = variant.value = year.value = price.value = was_price.value = '';
-      images.value = [];
-      previewUrls.value = [];
+      reg.value = make.value = model.value = variant.value = year.value = price.value = was_price.value = '';
+      clearImages();
     }
   } catch (error) {
     toast.add({
@@ -86,107 +143,115 @@ const submitCar = async () => {
     });
   }
 };
-</script>
 
+onMounted(() => {
+  const storeData = vehicleStore.getVehicleData;
+  if (storeData) {
+    vehicleData.value = storeData;
+    registrationNumber.value = storeData.registration || "";
+    registrationSuccess.value = !!registrationNumber.value;
+    populateVehicleFields();
+  }
+});
+</script>
 <template>
   <div>
     <PrimeToast />
     <div class="surface-section px-5 py-5 md:px-6 lg:px-8">
       <div class="text-3xl font-medium text-900 mb-4">Add New Car Listing</div>
       <div class="grid">
-        <!-- Image Upload -->
-        <div class="col-12 md:col-6">
-          <div class="card">
-            <FileUpload name="car_images" customUpload :auto="true" @uploader="onUpload" :multiple="true"
-              accept="image/*" :maxFileSize="5000000" previewWidth="100">
-              <template #empty>
-                <p>Drag and drop or browse to upload car images.</p>
-              </template>
-            </FileUpload>
+        <div class="col">
+          <div>
+            <div class="card">
+              <FileUpload name="car_images" customUpload :auto="true" @uploader="onUpload" :multiple="true"
+                accept="image/*" :maxFileSize="5000000" previewWidth="100">
+                <template #empty>
+                  <p>Drag and drop or browse to upload car images.</p>
+                  <div v-if="previewUrls.length" class="mt-3 grid grid-cols-3 gap-2">
+                    <div v-for="(url, index) in previewUrls" :key="index">
+                      <img :src="url" alt="Preview" class="w-full h-[120px] object-cover border-round" />
+                    </div>
+                  </div>
+                </template>
+              </FileUpload>
 
-            <div v-if="previewUrls.length" class="mt-3 grid grid-nogutter">
-              <div v-for="(url, index) in previewUrls" :key="index" class="col-4 p-1">
-                <img :src="url" alt="Preview" class="w-full border-round"
-                  style="max-height: 150px; object-fit: cover;" />
-              </div>
+              <PrimeButton label="Clear Images" icon="pi pi-times" severity="secondary" class="mt-2"
+                @click="clearImages" />
+
             </div>
-
-            <PrimeButton label="Clear Images" icon="pi pi-times" severity="secondary" class="mt-2"
-              @click="() => { images.value = []; previewUrls.value = [] }" />
           </div>
         </div>
+        <div class="col">
 
-        <!-- Car Info Form -->
-        <div class="col-12 md:col-6">
-          <div class="p-fluid">
-            <div class="field">
-              <label for="make">Make</label>
-              <InputText v-model="make" id="make" class="w-full" />
-            </div>
-            <div class="field">
-              <label for="model">Model</label>
-              <InputText v-model="model" id="model" class="w-full" />
-            </div>
-            <div class="field">
-              <label for="variant">Variant</label>
-              <InputText v-model="variant" id="variant" class="w-full" />
-            </div>
-            <div class="field">
-              <label for="year">Year</label>
-              <InputText v-model="year" id="year" class="w-full" />
-            </div>
-            <div class="field">
-              <label for="price">Price (£)</label>
-              <InputText v-model="price" id="price" class="w-full" />
-            </div>
-            <div class="field">
-              <label for="was_price">Was Price (£)</label>
-              <InputText v-model="was_price" id="was_price" class="w-full" />
-            </div>
-            <div class="field">
-              <label for="mileage">Mileage</label>
-              <div class="w-56">
-                <label for="mileage">Mileage</label>
-                <PrimeSlider v-model="mileageRange" :min="0" :max="200000" :step="1000" class="w-full mb-2" />
-                <InputText v-model="mileageRange" id="mileage" class="w-full" />
-              </div>
-            </div>
-            <div class="field">
-              <label for="fuel_type">Fuel Type</label>
-              <PrimeDropDown v-model="fuel_type" :options="['Petrol', 'Diesel', 'Hybrid', 'Electric']"
-                placeholder="Select Fuel Type" />
-            </div>
-            <div class="field">
-              <label for="body_style">Body Style</label>
-              <InputText v-model="body_style" id="body_style" class="w-full" />
-            </div>
-            <div class="field">
-              <label for="colour">Colour</label>
-              <InputText v-model="colour" id="colour" class="w-full" />
-            </div>
-            <div class="field">
-              <label for="doors">Doors</label>
-              <InputText v-model="doors" id="doors" class="w-full" />
-            </div>
-            <div class="field">
-              <label for="veh_type">Vehicle Type</label>
-              <InputText v-model="veh_type" id="veh_type" class="w-full" />
-            </div>
-            <div class="field">
-              <label for="subtitle">Subtitle</label>
-              <InputText v-model="subtitle" id="subtitle" class="w-full" />
-            </div>
-            <div class="field">
-              <label for="description">Description</label>
-              <PrimeTextarea v-model="description" id="description" class="w-full" rows="3" />
-            </div>
-            <PrimeButton label="Submit Car Listing" icon="pi pi-check" class="mt-3" @click="submitCar" />
+          <InputGroup class="mb-5">
+            <!-- <InputGroupAddon style="background-color: #00309a; color: #fbe90a; height: 50%;">
+              GB
+            </InputGroupAddon> -->
+            <InputText v-model="registrationNumber" style="background-color: #fbe90a; border-color: #00309a"
+              placeholder="REG" inputClass="'bg-transparent text-900 border-400 border-blue-500'"
+              class="text-2xl text-100 font-bold" />
+            <PrimeButton label="Type and click me" text @click="handleRegistrationNumberChange" />
+          </InputGroup>
+          <div class="field mt-2"><label>Registration</label>
+            <InputText v-model="reg" class="w-full mt-2" />
           </div>
+          <div class="field"><label>Make</label>
+            <InputText v-model="make" class="w-full" />
+          </div>
+          <div class="field"><label>Model</label>
+            <InputText v-model="model" class="w-full" />
+          </div>
+          <div class="field"><label>Variant</label>
+            <InputText v-model="variant" class="w-full" />
+          </div>
+          <div class="field"><label>Year</label>
+            <InputText v-model="year" class="w-full" />
+          </div>
+          <div class="field"><label>Price (£)</label>
+            <InputText v-model="price" class="w-full" />
+          </div>
+          <div class="field"><label>Was Price (£)</label>
+            <InputText v-model="was_price" class="w-full" />
+          </div>
+          <div class="field">
+            <label>Mileage</label>
+            <PrimeSlider v-model="mileageRange" :min="0" :max="200000" :step="1000" class="w-full mb-2" />
+            <InputText v-model="mileageRange" class="w-full" />
+          </div>
+          <div class="field"><label>Fuel Type</label>
+            <PrimeDropDown v-model="fuel_type" class="w-full" :options="['Petrol', 'Diesel', 'Hybrid', 'Electric']"
+              placeholder="Select Fuel Type" />
+          </div>
+          <div class="field"><label>Body Style</label>
+            <InputText v-model="body_style" class="w-full" />
+          </div>
+          <div class="field"><label>Colour</label>
+            <InputText v-model="colour" class="w-full" />
+          </div>
+          <div class="field"><label>Doors</label>
+            <InputText v-model="doors" class="w-full" />
+          </div>
+          <div class="field"><label>Vehicle Type</label>
+            <InputText v-model="veh_type" class="w-full" />
+          </div>
+          <div class="field col-span-2"><label>Description</label>
+            <PrimeTextarea v-model="description" class="w-full" rows="3" />
+          </div>
+          <PrimeButton label="Submit Car Listing" icon="pi pi-check" class="mt-3 w-full" @click="submitCar" />
+
         </div>
       </div>
     </div>
   </div>
 </template>
+
+<style scoped>
+.surface-section {
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+</style>
 
 <style scoped>
 .surface-section {
