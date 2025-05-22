@@ -62,84 +62,71 @@ onMounted(fetchCar);
 </script>
 
 <template>
-  <div class="surface-section px-4 pt-5 md:px-6 lg:px-8 car-details-container">
+  <div class="surface-section  pt-5 md:px-6 lg:px-8 car-details-container">
     <div
-      class="flex md:align-items-center md:justify-content-between flex-column md:flex-row pb-4 border-bottom-1 surface-border ">
-      <h2 class="text-2xl font-light">Edit Car Listing <span class="font-bold">{{ form.make +' '+ form.model + ' ' +form.variant}}</span></h2>
+      class="flex md:align-items-center md:justify-content-between flex-column md:flex-row pb-4 border-bottom-1 surface-border mb-3">
+      <h2 class="text-2xl font-light">Edit Car Listing <span class="font-bold">{{ form.make + ' ' + form.model + ' '
+        + form.variant }}</span></h2>
     </div>
-  </div>
+    <div class="grid">
+      <div class="col">
+        <InputText type="file" multiple @change="onImageUpload" class="w-full" />
 
-  <div class="p-6 md:p-8">
+        <PrimeImage v-for="(img, index) in car?.images" :key="'existing-' + index" preview width="250"
+          :alt="`Car image ${index + 1}`" :src="`data:image/jpeg;base64,${img.car_image}`" />
 
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-      <!-- Image section -->
-      <div class="card flex justify-center">
-        <!-- Image section using PrimeImage -->
-        <div class="flex flex-wrap gap-4 mb-6">
-          <!-- Existing images from DB -->
-          <PrimeImage v-for="(img, index) in car?.images" :key="'existing-' + index" preview
-            width="250" :alt="`Car image ${index + 1}`"
-            :src="`data:image/jpeg;base64,${img.car_image}`" />
-
-          <!-- Preview of newly uploaded images -->
-          <PrimeImage v-for="(url, index) in previewUrls" :key="'new-' + index" preview
-            width="250" :alt="`New image ${index + 1}`" :src="url" />
+        <!-- Preview of newly uploaded images -->
+        <PrimeImage v-for="(url, index) in previewUrls" :key="'new-' + index" preview width="250"
+          :alt="`New image ${index + 1}`" :src="url" />
+      </div>
+      <div class="col">
+        <div class="field"><label>Make</label>
+          <InputText v-model="form.make" class="w-full" />
         </div>
-
-      </div>
-      <div>
-        <InputText type="file" multiple @change="onImageUpload" />
-      </div>
-
-      <!-- Editable Form -->
-      <div class="space-y-4">
-        <div><label>Make</label>
+        <!-- <div><label>Make</label>
           <InputText v-model="form.make" class="input" />
+        </div> -->
+        <div class="field"><label>Model</label>
+          <InputText v-model="form.model" class="w-full input" />
         </div>
-        <div><label>Model</label>
-          <InputText v-model="form.model" class="input" />
+        <div class="field"><label>Variant</label>
+          <InputText v-model="form.variant" class="w-full input" />
         </div>
-        <div><label>Variant</label>
-          <InputText v-model="form.variant" class="input" />
+        <div class="field"><label>Price</label>
+          <InputText v-model="form.price" type="number" class="w-full input" />
         </div>
-        <div><label>Price</label>
-          <InputText v-model="form.price" type="number" class="input" />
+        <div class="field"><label>Was Price</label>
+          <InputText v-model="form.was_price" type="number" class="w-full input" />
         </div>
-        <div><label>Was Price</label>
-          <InputText v-model="form.was_price" type="number" class="input" />
+        <div class="field"><label>Mileage</label>
+          <InputText v-model="form.mileage" type="number" class="w-full input" />
         </div>
-        <div><label>Mileage</label>
-          <InputText v-model="form.mileage" type="number" class="input" />
+        <div class="field"><label>Fuel Type</label>
+          <InputText v-model="form.fuel_type" class="w-full input" />
         </div>
-        <div><label>Fuel Type</label>
-          <InputText v-model="form.fuel_type" class="input" />
+        <div class="field"><label>Doors</label>
+          <InputText v-model="form.doors" type="number" class="w-full input" />
         </div>
-        <div><label>Doors</label>
-          <InputText v-model="form.doors" type="number" class="input" />
+        <div class="field"><label>Vehicle Type</label>
+          <InputText v-model="form.veh_type" class="w-full input" />
         </div>
-        <div><label>Vehicle Type</label>
-          <InputText v-model="form.veh_type" class="input" />
+        <div class="field"><label>Body Style</label>
+          <InputText v-model="form.body_style" class="w-full input" />
         </div>
-        <div><label>Body Style</label>
-          <InputText v-model="form.body_style" class="input" />
+        <div class="field"><label>Colour</label>
+          <InputText v-model="form.colour" class="w-full input" />
         </div>
-        <div><label>Colour</label>
-          <InputText v-model="form.colour" class="input" />
+        <div class="field"><label>Year</label>
+          <InputText v-model="form.year" class="w-full input" />
         </div>
-        <div><label>Year</label>
-          <InputText v-model="form.year" class="input" />
+        <div class="field"><label>Subtitle</label>
+          <InputText v-model="form.subtitle" class="w-full input" />
         </div>
-        <div><label>Subtitle</label>
-          <InputText v-model="form.subtitle" class="input" />
+        <div class="field"><label>Description</label>
+          <PrimeTextarea v-model="form.description" class="w-full input"></PrimeTextarea>
         </div>
-        <div><label>Description</label>
-          <PrimeTextarea v-model="form.description" class="input"></PrimeTextarea>
-        </div>
+        <PrimeButton class="bg-blue-600 text-white px-4 py-2 rounded" @click="submitUpdate">Update Listing</PrimeButton>
       </div>
-    </div>
-
-    <div class="mt-6">
-      <PrimeButton class="bg-blue-600 text-white px-4 py-2 rounded" @click="submitUpdate">Update Listing</PrimeButton>
     </div>
   </div>
 </template>
