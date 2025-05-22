@@ -34,6 +34,7 @@ import IconField from 'primevue/iconfield';
 import InputIcon from 'primevue/inputicon';
 import ProgressBar from 'primevue/progressbar';
 import FileUpload from 'primevue/fileupload';
+import Image from 'primevue/image';
 
 
 
@@ -66,6 +67,7 @@ app.component('PrimeSlider', Slider);
 app.component('DataTable', DataTable);
 app.component('PrimeColumn', Column);
 app.component('PrimeTextarea', Textarea);
+app.component('PrimeImage', Image);
 app.component('PrimeCalendar', Calendar);
 app.component('PrimeBadge', Badge);
 app.component('PrimeMessage', Message);

@@ -11,6 +11,8 @@ import UserBooking from '../app/secure/pages/users/UserBooking.vue'
 import AddCar from '@/app/secure/pages/scs/AddCar.vue'
 import { useAuthStore } from '../stores/authStore'
 import { useUserStore } from '@/stores/userStore'
+import ViewAllCarsVue from '@/app/secure/pages/scs/ViewAllCars.vue'
+import CarDetail from '@/app/secure/pages/scs/CarDetail.vue'
 
 // const checkAuth = async (to, from, next) => {
 //     if (authStore.isAuthenticated) next();
@@ -72,7 +74,20 @@ const router = createRouter({
           name: 'scs',
           component: AddCar,
           meta: { requiresAuth: true } 
+        },
+        {
+          path: '/dashboard/view-listings',
+          name: 'scs-car-listings',
+          component: ViewAllCarsVue,
+          meta: { requiresAuth: true } 
+        },
+        {
+          path: '/cars/:id',
+          name: 'car-detail',
+          component: CarDetail,
+          meta: { requiresAuth: true } 
         }
+
       ],
       meta: { requiresAuth: true }
     },
