@@ -70,7 +70,8 @@ onMounted(fetchCar);
     </div>
     <div class="grid">
       <div class="col">
-        <InputText type="file" multiple @change="onImageUpload" class="w-full" />
+        <label>Images</label>
+        <InputText type="file" multiple @change="onImageUpload" class="w-full mt-2" />
 
         <PrimeImage v-for="(img, index) in car?.images" :key="'existing-' + index" preview width="250"
           :alt="`Car image ${index + 1}`" :src="`data:image/jpeg;base64,${img.car_image}`" />
@@ -125,7 +126,7 @@ onMounted(fetchCar);
         <div class="field"><label>Description</label>
           <PrimeTextarea v-model="form.description" class="w-full input"></PrimeTextarea>
         </div>
-        <PrimeButton class="bg-blue-600 text-white px-4 py-2 rounded" @click="submitUpdate">Update Listing</PrimeButton>
+        <PrimeButton class="w-full rounded" label="Update Listing" @click="submitUpdate"></PrimeButton>
       </div>
     </div>
   </div>
