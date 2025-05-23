@@ -13,7 +13,7 @@ const router = useRouter();
 
 const getCars = async () => {
   try {
-    const res = await axios.get('http://127.0.0.1:8000/api/scs-cars');
+    const res = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/scs-cars`);
     cars.value = res.data;
   } catch (error) {
     console.error('Failed to fetch cars', error);

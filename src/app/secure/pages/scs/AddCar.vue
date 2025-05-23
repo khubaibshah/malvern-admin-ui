@@ -128,7 +128,7 @@ const submitCar = async () => {
   });
 
   try {
-    const response = await axios.post('http://127.0.0.1:8000/api/upload-scs-car', formData);
+    const response = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/upload-scs-car`, formData);
     if (response.status === 201) {
       toast.add({ severity: 'success', summary: 'Success', detail: 'Car added successfully', life: 3000 });
       reg.value = make.value = model.value = variant.value = year.value = price.value = was_price.value = '';

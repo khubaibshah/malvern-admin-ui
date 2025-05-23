@@ -25,7 +25,7 @@ class VehicleService {
   // Function to fetch vehicle details from DVLA API
   getVehicleDetails = async (registrationNumber: string): Promise<VehicleData> => {
     try {
-      const response = await axios.post('http://127.0.0.1:8000/admin/get-vehicle-details', {
+      const response = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/admin/get-vehicle-details`, {
         registrationNumber: registrationNumber,
       });
       
@@ -73,7 +73,7 @@ class VehicleService {
   // Function to fetch a single vehicle by ID
   getVehicleByReg = async (registrationNumber: any): Promise<VehicleData> => {
     try {
-      const response = await axios.get(`http://127.0.0.1:8000/admin/vehicle-details/${registrationNumber}`);
+      const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/admin/vehicle-details/${registrationNumber}`);
       console.log('Fetched vehicle data by Registration from db:', response.data);
       return response.data;
     } catch (error) {
@@ -83,7 +83,7 @@ class VehicleService {
   };
   getDvsaVehicleByReg = async (registrationNumber: any) => {
     try {
-      const response = await axios.get(`http://127.0.0.1:8000/admin/dvsa-vehicle-details/${registrationNumber}`);
+      const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/admin/dvsa-vehicle-details/${registrationNumber}`);
 
       console.log('Fetched vehicle data by Registration from dvsa data:', response.data);
       return response.data;

@@ -14,7 +14,7 @@ const previewUrls = ref<string[]>([]);
 const fetchCar = async () => {
   try {
     const id = route.params.id;
-    const res = await axios.get(`http://127.0.0.1:8000/api/get-car-by-id/${id}`);
+    const res = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/get-vehicle-by-id/${id}`);
     car.value = res.data.car;
     form.value = { ...res.data.car }; // Pre-fill editable form
     if (Array.isArray(car.value.images) && car.value.images.length > 0) {
@@ -50,7 +50,7 @@ const submitUpdate = async () => {
   newImages.value.forEach((file, i) => formData.append(`car_images[${i}]`, file));
 
   try {
-    await axios.post(`http://127.0.0.1:8000/api/update-car/${car.value.id}`, formData);
+    await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/update-car/${car.value.id}`, formData);
     alert('Car updated successfully');
   } catch (err) {
     console.error('Update failed', err);
