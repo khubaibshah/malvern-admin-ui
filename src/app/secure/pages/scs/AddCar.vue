@@ -189,7 +189,7 @@ onMounted(() => {
             </InputGroupAddon> -->
             <InputText v-model="registrationNumber" style="background-color: #fbe90a; border-color: #00309a"
               placeholder="REG" inputClass="'bg-transparent text-900 border-400 border-blue-500'"
-              class="text-2xl text-100 font-bold" />
+              class="text-2xl text-500 font-bold" />
             <PrimeButton label="Type and click me" text @click="handleRegistrationNumberChange" />
           </InputGroup>
           <div class="field mt-2"><label>Registration</label>

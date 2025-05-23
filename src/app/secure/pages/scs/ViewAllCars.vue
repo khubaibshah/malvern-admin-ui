@@ -47,7 +47,7 @@ onMounted(getCars);
   :sortOrder="-1"
   paginator
   :rows="10"
-  :globalFilterFields="['make', 'model', 'variant', 'price', 'mileage']"
+  :globalFilterFields="['make', 'model', 'variant', 'price', 'mileage', 'registration']"
   @row-click="goToCarDetail"
 >
 
@@ -61,6 +61,7 @@ onMounted(getCars);
     </div>
   </template>
 
+  <PrimeColumn field="registration" header="Registration" sortable />
   <PrimeColumn field="make" header="Make" sortable />
   <PrimeColumn field="model" header="Model" sortable />
   <PrimeColumn field="variant" header="Variant" sortable />
