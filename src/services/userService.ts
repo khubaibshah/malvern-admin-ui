@@ -2,7 +2,7 @@ import axios from 'axios'
 
 class UserService {
   getCookie = async () => {
-    const apiCall = `${import.meta.env.VITE_API_BASE_URL}/sanctum/csrf-cookie`
+    const apiCall = `https://malvern-api-production.up.railway.app/sanctum/csrf-cookie`
     const config = {
       headers: {
         'Content-Type': 'application/json',
@@ -39,7 +39,7 @@ class UserService {
 //     }
 //   }
   getUser = async (token: string | null) => {
-    const apiCall = '${import.meta.env.VITE_API_BASE_URL}/api/user'
+    const apiCall = 'https://malvern-api-production.up.railway.app/api/user'
     const config = {
       headers: {
         Authorization: 'Bearer ' + token,
@@ -57,7 +57,7 @@ class UserService {
     }
   }
   logout = async (token: string | null) => {
-    const apiCall = `${import.meta.env.VITE_API_BASE_URL}/api/logout`
+    const apiCall = `https://malvern-api-production.up.railway.app/api/logout`
     const config = {
       headers: {
         Authorization: 'Bearer ' + token,
@@ -76,7 +76,7 @@ class UserService {
   }
   getAllUsers = async (token: string | null) => {
     try {
-      const apiCall = `${import.meta.env.VITE_API_BASE_URL}/api/users`
+      const apiCall = `https://malvern-api-production.up.railway.app/api/users`
       const config = {
         headers: {
           'Authorization': "Bearer "+token,
