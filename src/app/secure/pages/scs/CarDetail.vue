@@ -15,10 +15,10 @@ const fetchCar = async () => {
   try {
     const id = route.params.id;
     const res = await axios.get(`http://127.0.0.1:8000/api/get-car-by-id/${id}`);
-    car.value = res.data;
-    form.value = { ...res.data }; // Pre-fill editable form
-    if (car.value.images?.length) {
-      mainImage.value = `data:image/jpeg;base64,${car.value.images[0].car_image}`;
+    car.value = res.data.car;
+    form.value = { ...res.data.car }; // Pre-fill editable form
+    if (Array.isArray(car.value.images) && car.value.images.length > 0) {
+      mainImage.value = car.value.images[0];
     }
   } catch (err) {
     console.error('Failed to load car data', err);
@@ -27,7 +27,7 @@ const fetchCar = async () => {
 
 const setMainImage = (index: number) => {
   activeIndex.value = index;
-  mainImage.value = `data:image/jpeg;base64,${car.value.images[index].car_image}`;
+  mainImage.value = car.value.images[index];
 };
 
 const onImageUpload = (event: Event) => {
@@ -62,66 +62,56 @@ onMounted(fetchCar);
 </script>
 
 <template>
-  <div class="surface-section  pt-5 md:px-6 lg:px-8 car-details-container">
-    <div
-      class="flex md:align-items-center md:justify-content-between flex-column md:flex-row pb-4 border-bottom-1 surface-border mb-3">
-      <h2 class="text-2xl font-light">Edit Car Listing <span class="font-bold">{{ form.make + ' ' + form.model + ' '
-        + form.variant }}</span></h2>
+  <div class="surface-section pt-5 md:px-6 lg:px-8 car-details-container">
+    <div class="flex md:align-items-center md:justify-content-between flex-column md:flex-row pb-4 border-bottom-1 surface-border mb-3">
+      <h2 class="text-2xl font-light">Edit Car Listing <span class="font-bold">{{ form.make + ' ' + form.model + ' ' + form.variant }}</span></h2>
     </div>
     <div class="grid">
       <div class="col">
         <label>Images</label>
         <InputText type="file" multiple @change="onImageUpload" class="w-full mt-2" />
 
-        <PrimeImage v-for="(img, index) in car?.images" :key="'existing-' + index" preview width="250"
-          :alt="`Car image ${index + 1}`" :src="`data:image/jpeg;base64,${img.car_image}`" />
+        <div class="mt-3">
+          <div v-if="mainImage">
+            <PrimeImage :src="mainImage" alt="Main" 
+             width="400"
+             height="180"
+            preview/>
+          </div>
 
-        <!-- Preview of newly uploaded images -->
-        <PrimeImage v-for="(url, index) in previewUrls" :key="'new-' + index" preview width="250"
-          :alt="`New image ${index + 1}`" :src="url" />
+          <div class="flex gap-2 flex-wrap">
+            <PrimeImage
+              v-for="(img, index) in car?.images"
+              :key="'existing-' + index"
+              :src="img"
+              :alt="'Car image ' + index"
+              width="100"
+              class="cursor-pointer border-round"
+              @click="setMainImage(index)"
+              preview
+            />
+          </div>
+
+          <div class="mt-2">
+            <div class="text-sm text-gray-500">New Images:</div>
+            <div class="flex gap-2 flex-wrap mt-1">
+              <PrimeImage
+                v-for="(url, index) in previewUrls"
+                :key="'new-' + index"
+                :src="url"
+                width="100"
+                class="border-round"
+                preview
+              />
+            </div>
+          </div>
+        </div>
       </div>
+
       <div class="col">
-        <div class="field"><label>Make</label>
-          <InputText v-model="form.make" class="w-full" />
-        </div>
-        <!-- <div><label>Make</label>
-          <InputText v-model="form.make" class="input" />
-        </div> -->
-        <div class="field"><label>Model</label>
-          <InputText v-model="form.model" class="w-full input" />
-        </div>
-        <div class="field"><label>Variant</label>
-          <InputText v-model="form.variant" class="w-full input" />
-        </div>
-        <div class="field"><label>Price</label>
-          <InputText v-model="form.price" type="number" class="w-full input" />
-        </div>
-        <div class="field"><label>Was Price</label>
-          <InputText v-model="form.was_price" type="number" class="w-full input" />
-        </div>
-        <div class="field"><label>Mileage</label>
-          <InputText v-model="form.mileage" type="number" class="w-full input" />
-        </div>
-        <div class="field"><label>Fuel Type</label>
-          <InputText v-model="form.fuel_type" class="w-full input" />
-        </div>
-        <div class="field"><label>Doors</label>
-          <InputText v-model="form.doors" type="number" class="w-full input" />
-        </div>
-        <div class="field"><label>Vehicle Type</label>
-          <InputText v-model="form.veh_type" class="w-full input" />
-        </div>
-        <div class="field"><label>Body Style</label>
-          <InputText v-model="form.body_style" class="w-full input" />
-        </div>
-        <div class="field"><label>Colour</label>
-          <InputText v-model="form.colour" class="w-full input" />
-        </div>
-        <div class="field"><label>Year</label>
-          <InputText v-model="form.year" class="w-full input" />
-        </div>
-        <div class="field"><label>Subtitle</label>
-          <InputText v-model="form.subtitle" class="w-full input" />
+        <div class="field" v-for="(value, key) in form" :key="key" v-if="typeof value !== 'object'">
+          <label :for="key">{{ key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()) }}</label>
+          <InputText v-model="form[key]" :type="typeof value === 'number' ? 'number' : 'text'" class="w-full input" />
         </div>
         <div class="field"><label>Description</label>
           <PrimeTextarea v-model="form.description" class="w-full input"></PrimeTextarea>

@@ -246,7 +246,7 @@ const getUser = async () => {
                                 ></i>
                                 <span
                                     class="text-center font-medium inline text-base lg:text-xs lg:block"
-                                    >SCS Cars</span
+                                    >Add SCS car listing</span
                                 >
                             </a>
                         </li>
