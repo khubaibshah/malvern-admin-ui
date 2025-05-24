@@ -4,6 +4,8 @@ import axios from 'axios';
 import { FilterMatchMode } from 'primevue/api';
 import { useRouter } from 'vue-router';
 
+
+const seshId = sessionStorage.getItem('token')
 const cars = ref([]);
 const filters = ref({
   global: { value: null, matchMode: FilterMatchMode.CONTAINS }
@@ -13,7 +15,14 @@ const router = useRouter();
 
 const getCars = async () => {
   try {
-    const res = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/scs-cars`);
+    const config = {
+      headers: {
+        Authorization: 'Bearer ' + seshId,
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*'
+      }
+    }
+    const res = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/scs-cars`, config);
     cars.value = res.data;
   } catch (error) {
     console.error('Failed to fetch cars', error);

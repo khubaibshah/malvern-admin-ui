@@ -10,11 +10,18 @@ const activeIndex = ref(0);
 const form = ref<any>({});
 const newImages = ref<File[]>([]);
 const previewUrls = ref<string[]>([]);
-
+const seshId = sessionStorage.getItem('token')
 const fetchCar = async () => {
   try {
     const id = route.params.id;
-    const res = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/get-vehicle-by-id/${id}`);
+    const config = {
+      headers: {
+        Authorization: 'Bearer ' + seshId,
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*'
+      }
+    }
+    const res = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/get-vehicle-by-id/${id}`, config);
     car.value = res.data.car;
     form.value = { ...res.data.car }; // Pre-fill editable form
     if (Array.isArray(car.value.images) && car.value.images.length > 0) {
@@ -50,7 +57,15 @@ const submitUpdate = async () => {
   newImages.value.forEach((file, i) => formData.append(`car_images[${i}]`, file));
 
   try {
-    await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/update-car/${car.value.id}`, formData);
+    const config = {
+      headers: {
+        Authorization: 'Bearer ' + token,
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*'
+      }
+    }
+    await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/update-car/${car.value.id}`, formData, config);
+    
     alert('Car updated successfully');
   } catch (err) {
     console.error('Update failed', err);

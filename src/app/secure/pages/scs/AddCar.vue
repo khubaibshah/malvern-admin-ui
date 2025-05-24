@@ -29,6 +29,7 @@ const description = ref('');
 const previewUrls = ref<string[]>([]);
 const mileageRange = ref(50000);
 const registrationSuccess = ref(false);
+const seshId = sessionStorage.getItem('token')
 
 const onUpload = (event: any) => {
   const newFiles: File[] = event.files;
@@ -128,7 +129,14 @@ const submitCar = async () => {
   });
 
   try {
-    const response = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/upload-scs-car`, formData);
+    const config = {
+      headers: {
+        Authorization: 'Bearer ' + seshId,
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*'
+      }
+    }
+    const response = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/upload-scs-car`, formData, config);
     if (response.status === 201) {
       toast.add({ severity: 'success', summary: 'Success', detail: 'Car added successfully', life: 3000 });
       reg.value = make.value = model.value = variant.value = year.value = price.value = was_price.value = '';
