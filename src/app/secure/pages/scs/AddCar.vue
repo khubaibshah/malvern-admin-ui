@@ -108,45 +108,51 @@ const submitCar = async () => {
   }
 
   const formData = new FormData();
-  formData.append('reg', reg.value);
   formData.append('make', make.value);
   formData.append('model', model.value);
-  formData.append('variant', variant.value);
   formData.append('year', year.value);
   formData.append('price', price.value);
-  formData.append('was_price', was_price.value);
   formData.append('mileage', mileageRange.value.toString());
   formData.append('fuel_type', fuel_type.value);
-  formData.append('body_style', body_style.value);
   formData.append('colour', colour.value);
-  formData.append('doors', doors.value);
   formData.append('veh_type', veh_type.value);
   formData.append('description', description.value);
   formData.append('registration', registrationNumber.value);
 
-  images.value.forEach((file) => {
-    formData.append('car_images[]', file);
+  // Append each file individually (not as array)
+  images.value.forEach((file, index) => {
+    formData.append(`car_images[${index}]`, file);
   });
 
   try {
-    const config = {
-      headers: {
-        Authorization: 'Bearer ' + seshId,
-        'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': '*'
+    const response = await axios.post(
+      `${import.meta.env.VITE_API_BASE_URL}/api/upload-scs-car`,
+      formData,
+      {
+        headers: {
+          'Authorization': 'Bearer ' + seshId,
+          'Content-Type': 'multipart/form-data' // Important for file uploads
+        }
       }
-    }
-    const response = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/upload-scs-car`, formData, config);
+    );
+    
     if (response.status === 201) {
-      toast.add({ severity: 'success', summary: 'Success', detail: 'Car added successfully', life: 3000 });
+      toast.add({ 
+        severity: 'success', 
+        summary: 'Success', 
+        detail: 'Car added successfully', 
+        life: 3000 
+      });
+      // Reset form
       reg.value = make.value = model.value = variant.value = year.value = price.value = was_price.value = '';
       clearImages();
     }
   } catch (error) {
+    console.error('Upload error:', error);
     toast.add({
       severity: 'error',
       summary: 'Error',
-      detail: 'Failed to upload car data',
+      detail: error.response?.data?.message || 'Failed to upload car data',
       life: 3000
     });
   }
