@@ -22,7 +22,7 @@ const getCars = async () => {
         'Access-Control-Allow-Origin': '*'
       }
     }
-    const res = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/scs-cars`, config);
+    const res = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/admin/vehicle-list`, config);
     cars.value = res.data;
   } catch (error) {
     console.error('Failed to fetch cars', error);
