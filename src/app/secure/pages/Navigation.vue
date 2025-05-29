@@ -223,6 +223,7 @@ const getUser = async () => {
                         </li>
                         <li>
                             <a
+                            @click="router.push({name : 'featured-vehicle'})"
                                 v-ripple
                                 class="flex flex-row lg:flex-column align-items-center cursor-pointer p-3 lg:justify-content-center hover:bg-gray-800 border-round text-gray-300 hover:text-white transition-duration-150 transition-colors p-ripple"
                             >
@@ -230,8 +231,8 @@ const getUser = async () => {
                                     class="pi pi-calendar mr-2 lg:mr-0 mb-0 lg:mb-2 text-base lg:text-lg"
                                 ></i>
                                 <span
-                                    class="font-medium inline text-base lg:text-xs lg:block"
-                                    >Events</span
+                                    class="text-center font-medium inline text-base lg:text-xs lg:block"
+                                    >Featured Vehicle</span
                                 >
                             </a>
                         </li>

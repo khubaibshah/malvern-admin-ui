@@ -2,7 +2,7 @@ import axios from 'axios'
 
 class UserService {
   getCookie = async () => {
-    const apiCall = `https://malvern-api-production.up.railway.app/sanctum/csrf-cookie`
+    const apiCall = `${import.meta.env.VITE_API_BASE_URL}/sanctum/csrf-cookie`
     const config = {
       headers: {
         'Content-Type': 'application/json',
@@ -19,7 +19,7 @@ class UserService {
     }
   }
 //   getLogin = async (userDetails) => {
-//     const apiCall = 'https://malvern-api-production.up.railway.app/api/login'
+//     const apiCall = '${import.meta.env.VITE_API_BASE_URL}/api/login'
 //     const config = {
 //       headers: {
 //         'Content-Type': 'application/json',
@@ -39,7 +39,7 @@ class UserService {
 //     }
 //   }
   getUser = async (token: string | null) => {
-    const apiCall = 'https://malvern-api-production.up.railway.app/api/user'
+    const apiCall = '${import.meta.env.VITE_API_BASE_URL}/api/user'
     const config = {
       headers: {
         Authorization: 'Bearer ' + token,
@@ -57,7 +57,7 @@ class UserService {
     }
   }
   logout = async (token: string | null) => {
-    const apiCall = `https://malvern-api-production.up.railway.app/api/logout`
+    const apiCall = `${import.meta.env.VITE_API_BASE_URL}/api/logout`
     const config = {
       headers: {
         Authorization: 'Bearer ' + token,
@@ -76,7 +76,7 @@ class UserService {
   }
   getAllUsers = async (token: string | null) => {
     try {
-      const apiCall = `https://malvern-api-production.up.railway.app/api/users`
+      const apiCall = `${import.meta.env.VITE_API_BASE_URL}/api/users`
       const config = {
         headers: {
           'Authorization': "Bearer "+token,
@@ -92,7 +92,7 @@ class UserService {
     }
   }
 //   register = async () =>{
-//     const apiCall = 'https://malvern-api-production.up.railway.app/api/register'
+//     const apiCall = '${import.meta.env.VITE_API_BASE_URL}/api/register'
 //         const config = {
 //           headers: {
 //             'Content-Type': 'application/json',

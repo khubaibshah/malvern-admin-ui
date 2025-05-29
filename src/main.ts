@@ -35,6 +35,10 @@ import InputIcon from 'primevue/inputicon';
 import ProgressBar from 'primevue/progressbar';
 import FileUpload from 'primevue/fileupload';
 import Image from 'primevue/image';
+import MegaMenu from 'primevue/megamenu';
+
+import DataView from 'primevue/dataview';
+
 
 
 
@@ -72,7 +76,7 @@ app.component('PrimeCalendar', Calendar);
 app.component('PrimeBadge', Badge);
 app.component('PrimeMessage', Message);
 app.component('PrimeToast', Toast);
-app.component('PrimeCheckbox', Checkbox);
+app.component('PrimeCheckbox', Chec kbox);
 app.component('PrimeDivider', Divider);
 app.component('PrimeCarousel', Carousel);
 app.component('VirtualScroller', VirtualScroller);
@@ -83,6 +87,8 @@ app.component('IconField', IconField);
 app.component('InputIcon', InputIcon);
 app.component('ProgressBar', ProgressBar);
 app.component('FileUpload', FileUpload);
+app.component('PrimeMegaMenu', MegaMenu);
+app.component('PrimeDataView', DataView);
 
 app.config.globalProperties.$filters = {
     currencyGBP(value: number | string) {

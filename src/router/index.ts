@@ -13,6 +13,7 @@ import { useAuthStore } from '../stores/authStore'
 import { useUserStore } from '@/stores/userStore'
 import ViewAllCarsVue from '@/app/secure/pages/scs/ViewAllCars.vue'
 import CarDetail from '@/app/secure/pages/scs/CarDetail.vue'
+import FeaturedVehicle from '@/app/secure/pages/scs/FeaturedVehicle.vue'
 
 // const checkAuth = async (to, from, next) => {
 //     if (authStore.isAuthenticated) next();
@@ -85,6 +86,12 @@ const router = createRouter({
           path: '/cars/:id',
           name: 'car-detail',
           component: CarDetail,
+          meta: { requiresAuth: true } 
+        },
+        {
+          path: '/cars/featured-vehicle',
+          name: 'featured-vehicle',
+          component: FeaturedVehicle,
           meta: { requiresAuth: true } 
         }
 

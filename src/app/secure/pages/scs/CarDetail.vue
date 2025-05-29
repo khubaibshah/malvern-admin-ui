@@ -105,7 +105,7 @@ const submitUpdate = async () => {
         'Access-Control-Allow-Origin': '*'
       }
     };
-    await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/update-car/${car.value.id}`, formData, config);
+    await axios.post(`${import.meta.env.VITE_API_BASE_URL}/admin/update-car/${car.value.id}`, formData, config);
     alert('Car updated successfully');
   } catch (err) {
     console.error('Update failed', err);
@@ -128,25 +128,27 @@ onMounted(fetchCar);
         <label>Images</label>
         <InputText type="file" multiple @change="onImageUpload" class="w-full mt-2" />
 
-        <div class="mt-3">
-          <div v-if="mainImage">
-            <PrimeImage :src="mainImage" alt="Main" width="400" height="180" preview />
+        <div class="mt-4">
+          <h3 class="text-lg font-semibold mb-2">Gallery</h3>
+          <div v-if="car?.images?.length" class="bg-white shadow rounded-md p-3">
+            <PrimeCarousel :value="car.images" :numVisible="1" :numScroll="1" :circular="true" :autoplayInterval="4000"
+              :responsiveOptions="[
+                { breakpoint: '1400px', numVisible: 1, numScroll: 1 },
+                { breakpoint: '1024px', numVisible: 1, numScroll: 1 },
+                { breakpoint: '768px', numVisible: 1, numScroll: 1 }
+              ]">
+              <template #item="{ data, index }">
+                <div class="relative cursor-pointer" @click="mainImage = data">
+                  <PrimeImage :src="data"
+                    class="w-full h-[280px] object-cover rounded-lg hover:scale-105 transition-transform duration-300"
+                    :alt="'Image ' + index" />
+                </div>
+              </template>
+            </PrimeCarousel>
           </div>
-
-          <div class="flex gap-2 flex-wrap">
-            <PrimeImage v-for="(img, index) in car?.images" :key="'existing-' + index" :src="img"
-              :alt="'Car image ' + index" width="100" class="cursor-pointer border-round" @click="setMainImage(index)"
-              preview />
-          </div>
-
-          <div class="mt-2">
-            <div class="text-sm text-gray-500">New Images:</div>
-            <div class="flex gap-2 flex-wrap mt-1">
-              <PrimeImage v-for="(url, index) in previewUrls" :key="'new-' + index" :src="url" width="100"
-                class="border-round" preview />
-            </div>
-          </div>
+          <p v-else class="text-gray-500 italic mt-2">No images available for this vehicle.</p>
         </div>
+
       </div>
 
       <div class="col">
