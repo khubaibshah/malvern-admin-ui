@@ -76,7 +76,7 @@ app.component('PrimeCalendar', Calendar);
 app.component('PrimeBadge', Badge);
 app.component('PrimeMessage', Message);
 app.component('PrimeToast', Toast);
-app.component('PrimeCheckbox', Chec kbox);
+app.component('PrimeCheckbox', Checkbox);
 app.component('PrimeDivider', Divider);
 app.component('PrimeCarousel', Carousel);
 app.component('VirtualScroller', VirtualScroller);
