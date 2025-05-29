@@ -158,6 +158,17 @@ const submitCar = async () => {
   }
 };
 
+const removeImage = (index: number) => {
+  images.value.splice(index, 1);
+  previewUrls.value.splice(index, 1);
+  toast.add({
+    severity: 'info',
+    summary: 'Image Removed',
+    detail: 'The image has been removed',
+    life: 3000
+  });
+};
+
 onMounted(() => {
   const storeData = vehicleStore.getVehicleData;
   if (storeData) {
@@ -178,20 +189,26 @@ onMounted(() => {
           <div>
             <div class="card">
               <FileUpload name="car_images" customUpload :auto="true" @uploader="onUpload" :multiple="true"
-                accept="image/*" :maxFileSize="5000000" previewWidth="100">
-                <template #empty>
-                  <p>Drag and drop or browse to upload car images.</p>
-                  <div v-if="previewUrls.length" class="mt-3 grid grid-cols-3 gap-2">
-                    <div v-for="(url, index) in previewUrls" :key="index">
-                      <img :src="url" alt="Preview" class="w-full h-[120px] object-cover border-round" />
-                    </div>
-                  </div>
-                </template>
-              </FileUpload>
-
-              <PrimeButton label="Clear Images" icon="pi pi-times" severity="secondary" class="mt-2"
-                @click="clearImages" />
-
+  accept="image/*" :maxFileSize="5000000">
+  <template #empty>
+    <p>Drag and drop or browse to upload car images.</p>
+    <div v-if="previewUrls.length" class="mt-3 grid grid-cols-3 gap-2">
+      <div v-for="(url, index) in previewUrls" :key="index" class="relative">
+        <img 
+          :src="url" 
+          alt="Preview" 
+          class="w-full h-24 object-contain border-round bg-gray-100 p-1"
+          style="max-width: 120px; max-height: 161px;"
+        />
+        <PrimeButton 
+          icon="pi pi-times" 
+          class="absolute top-0 right-0 p-1 w-2rem h-2rem bg-white border-circle shadow-2"
+          @click.stop="removeImage(index)"
+        />
+      </div>
+    </div>
+  </template>
+</FileUpload>
             </div>
           </div>
         </div>

@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { onMounted, ref } from 'vue';
+import { onMounted, ref, computed } from 'vue';
 import { useRoute } from 'vue-router';
+import { useToast } from 'primevue/usetoast';
 import axios from 'axios';
 
 const route = useRoute();
@@ -8,8 +9,6 @@ const car = ref<any>(null);
 const mainImage = ref('');
 const activeIndex = ref(0);
 const form = ref<any>({});
-const newImages = ref<File[]>([]);
-const previewUrls = ref<string[]>([]);
 const seshId = sessionStorage.getItem('token');
 
 // individual form fields
@@ -25,6 +24,8 @@ const colour = ref('');
 const doors = ref<number | null>(null);
 const veh_type = ref('');
 const description = ref('');
+const toast = useToast();
+const files = ref<any[]>([]);
 
 const fetchCar = async () => {
   try {
@@ -62,26 +63,8 @@ const fetchCar = async () => {
   }
 };
 
-const setMainImage = (index: number) => {
-  activeIndex.value = index;
-  mainImage.value = car.value.images[index];
-};
-
-const onImageUpload = (event: Event) => {
-  const files = (event.target as HTMLInputElement).files;
-  if (files) {
-    Array.from(files).forEach((file) => {
-      newImages.value.push(file);
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        if (e.target?.result) previewUrls.value.push(e.target.result as string);
-      };
-      reader.readAsDataURL(file);
-    });
-  }
-};
-
-const submitUpdate = async () => {
+const onUpload = async (event: any) => {
+  // Prepare form data with all fields
   const formData = new FormData();
   formData.append('make', make.value);
   formData.append('model', model.value);
@@ -95,29 +78,51 @@ const submitUpdate = async () => {
   formData.append('doors', doors.value?.toString() || '');
   formData.append('veh_type', veh_type.value);
   formData.append('description', description.value);
-  newImages.value.forEach((file, i) => formData.append(`car_images[${i}]`, file));
+  
+  // Add uploaded files to formData
+  event.files.forEach((file: any) => {
+    formData.append('car_images[]', file);
+  });
 
   try {
     const config = {
       headers: {
         Authorization: 'Bearer ' + seshId,
-        'Content-Type': 'multipart/form-data',
-        'Access-Control-Allow-Origin': '*'
+        'Content-Type': 'multipart/form-data'
       }
     };
-    await axios.post(`${import.meta.env.VITE_API_BASE_URL}/admin/update-car/${car.value.id}`, formData, config);
-    alert('Car updated successfully');
+    
+    const response = await axios.post(
+      `${import.meta.env.VITE_API_BASE_URL}/admin/update-car/${car.value.id}`,
+      formData,
+      config
+    );
+    
+    toast.add({ severity: 'info', summary: 'Success', detail: 'File Uploaded', life: 3000 });
+    
+    // Refresh car data after update
+    await fetchCar();
+    
   } catch (err) {
     console.error('Update failed', err);
-    alert('Failed to update car');
+    toast.add({ 
+      severity: 'error', 
+      summary: 'Error', 
+      detail: 'Failed to update car', 
+      life: 3000 
+    });
   }
 };
-
+const uploadUrl = computed(() => {
+  return car.value?.id 
+    ? `${import.meta.env.VITE_API_BASE_URL}/admin/update-car/${car.value.id}`
+    : '';
+});
 onMounted(fetchCar);
 </script>
 
-
 <template>
+  <Toast />
   <div class="surface-section pt-5 md:px-6 lg:px-8 car-details-container">
     <div
       class="flex md:align-items-center md:justify-content-between flex-column md:flex-row pb-4 border-bottom-1 surface-border mb-3">
@@ -126,29 +131,29 @@ onMounted(fetchCar);
     <div class="grid">
       <div class="col">
         <label>Images</label>
-        <InputText type="file" multiple @change="onImageUpload" class="w-full mt-2" />
+        <Toast />
+       <FileUpload name="demo[]" :url="uploadUrl" @upload="onUpload($event)" :multiple="true" accept="image/*" :maxFileSize="1000000">
+            <template #empty>
+                <span>Drag and drop files to here to upload.</span>
+            </template>
+        </FileUpload>
 
         <div class="mt-4">
           <h3 class="text-lg font-semibold mb-2">Gallery</h3>
-          <div v-if="car?.images?.length" class="bg-white shadow rounded-md p-3">
-            <PrimeCarousel :value="car.images" :numVisible="1" :numScroll="1" :circular="true" :autoplayInterval="4000"
-              :responsiveOptions="[
-                { breakpoint: '1400px', numVisible: 1, numScroll: 1 },
-                { breakpoint: '1024px', numVisible: 1, numScroll: 1 },
-                { breakpoint: '768px', numVisible: 1, numScroll: 1 }
-              ]">
-              <template #item="{ data, index }">
-                <div class="relative cursor-pointer" @click="mainImage = data">
-                  <PrimeImage :src="data"
-                    class="w-full h-[280px] object-cover rounded-lg hover:scale-105 transition-transform duration-300"
-                    :alt="'Image ' + index" />
-                </div>
-              </template>
-            </PrimeCarousel>
+          <div class="bg-white shadow rounded-md p-3">
+            <div v-if="car?.images?.length" class="mb-6">
+              <h4 class="font-medium mb-2">Existing Images</h4>
+              <PrimeCarousel :value="car.images" :numVisible="1" :numScroll="1" :circular="true"
+                class="carousel-container">
+                <template #item="{ data }">
+                  <div class="carousel-image-container">
+                    <img :src="data" class="carousel-image" :alt="'Car image'" />
+                  </div>
+                </template>
+              </PrimeCarousel>
+            </div>
           </div>
-          <p v-else class="text-gray-500 italic mt-2">No images available for this vehicle.</p>
         </div>
-
       </div>
 
       <div class="col">
@@ -188,13 +193,78 @@ onMounted(fetchCar);
         <div class="field col-span-2"><label>Description</label>
           <PrimeTextarea v-model="description" class="w-full" rows="3" />
         </div>
-        <PrimeButton class="w-full rounded" label="Update Listing" @click="submitUpdate"></PrimeButton>
       </div>
     </div>
   </div>
 </template>
 
 <style scoped>
+/* Your existing styles remain the same */
+.thumbnail-image {
+  width: 120px;
+  height: 90px;
+  object-fit: cover;
+  border-radius: 4px;
+}
+
+.carousel-container {
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.carousel-image-container {
+  width: 100%;
+  height: 400px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+}
+
+.carousel-image {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  border-radius: 8px;
+}
+
+@media (max-width: 768px) {
+  .carousel-image-container {
+    height: 300px;
+  }
+
+  .thumbnail-image {
+    width: 100px;
+    height: 75px;
+  }
+}
+
+.thumbnail-image {
+  width: 120px;
+  height: 120px;
+  object-fit: cover;
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
+}
+
+.remove-btn {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  width: 24px;
+  height: 24px;
+  background: rgb(0, 0, 0);
+  border-radius: 50%;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  color: white;
+}
+
+@media (max-width: 480px) {
+  .carousel-image-container {
+    height: 250px;
+  }
+}
+
 .input {
   @apply w-full border border-gray-300 rounded px-3 py-2;
 }
