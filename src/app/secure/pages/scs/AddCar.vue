@@ -47,6 +47,8 @@ const onUpload = async (event: any) => {
         {
           headers: {
             Authorization: `Bearer ${seshId}`,
+             'Content-Type': 'application/json'
+
           }
         }
       );
