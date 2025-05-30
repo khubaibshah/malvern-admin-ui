@@ -24,7 +24,6 @@ const body_style = ref('');
 const colour = ref('');
 const doors = ref('');
 const veh_type = ref('Car');
-const subtitle = ref('');
 const description = ref('');
 const previewUrls = ref<string[]>([]);
 const mileageRange = ref(50000);
@@ -110,18 +109,20 @@ const submitCar = async () => {
   const formData = new FormData();
   formData.append('make', make.value);
   formData.append('model', model.value);
+  formData.append('variant', variant.value);
   formData.append('year', year.value);
   formData.append('price', price.value);
   formData.append('mileage', mileageRange.value.toString());
   formData.append('fuel_type', fuel_type.value);
   formData.append('colour', colour.value);
+  formData.append('door', doors.value);
   formData.append('veh_type', veh_type.value);
   formData.append('description', description.value);
   formData.append('registration', registrationNumber.value);
 
   // Append each file individually (not as array)
   images.value.forEach((file, index) => {
-    formData.append(`car_images[${index}]`, file);
+    formData.append('car_images[]', file); // ✅ This ensures PHP parses it as an array
   });
 
   try {
@@ -189,7 +190,7 @@ onMounted(() => {
           <div>
             <div class="card">
               <FileUpload name="car_images" customUpload :auto="true" @uploader="onUpload" :multiple="true"
-  accept="image/*" :maxFileSize="5000000">
+  accept="image/*">
   <template #empty>
     <p>Drag and drop or browse to upload car images.</p>
     <div v-if="previewUrls.length" class="mt-3 grid grid-cols-3 gap-2">
