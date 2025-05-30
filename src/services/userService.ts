@@ -39,7 +39,7 @@ class UserService {
 //     }
 //   }
   getUser = async (token: string | null) => {
-    const apiCall = '${import.meta.env.VITE_API_BASE_URL}/api/user'
+    const apiCall = `${import.meta.env.VITE_API_BASE_URL}/api/user`
     const config = {
       headers: {
         Authorization: 'Bearer ' + token,
