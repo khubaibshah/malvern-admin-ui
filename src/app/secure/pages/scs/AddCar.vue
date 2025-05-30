@@ -30,19 +30,60 @@ const mileageRange = ref(50000);
 const registrationSuccess = ref(false);
 const seshId = sessionStorage.getItem('token')
 
-const onUpload = (event: any) => {
+const s3ImageKeys = ref<string[]>([]); // store uploaded S3 image keys
+
+const onUpload = async (event: any) => {
   const newFiles: File[] = event.files;
-  newFiles.forEach((file) => {
-    images.value.push(file);
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      if (e.target?.result) {
-        previewUrls.value.push(e.target.result as string);
-      }
-    };
-    reader.readAsDataURL(file);
-  });
+
+  for (const file of newFiles) {
+    try {
+      // Request a pre-signed URL from your backend
+      const presignRes = await axios.post(
+        `${import.meta.env.VITE_API_BASE_URL}/admin/s3-presigned-url`, // your new route
+        {
+          filename: file.name,
+          contentType: file.type
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${seshId}`,
+          }
+        }
+      );
+
+      const { url, key } = presignRes.data;
+
+      // Upload directly to S3
+      await axios.put(url, file, {
+        headers: {
+          'Content-Type': file.type,
+        }
+      });
+
+      // Store for submission later
+      s3ImageKeys.value.push(key);
+
+      // Preview for UI
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        if (e.target?.result) {
+          previewUrls.value.push(e.target.result as string);
+        }
+      };
+      reader.readAsDataURL(file);
+
+    } catch (err) {
+      console.error('S3 upload failed:', err);
+      toast.add({
+        severity: 'error',
+        summary: 'Image Upload Error',
+        detail: file.name + ' failed to upload',
+        life: 3000,
+      });
+    }
+  }
 };
+
 
 const clearImages = () => {
   images.value = [];
@@ -121,9 +162,10 @@ const submitCar = async () => {
   formData.append('registration', registrationNumber.value);
 
   // Append each file individually (not as array)
-  images.value.forEach((file, index) => {
-    formData.append('car_images[]', file); // ✅ This ensures PHP parses it as an array
-  });
+s3ImageKeys.value.forEach((key, index) => {
+  formData.append(`car_images[${index}]`, key); // store S3 keys/paths only
+});
+
 
   try {
     const response = await axios.post(
