@@ -9,6 +9,7 @@ const toast = useToast();
 const vehicleStore = useVehicleStore();
 const vehicleData = ref();
 
+// Form fields
 const registrationNumber = ref("");
 const reg = ref('');
 const make = ref('');
@@ -17,7 +18,6 @@ const variant = ref('');
 const year = ref('');
 const price = ref('');
 const was_price = ref('');
-const images = ref<File[]>([]);
 const mileage = ref('');
 const fuel_type = ref('');
 const body_style = ref('');
@@ -25,21 +25,24 @@ const colour = ref('');
 const doors = ref('');
 const veh_type = ref('Car');
 const description = ref('');
-const previewUrls = ref<string[]>([]);
 const mileageRange = ref(50000);
 const registrationSuccess = ref(false);
-const seshId = sessionStorage.getItem('token')
+const seshId = sessionStorage.getItem('token');
 
-const s3ImageKeys = ref<string[]>([]); // store uploaded S3 image keys
+// Image handling
+const previewUrls = ref<string[]>([]);
+const s3ImageKeys = ref<string[]>([]); // Store uploaded S3 image keys
+const isUploading = ref(false); // Track upload state
 
 const onUpload = async (event: any) => {
   const newFiles: File[] = event.files;
+  isUploading.value = true;
 
-  for (const file of newFiles) {
-    try {
-      // Request a pre-signed URL from your backend
+  try {
+    for (const file of newFiles) {
+      // Request a pre-signed URL from backend
       const presignRes = await axios.post(
-        `${import.meta.env.VITE_API_BASE_URL}/admin/s3-presigned-url`, // your new route
+        `${import.meta.env.VITE_API_BASE_URL}/admin/s3-presigned-url`,
         {
           filename: file.name,
           contentType: file.type
@@ -47,8 +50,7 @@ const onUpload = async (event: any) => {
         {
           headers: {
             Authorization: `Bearer ${seshId}`,
-             'Content-Type': 'application/json'
-
+            'Content-Type': 'application/json'
           }
         }
       );
@@ -65,7 +67,7 @@ const onUpload = async (event: any) => {
       // Store for submission later
       s3ImageKeys.value.push(key);
 
-      // Preview for UI
+      // Create preview for UI
       const reader = new FileReader();
       reader.onload = (e) => {
         if (e.target?.result) {
@@ -73,23 +75,23 @@ const onUpload = async (event: any) => {
         }
       };
       reader.readAsDataURL(file);
-
-    } catch (err) {
-      console.error('S3 upload failed:', err);
-      toast.add({
-        severity: 'error',
-        summary: 'Image Upload Error',
-        detail: file.name + ' failed to upload',
-        life: 3000,
-      });
     }
+  } catch (err) {
+    console.error('S3 upload failed:', err);
+    toast.add({
+      severity: 'error',
+      summary: 'Image Upload Error',
+      detail: 'Failed to upload images',
+      life: 3000,
+    });
+  } finally {
+    isUploading.value = false;
   }
 };
 
-
 const clearImages = () => {
-  images.value = [];
   previewUrls.value = [];
+  s3ImageKeys.value = [];
   toast.add({
     severity: 'info',
     summary: 'Cleared',
@@ -138,60 +140,94 @@ const handleRegistrationNumberChange = async () => {
   }
 };
 
-const submitCar = async () => {
-  if (!reg.value || !make.value || !model.value || !price.value || images.value.length === 0) {
+const validateForm = () => {
+  const requiredFields = [
+    { value: reg.value, name: 'Registration' },
+    { value: make.value, name: 'Make' },
+    { value: model.value, name: 'Model' },
+    { value: price.value, name: 'Price' }
+  ];
+
+  const missingFields = requiredFields.filter(field => !field.value).map(field => field.name);
+
+  if (missingFields.length > 0 || previewUrls.value.length === 0) {
+    const missingMessage = missingFields.length > 0 
+      ? `Missing fields: ${missingFields.join(', ')}. ` 
+      : '';
+    const imageMessage = previewUrls.value.length === 0 ? 'Please select at least one image.' : '';
+    
     toast.add({
       severity: 'warn',
-      summary: 'Missing Fields',
-      detail: 'Please fill all required fields and select at least one image.',
+      summary: 'Missing Information',
+      detail: missingMessage + imageMessage,
+      life: 3000
+    });
+    return false;
+  }
+  return true;
+};
+
+const submitCar = async () => {
+  if (!validateForm()) return;
+
+  if (isUploading.value) {
+    toast.add({
+      severity: 'warn',
+      summary: 'Upload in Progress',
+      detail: 'Please wait for images to finish uploading',
       life: 3000
     });
     return;
   }
 
-  const formData = new FormData();
-  formData.append('make', make.value);
-  formData.append('model', model.value);
-  formData.append('variant', variant.value);
-  formData.append('year', year.value);
-  formData.append('price', price.value);
-  formData.append('mileage', mileageRange.value.toString());
-  formData.append('fuel_type', fuel_type.value);
-  formData.append('colour', colour.value);
-  formData.append('door', doors.value);
-  formData.append('veh_type', veh_type.value);
-  formData.append('description', description.value);
-  formData.append('registration', registrationNumber.value);
-
-  // Append each file individually (not as array)
-s3ImageKeys.value.forEach((key, index) => {
-  formData.append(`car_images[${index}]`, key); // store S3 keys/paths only
-});
-
-
   try {
+    const formData = new FormData();
+    formData.append('make', make.value);
+    formData.append('model', model.value);
+    formData.append('variant', variant.value);
+    formData.append('year', year.value);
+    formData.append('price', price.value);
+    formData.append('mileage', mileageRange.value.toString());
+    formData.append('fuel_type', fuel_type.value);
+    formData.append('colour', colour.value);
+    formData.append('door', doors.value);
+    formData.append('veh_type', veh_type.value);
+    formData.append('description', description.value);
+    formData.append('registration', registrationNumber.value);
+
+    s3ImageKeys.value.forEach((key, index) => {
+      formData.append(`car_images[${index}]`, key);
+    });
+
     const response = await axios.post(
       `${import.meta.env.VITE_API_BASE_URL}/admin/vehicle-upload`,
       formData,
       {
         headers: {
-          'Authorization': 'Bearer ' + seshId,
-          'Content-Type': 'multipart/form-data' // Important for file uploads
+          'Authorization': `Bearer ${seshId}`,
+          'Content-Type': 'multipart/form-data'
         }
       }
     );
-    
+
     if (response.status === 201) {
-      toast.add({ 
-        severity: 'success', 
-        summary: 'Success', 
-        detail: 'Car added successfully', 
-        life: 3000 
+      toast.add({
+        severity: 'success',
+        summary: 'Success',
+        detail: 'Car added successfully',
+        life: 3000
       });
       // Reset form
-      reg.value = make.value = model.value = variant.value = year.value = price.value = was_price.value = '';
+      reg.value = '';
+      make.value = '';
+      model.value = '';
+      variant.value = '';
+      year.value = '';
+      price.value = '';
+      was_price.value = '';
       clearImages();
     }
+
   } catch (error) {
     console.error('Upload error:', error);
     toast.add({
@@ -204,8 +240,8 @@ s3ImageKeys.value.forEach((key, index) => {
 };
 
 const removeImage = (index: number) => {
-  images.value.splice(index, 1);
   previewUrls.value.splice(index, 1);
+  s3ImageKeys.value.splice(index, 1);
   toast.add({
     severity: 'info',
     summary: 'Image Removed',
@@ -224,6 +260,7 @@ onMounted(() => {
   }
 });
 </script>
+
 <template>
   <div>
     <PrimeToast />
@@ -233,36 +270,29 @@ onMounted(() => {
         <div class="col">
           <div>
             <div class="card">
-              <FileUpload name="car_images" customUpload :auto="true" @uploader="onUpload" :multiple="true"
-  accept="image/*">
-  <template #empty>
-    <p>Drag and drop or browse to upload car images.</p>
-    <div v-if="previewUrls.length" class="mt-3 grid grid-cols-3 gap-2">
-      <div v-for="(url, index) in previewUrls" :key="index" class="relative">
-        <img 
-          :src="url" 
-          alt="Preview" 
-          class="w-full h-24 object-contain border-round bg-gray-100 p-1"
-          style="max-width: 120px; max-height: 161px;"
-        />
-        <PrimeButton 
-          icon="pi pi-times" 
-          class="absolute top-0 right-0 p-1 w-2rem h-2rem bg-white border-circle shadow-2"
-          @click.stop="removeImage(index)"
-        />
-      </div>
-    </div>
-  </template>
-</FileUpload>
+              <FileUpload name="car_images" customUpload :auto="false" @uploader="onUpload" :multiple="true"
+                accept="image/*" :disabled="isUploading">
+                <template #empty>
+                  <p>Drag and drop or browse to upload car images.</p>
+                  <div v-if="previewUrls.length" class="mt-3 grid grid-cols-3 gap-2">
+                    <div v-for="(url, index) in previewUrls" :key="index" class="relative">
+                      <img :src="url" alt="Preview" class="w-full h-24 object-contain border-round bg-gray-100 p-1"
+                        style="max-width: 120px; max-height: 161px;" />
+                      <PrimeButton icon="pi pi-times"
+                        class="absolute top-0 right-0 p-1 w-2rem h-2rem bg-white border-circle shadow-2"
+                        @click.stop="removeImage(index)" />
+                    </div>
+                  </div>
+                </template>
+                <template #footer v-if="isUploading">
+                  <ProgressBar mode="indeterminate" style="height: 6px" />
+                </template>
+              </FileUpload>
             </div>
           </div>
         </div>
         <div class="col">
-
           <InputGroup class="mb-5">
-            <!-- <InputGroupAddon style="background-color: #00309a; color: #fbe90a; height: 50%;">
-              GB
-            </InputGroupAddon> -->
             <InputText v-model="registrationNumber" style="background-color: #fbe90a; border-color: #00309a"
               placeholder="REG" inputClass="'bg-transparent text-900 border-400 border-blue-500'"
               class="text-2xl text-500 font-bold" />
@@ -313,21 +343,13 @@ onMounted(() => {
           <div class="field col-span-2"><label>Description</label>
             <PrimeTextarea v-model="description" class="w-full" rows="3" />
           </div>
-          <PrimeButton label="Submit Car Listing" icon="pi pi-check" class="mt-3 w-full" @click="submitCar" />
-
+          <PrimeButton label="Submit Car Listing" icon="pi pi-check" class="mt-3 w-full" @click="submitCar" 
+            :loading="isUploading" />
         </div>
       </div>
     </div>
   </div>
 </template>
-
-<style scoped>
-.surface-section {
-  background: #fff;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-}
-</style>
 
 <style scoped>
 .surface-section {
