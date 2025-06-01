@@ -34,65 +34,29 @@ const previewUrls = ref<string[]>([]);
 const s3ImageKeys = ref<string[]>([]); // Store uploaded S3 image keys
 const isUploading = ref(false); // Track upload state
 
-const onUpload = async (event: any) => {
+const localFiles = ref<File[]>([]); // New: files stored for delayed upload
+
+const onUpload = (event: any) => {
   const newFiles: File[] = event.files;
-  isUploading.value = true;
 
-  try {
-    for (const file of newFiles) {
-      // Request a pre-signed URL from backend
-      const presignRes = await axios.post(
-        `${import.meta.env.VITE_API_BASE_URL}/admin/s3-presigned-url`,
-        {
-          filename: file.name,
-          contentType: file.type,
-          registration: registrationNumber.value // Pass the reg to use as folder name
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${seshId}`,
-            'Content-Type': 'application/json'
-          }
-        }
-      );
+  newFiles.forEach(file => {
+    localFiles.value.push(file);
 
-      const { url, key } = presignRes.data;
-
-      // Upload directly to S3
-      await axios.put(url, file, {
-        headers: {
-          'Content-Type': file.type,
-        }
-      });
-
-      // Store for submission later
-      s3ImageKeys.value.push(key);
-
-      // Create preview for UI
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        if (e.target?.result) {
-          previewUrls.value.push(e.target.result as string);
-        }
-      };
-      reader.readAsDataURL(file);
-    }
-  } catch (err) {
-    console.error('S3 upload failed:', err);
-    toast.add({
-      severity: 'error',
-      summary: 'Image Upload Error',
-      detail: 'Failed to upload images',
-      life: 3000,
-    });
-  } finally {
-    isUploading.value = false;
-  }
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      if (e.target?.result) {
+        previewUrls.value.push(e.target.result as string);
+      }
+    };
+    reader.readAsDataURL(file);
+  });
 };
+
 
 const clearImages = () => {
   previewUrls.value = [];
   s3ImageKeys.value = [];
+  localFiles.value = [];
   toast.add({
     severity: 'info',
     summary: 'Cleared',
@@ -100,6 +64,7 @@ const clearImages = () => {
     life: 3000
   });
 };
+
 
 const normalizeFuelType = (type: string) => {
   const val = type.toLowerCase();
@@ -171,17 +136,37 @@ const validateForm = () => {
 const submitCar = async () => {
   if (!validateForm()) return;
 
-  if (isUploading.value) {
-    toast.add({
-      severity: 'warn',
-      summary: 'Upload in Progress',
-      detail: 'Please wait for images to finish uploading',
-      life: 3000
-    });
-    return;
-  }
+  isUploading.value = true;
+  s3ImageKeys.value = [];
 
   try {
+    for (const file of localFiles.value) {
+      const presignRes = await axios.post(
+        `${import.meta.env.VITE_API_BASE_URL}/admin/s3-presigned-url`,
+        {
+          filename: file.name,
+          contentType: file.type,
+          registration: registrationNumber.value
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${seshId}`,
+            'Content-Type': 'application/json'
+          }
+        }
+      );
+
+      const { url, key } = presignRes.data;
+
+      await axios.put(url, file, {
+        headers: {
+          'Content-Type': file.type,
+        }
+      });
+
+      s3ImageKeys.value.push(key);
+    }
+
     const formData = new FormData();
     formData.append('make', make.value);
     formData.append('model', model.value);
@@ -205,7 +190,7 @@ const submitCar = async () => {
       formData,
       {
         headers: {
-          'Authorization': `Bearer ${seshId}`,
+          Authorization: `Bearer ${seshId}`,
           'Content-Type': 'multipart/form-data'
         }
       }
@@ -218,7 +203,9 @@ const submitCar = async () => {
         detail: 'Car added successfully',
         life: 3000
       });
-      // Reset form
+      // Reset everything
+      clearImages();
+      localFiles.value = [];
       reg.value = '';
       make.value = '';
       model.value = '';
@@ -226,7 +213,6 @@ const submitCar = async () => {
       year.value = '';
       price.value = '';
       was_price.value = '';
-      clearImages();
     }
 
   } catch (error) {
@@ -237,8 +223,11 @@ const submitCar = async () => {
       detail: error.response?.data?.message || 'Failed to upload car data',
       life: 3000
     });
+  } finally {
+    isUploading.value = false;
   }
 };
+
 
 const removeImage = (index: number) => {
   previewUrls.value.splice(index, 1);
