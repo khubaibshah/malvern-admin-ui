@@ -31,17 +31,14 @@ const seshId = sessionStorage.getItem('token');
 
 // Image handling
 const previewUrls = ref<string[]>([]);
-const s3ImageKeys = ref<string[]>([]); // Store uploaded S3 image keys
-const isUploading = ref(false); // Track upload state
-
-const localFiles = ref<File[]>([]); // New: files stored for delayed upload
+const localFiles = ref<File[]>([]);
+const s3ImageKeys = ref<string[]>([]);
+const isUploading = ref(false);
 
 const onUpload = (event: any) => {
   const newFiles: File[] = event.files;
-
   newFiles.forEach(file => {
     localFiles.value.push(file);
-
     const reader = new FileReader();
     reader.onload = (e) => {
       if (e.target?.result) {
@@ -52,6 +49,34 @@ const onUpload = (event: any) => {
   });
 };
 
+const uploadImagesToS3 = async (): Promise<string[]> => {
+  const uploadPromises = localFiles.value.map(async (file) => {
+    const presignRes = await axios.post(
+      `${import.meta.env.VITE_API_BASE_URL}/admin/s3-presigned-url`,
+      {
+        filename: file.name,
+        contentType: file.type,
+        registration: registrationNumber.value
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${seshId}`,
+          'Content-Type': 'application/json'
+        }
+      }
+    );
+
+    const { url, key } = presignRes.data;
+
+    await axios.put(url, file, {
+      headers: { 'Content-Type': file.type }
+    });
+
+    return key;
+  });
+
+  return Promise.all(uploadPromises);
+};
 
 const clearImages = () => {
   previewUrls.value = [];
@@ -64,7 +89,6 @@ const clearImages = () => {
     life: 3000
   });
 };
-
 
 const normalizeFuelType = (type: string) => {
   const val = type.toLowerCase();
@@ -116,12 +140,12 @@ const validateForm = () => {
 
   const missingFields = requiredFields.filter(field => !field.value).map(field => field.name);
 
-  if (missingFields.length > 0 || previewUrls.value.length === 0) {
+  if (missingFields.length > 0 || localFiles.value.length === 0) {
     const missingMessage = missingFields.length > 0 
       ? `Missing fields: ${missingFields.join(', ')}. ` 
       : '';
-    const imageMessage = previewUrls.value.length === 0 ? 'Please select at least one image.' : '';
-    
+    const imageMessage = localFiles.value.length === 0 ? 'Please select at least one image.' : '';
+
     toast.add({
       severity: 'warn',
       summary: 'Missing Information',
@@ -135,37 +159,11 @@ const validateForm = () => {
 
 const submitCar = async () => {
   if (!validateForm()) return;
-
   isUploading.value = true;
-  s3ImageKeys.value = [];
 
   try {
-    for (const file of localFiles.value) {
-      const presignRes = await axios.post(
-        `${import.meta.env.VITE_API_BASE_URL}/admin/s3-presigned-url`,
-        {
-          filename: file.name,
-          contentType: file.type,
-          registration: registrationNumber.value
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${seshId}`,
-            'Content-Type': 'application/json'
-          }
-        }
-      );
-
-      const { url, key } = presignRes.data;
-
-      await axios.put(url, file, {
-        headers: {
-          'Content-Type': file.type,
-        }
-      });
-
-      s3ImageKeys.value.push(key);
-    }
+    const uploadedKeys = await uploadImagesToS3();
+    s3ImageKeys.value = uploadedKeys;
 
     const formData = new FormData();
     formData.append('make', make.value);
@@ -181,7 +179,7 @@ const submitCar = async () => {
     formData.append('description', description.value);
     formData.append('registration', registrationNumber.value);
 
-    s3ImageKeys.value.forEach((key, index) => {
+    uploadedKeys.forEach((key, index) => {
       formData.append(`car_images[${index}]`, key);
     });
 
@@ -203,7 +201,6 @@ const submitCar = async () => {
         detail: 'Car added successfully',
         life: 3000
       });
-      // Reset everything
       clearImages();
       localFiles.value = [];
       reg.value = '';
@@ -214,7 +211,6 @@ const submitCar = async () => {
       price.value = '';
       was_price.value = '';
     }
-
   } catch (error) {
     console.error('Upload error:', error);
     toast.add({
@@ -228,7 +224,6 @@ const submitCar = async () => {
   }
 };
 
-
 const removeImage = (index: number) => {
   previewUrls.value.splice(index, 1);
   s3ImageKeys.value.splice(index, 1);
@@ -240,6 +235,7 @@ const removeImage = (index: number) => {
   });
 };
 
+
 onMounted(() => {
   const storeData = vehicleStore.getVehicleData;
   if (storeData) {
@@ -250,7 +246,6 @@ onMounted(() => {
   }
 });
 </script>
-
 <template>
   <div>
     <PrimeToast />
@@ -258,83 +253,94 @@ onMounted(() => {
       <div class="text-3xl font-medium text-900 mb-4">Add New Car Listing</div>
       <div class="grid">
         <div class="col">
-          <div>
-            <div class="card">
-              <FileUpload name="car_images" customUpload :auto="false" @uploader="onUpload" :multiple="true"
-                accept="image/*" :disabled="isUploading">
-                <template #empty>
-                  <p>Drag and drop or browse to upload car images.</p>
-                  <div v-if="previewUrls.length" class="mt-3 grid grid-cols-3 gap-2">
-                    <div v-for="(url, index) in previewUrls" :key="index" class="relative">
-                      <img :src="url" alt="Preview" class="w-full h-24 object-contain border-round bg-gray-100 p-1"
-                        style="max-width: 120px; max-height: 161px;" />
-                      <PrimeButton icon="pi pi-times"
-                        class="absolute top-0 right-0 p-1 w-2rem h-2rem bg-white border-circle shadow-2"
-                        @click.stop="removeImage(index)" />
-                    </div>
+          <div class="card">
+            <FileUpload
+              name="car_images"
+              customUpload
+              :auto="false"
+              @uploader="onUpload"
+              :multiple="true"
+              accept="image/*"
+              :disabled="isUploading"
+            >
+              <template #empty>
+                <p>Drag and drop or browse to select car images. Uploads occur when you submit the form.</p>
+                <div v-if="previewUrls.length" class="mt-3 grid grid-cols-3 gap-2">
+                  <div v-for="(url, index) in previewUrls" :key="index" class="relative">
+                    <PrimeImage
+                      :src="url"
+                      width="160px"
+                      height="161px"
+                      preview
+                    />
+                    <PrimeButton
+                      icon="pi pi-times"
+                      class="absolute top-0 right-0 p-1 w-2rem h-2rem bg-white border-circle shadow-2"
+                      @click.stop="removeImage(index)"
+                    />
                   </div>
-                </template>
-                <template #footer v-if="isUploading">
-                  <ProgressBar mode="indeterminate" style="height: 6px" />
-                </template>
-              </FileUpload>
-            </div>
+                </div>
+              </template>
+              <template #footer v-if="isUploading">
+                <ProgressBar mode="indeterminate" style="height: 6px" />
+              </template>
+            </FileUpload>
           </div>
         </div>
+
         <div class="col">
           <InputGroup class="mb-5">
-            <InputText v-model="registrationNumber" style="background-color: #fbe90a; border-color: #00309a"
-              placeholder="REG" inputClass="'bg-transparent text-900 border-400 border-blue-500'"
-              class="text-2xl text-500 font-bold" />
-            <PrimeButton label="Type and click me" text @click="handleRegistrationNumberChange" />
+            <InputText
+              v-model="registrationNumber"
+              style="background-color: #fbe90a; border-color: #00309a; color: red;"
+              placeholder="Enter the Vehicle Reg"
+              inputClass="'bg-transparent text-900 border-400 border-blue-500'"
+              class="text-2xl text-500 font-bold mb-3 w-full"
+            />
+            <PrimeButton label="Type and click me" @click="handleRegistrationNumberChange" class="w-full" />
           </InputGroup>
-          <div class="field mt-2"><label>Registration</label>
-            <InputText v-model="reg" class="w-full mt-2" />
-          </div>
-          <div class="field"><label>Make</label>
-            <InputText v-model="make" class="w-full" />
-          </div>
-          <div class="field"><label>Model</label>
-            <InputText v-model="model" class="w-full" />
-          </div>
-          <div class="field"><label>Variant</label>
-            <InputText v-model="variant" class="w-full" />
-          </div>
-          <div class="field"><label>Year</label>
-            <InputText v-model="year" class="w-full" />
-          </div>
-          <div class="field"><label>Price (£)</label>
-            <InputText v-model="price" class="w-full" />
-          </div>
-          <div class="field"><label>Was Price (£)</label>
-            <InputText v-model="was_price" class="w-full" />
-          </div>
+
+          <div class="field mt-2"><label>Registration</label><InputText v-model="reg" class="w-full mt-2" /></div>
+          <div class="field"><label>Make</label><InputText v-model="make" class="w-full" /></div>
+          <div class="field"><label>Model</label><InputText v-model="model" class="w-full" /></div>
+          <div class="field"><label>Variant</label><InputText v-model="variant" class="w-full" /></div>
+          <div class="field"><label>Year</label><InputText v-model="year" class="w-full" /></div>
+          <div class="field"><label>Price (£)</label><InputText v-model="price" class="w-full" /></div>
+          <div class="field"><label>Was Price (£)</label><InputText v-model="was_price" class="w-full" /></div>
+
           <div class="field">
             <label>Mileage</label>
             <PrimeSlider v-model="mileageRange" :min="0" :max="200000" :step="1000" class="w-full mb-2" />
             <InputText v-model="mileageRange" class="w-full" />
           </div>
-          <div class="field"><label>Fuel Type</label>
-            <PrimeDropDown v-model="fuel_type" class="w-full" :options="['Petrol', 'Diesel', 'Hybrid', 'Electric']"
-              placeholder="Select Fuel Type" />
+
+          <div class="field">
+            <label>Fuel Type</label>
+            <PrimeDropDown
+              v-model="fuel_type"
+              class="w-full"
+              :options="['Petrol', 'Diesel', 'Hybrid', 'Electric']"
+              placeholder="Select Fuel Type"
+            />
           </div>
-          <div class="field"><label>Body Style</label>
-            <InputText v-model="body_style" class="w-full" />
-          </div>
-          <div class="field"><label>Colour</label>
-            <InputText v-model="colour" class="w-full" />
-          </div>
-          <div class="field"><label>Doors</label>
-            <InputText v-model="doors" class="w-full" />
-          </div>
-          <div class="field"><label>Vehicle Type</label>
-            <InputText v-model="veh_type" class="w-full" />
-          </div>
-          <div class="field col-span-2"><label>Description</label>
+
+          <div class="field"><label>Body Style</label><InputText v-model="body_style" class="w-full" /></div>
+          <div class="field"><label>Colour</label><InputText v-model="colour" class="w-full" /></div>
+          <div class="field"><label>Doors</label><InputText v-model="doors" class="w-full" /></div>
+          <div class="field"><label>Vehicle Type</label><InputText v-model="veh_type" class="w-full" /></div>
+
+          <div class="field col-span-2">
+            <label>Description</label>
             <PrimeTextarea v-model="description" class="w-full" rows="3" />
           </div>
-          <PrimeButton label="Submit Car Listing" icon="pi pi-check" class="mt-3 w-full" @click="submitCar" 
-            :loading="isUploading" />
+
+          <PrimeButton
+            label="Submit Car Listing"
+            icon="pi pi-check"
+            class="mt-3 w-full"
+            @click="submitCar"
+            :loading="isUploading"
+          />
         </div>
       </div>
     </div>
