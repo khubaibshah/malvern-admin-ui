@@ -45,7 +45,8 @@ const onUpload = async (event: any) => {
         `${import.meta.env.VITE_API_BASE_URL}/admin/s3-presigned-url`,
         {
           filename: file.name,
-          contentType: file.type
+          contentType: file.type,
+          registration: registrationNumber.value // Pass the reg to use as folder name
         },
         {
           headers: {
