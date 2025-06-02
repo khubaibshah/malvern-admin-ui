@@ -78,7 +78,7 @@ const onUpload = async (event: any) => {
   formData.append('doors', doors.value?.toString() || '');
   formData.append('veh_type', veh_type.value);
   formData.append('description', description.value);
-  
+
   // Add uploaded files to formData
   event.files.forEach((file: any) => {
     formData.append('car_images[]', file);
@@ -91,30 +91,31 @@ const onUpload = async (event: any) => {
         'Content-Type': 'multipart/form-data'
       }
     };
-    
+
     const response = await axios.post(
       `${import.meta.env.VITE_API_BASE_URL}/admin/update-car/${car.value.id}`,
       formData,
       config
     );
-    
+
     toast.add({ severity: 'info', summary: 'Success', detail: 'File Uploaded', life: 3000 });
-    
+
     // Refresh car data after update
     await fetchCar();
-    
+
   } catch (err) {
     console.error('Update failed', err);
-    toast.add({ 
-      severity: 'error', 
-      summary: 'Error', 
-      detail: 'Failed to update car', 
-      life: 3000 
+    toast.add({
+      severity: 'error',
+      summary: 'Error',
+      detail: 'Failed to update car',
+      life: 3000
     });
   }
 };
+
 const uploadUrl = computed(() => {
-  return car.value?.id 
+  return car.value?.id
     ? `${import.meta.env.VITE_API_BASE_URL}/admin/update-car/${car.value.id}`
     : '';
 });
@@ -132,10 +133,11 @@ onMounted(fetchCar);
       <div class="col">
         <label>Images</label>
         <Toast />
-       <FileUpload name="demo[]" :url="uploadUrl" @upload="onUpload($event)" :multiple="true" accept="image/*" :maxFileSize="1000000">
-            <template #empty>
-                <span>Drag and drop files to here to upload.</span>
-            </template>
+        <FileUpload name="demo[]" :url="uploadUrl" @upload="onUpload($event)" :multiple="true" accept="image/*"
+          :maxFileSize="1000000">
+          <template #empty>
+            <span>Drag and drop files to here to upload.</span>
+          </template>
         </FileUpload>
 
         <div class="mt-4">
@@ -157,6 +159,18 @@ onMounted(fetchCar);
       </div>
 
       <div class="col">
+        <div class="field">
+          <label>Registration</label>
+          <InputGroup class="w-full md:w-30rem h-5rem flex justify-center">
+            <InputGroupAddon style="background-color: #00309a; color: #fbe90a">
+              GB
+            </InputGroupAddon>
+            <InputText v-model="registration" style="background-color: #fbe90a; border-color: #00309a" placeholder="REG"
+              inputClass="'bg-transparent text-900 border-400 border-blue-500'"
+              class="text-5xl w-full text-100 font-bold" @input="registration.toUpperCase()" />
+          </InputGroup>
+
+        </div>
         <div class="field"><label>Make</label>
           <InputText v-model="make" class="w-full" />
         </div>
@@ -168,9 +182,6 @@ onMounted(fetchCar);
         </div>
         <div class="field"><label>Year</label>
           <InputText v-model="year" type="number" class="w-full" />
-        </div>
-        <div class="field"><label>Registration</label>
-          <InputText v-model="registration" class="w-full bg-gray-100" readonly />
         </div>
         <div class="field"><label>Price</label>
           <InputText v-model="price" type="number" class="w-full" />

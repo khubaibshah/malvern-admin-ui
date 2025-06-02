@@ -36,7 +36,8 @@ import ProgressBar from 'primevue/progressbar';
 import FileUpload from 'primevue/fileupload';
 import Image from 'primevue/image';
 import MegaMenu from 'primevue/megamenu';
-
+import InputGroup from 'primevue/inputgroup';
+import InputGroupAddon from 'primevue/inputgroupaddon';
 import DataView from 'primevue/dataview';
 
 
@@ -65,6 +66,8 @@ app.directive('ripple', Ripple);
 
 
 app.component('InputText', InputText);
+app.component('InputGroup', InputGroup);
+app.component('InputGroupAddon', InputGroupAddon);
 app.component('PrimeButton', Button);
 app.component('PrimeDropDown', DropDown);
 app.component('PrimeSlider', Slider);

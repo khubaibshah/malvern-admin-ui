@@ -34,6 +34,7 @@ const previewUrls = ref<string[]>([]);
 const localFiles = ref<File[]>([]);
 const s3ImageKeys = ref<string[]>([]);
 const isUploading = ref(false);
+const mainImageIndex = ref(0); // Track main image index
 
 const onUpload = (event: any) => {
   const newFiles: File[] = event.files;
@@ -78,10 +79,21 @@ const uploadImagesToS3 = async (): Promise<string[]> => {
   return Promise.all(uploadPromises);
 };
 
+const setMainImage = (index: number) => {
+  mainImageIndex.value = index;
+  toast.add({
+    severity: 'success',
+    summary: 'Main Image Set',
+    detail: 'This image will be displayed as the primary image',
+    life: 2000
+  });
+};
+
 const clearImages = () => {
   previewUrls.value = [];
   s3ImageKeys.value = [];
   localFiles.value = [];
+  mainImageIndex.value = 0;
   toast.add({
     severity: 'info',
     summary: 'Cleared',
@@ -178,6 +190,7 @@ const submitCar = async () => {
     formData.append('veh_type', veh_type.value);
     formData.append('description', description.value);
     formData.append('registration', registrationNumber.value);
+    formData.append('main_image_index', mainImageIndex.value.toString());
 
     uploadedKeys.forEach((key, index) => {
       formData.append(`car_images[${index}]`, key);
@@ -202,7 +215,6 @@ const submitCar = async () => {
         life: 3000
       });
       clearImages();
-      localFiles.value = [];
       reg.value = '';
       make.value = '';
       model.value = '';
@@ -226,7 +238,15 @@ const submitCar = async () => {
 
 const removeImage = (index: number) => {
   previewUrls.value.splice(index, 1);
-  s3ImageKeys.value.splice(index, 1);
+  localFiles.value.splice(index, 1);
+  
+  // Adjust main image index if needed
+  if (mainImageIndex.value === index) {
+    mainImageIndex.value = 0; // Reset to first image
+  } else if (mainImageIndex.value > index) {
+    mainImageIndex.value--; // Decrement if main image was after the removed one
+  }
+
   toast.add({
     severity: 'info',
     summary: 'Image Removed',
@@ -234,7 +254,6 @@ const removeImage = (index: number) => {
     life: 3000
   });
 };
-
 
 onMounted(() => {
   const storeData = vehicleStore.getVehicleData;
@@ -246,6 +265,7 @@ onMounted(() => {
   }
 });
 </script>
+
 <template>
   <div>
     <PrimeToast />
@@ -264,20 +284,42 @@ onMounted(() => {
               :disabled="isUploading"
             >
               <template #empty>
-                <p>Drag and drop or browse to select car images. Uploads occur when you submit the form.</p>
+                <p>Drag and drop or browse to select car images. First image will be main by default.</p>
                 <div v-if="previewUrls.length" class="mt-3 grid grid-cols-3 gap-2">
-                  <div v-for="(url, index) in previewUrls" :key="index" class="relative">
+                  <div 
+                    v-for="(url, index) in previewUrls" 
+                    :key="index" 
+                    class="relative group"
+                    @click="setMainImage(index)"
+                  >
                     <PrimeImage
                       :src="url"
                       width="160px"
                       height="161px"
                       preview
+                      class="border-2 transition-all duration-200 cursor-pointer"
+                      :class="{'border-primary-500 border-4': index === mainImageIndex}"
                     />
+                    <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                      <PrimeButton
+                        v-if="index !== mainImageIndex"
+                        icon="pi pi-star"
+                        class="p-1 w-2rem h-2rem bg-white border-circle shadow-2"
+                        @click.stop="setMainImage(index)"
+                        severity="secondary"
+                      />
+                    </div>
                     <PrimeButton
                       icon="pi pi-times"
                       class="absolute top-0 right-0 p-1 w-2rem h-2rem bg-white border-circle shadow-2"
                       @click.stop="removeImage(index)"
                     />
+                    <div 
+                      v-if="index === mainImageIndex"
+                      class="absolute top-0 left-0 bg-primary-500 text-white text-xs px-2 py-1 rounded-br"
+                    >
+                      Main Image
+                    </div>
                   </div>
                 </div>
               </template>
@@ -352,5 +394,9 @@ onMounted(() => {
   background: #fff;
   border-radius: 8px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.group:hover .group-hover\:opacity-100 {
+  opacity: 1;
 }
 </style>

@@ -161,7 +161,7 @@ const submitForm = async () => {
     userStore.setUser(user.value)
     
     if (user.value) {
-      router.push({ name: 'Userhome' }) // Push to the correct route
+      router.push({ name: 'scs-car-listings' }) // Push to the correct route
     }
   } catch (error) {
     toast.add({ severity: 'error', summary: 'Info', detail: 'Logged in failed because '+ error, life: 10000 });
