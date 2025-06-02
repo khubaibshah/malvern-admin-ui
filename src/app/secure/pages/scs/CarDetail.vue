@@ -124,22 +124,22 @@ onMounted(fetchCar);
 
 <template>
   <Toast />
-  <div class="surface-section pt-5 md:px-6 lg:px-8 car-details-container">
-    <div
-      class="flex md:align-items-center md:justify-content-between flex-column md:flex-row pb-4 border-bottom-1 surface-border mb-3">
-      <h2 class="text-2xl font-light">Edit Car Listing for <span class="font-bold">{{ form.registration }}</span></h2>
-    </div>
-    <div class="grid">
-      <div class="col">
-        <label>Images</label>
-        <Toast />
-        <FileUpload name="demo[]" :url="uploadUrl" @upload="onUpload($event)" :multiple="true" accept="image/*"
-          :maxFileSize="1000000">
-          <template #empty>
-            <span>Drag and drop files to here to upload.</span>
-          </template>
-        </FileUpload>
 
+  <div class="surface-section px-5 py-5 md:px-6 lg:px-8">
+    <h2 class="text-2xl font-light">Edit Car Listing for <span class="font-bold">{{ form.registration }}</span></h2>
+    <div class="grid">
+      <div class="col-12 md:col-6 lg:col-6">
+        <div class="card">
+          <label>Images</label>
+          <Toast />
+          <FileUpload name="demo[]" :url="uploadUrl" @upload="onUpload($event)" :multiple="true" accept="image/*"
+            :maxFileSize="1000000">
+            <template #empty>
+              <span>Drag and drop files to here to upload.</span>
+            </template>
+          </FileUpload>
+
+        </div>
         <div class="mt-4">
           <h3 class="text-lg font-semibold mb-2">Gallery</h3>
           <div class="bg-white shadow rounded-md p-3">
@@ -157,20 +157,17 @@ onMounted(fetchCar);
           </div>
         </div>
       </div>
+      <div class="col-12 md:col-6 lg:col-6">
 
-      <div class="col">
-        <div class="field">
-          <label>Registration</label>
-          <InputGroup class="w-full h-4rem flex justify-center">
-            <InputGroupAddon style="background-color: #00309a; color: #fbe90a">
-              GB
-            </InputGroupAddon>
-            <InputText v-model="registration" style="background-color: #fbe90a; border-color: #00309a" placeholder="REG"
-              inputClass="'bg-transparent text-900 border-400 border-blue-500'"
-              class="text-5xl w-full text-100 font-bold" @input="registration.toUpperCase()" />
-          </InputGroup>
-
-        </div>
+        <label>Registration</label>
+        <InputGroup class="w-full h-4rem flex justify-center">
+          <InputGroupAddon style="background-color: #00309a; color: #fbe90a">
+            GB
+          </InputGroupAddon>
+          <InputText v-model="registration" style="background-color: #fbe90a; border-color: #00309a" placeholder="REG"
+            inputClass="'bg-transparent text-900 border-400 border-blue-500'" class="text-5xl w-full text-100 font-bold"
+            @input="registration.toUpperCase()" />
+        </InputGroup>
         <div class="field"><label>Make</label>
           <InputText v-model="make" class="w-full" />
         </div>
@@ -204,9 +201,22 @@ onMounted(fetchCar);
         <div class="field col-span-2"><label>Description</label>
           <PrimeTextarea v-model="description" class="w-full" rows="3" />
         </div>
+
+        <!-- <PrimeButton
+            label="Submit Car Listing"
+            icon="pi pi-check"
+            class="mt-3 w-full"
+            @click="submitCar"
+            :loading="isUploading"
+          /> -->
       </div>
     </div>
+
+
+
+
   </div>
+
 </template>
 
 <style scoped>
