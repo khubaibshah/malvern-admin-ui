@@ -331,7 +331,15 @@ onMounted(() => {
         </div>
 
         <div class="col">
-          <InputGroup class="mb-5">
+          <InputGroup class="w-full h-4rem flex justify-center mb-3">
+            <InputGroupAddon style="background-color: #00309a; color: #fbe90a">
+              GB
+            </InputGroupAddon>
+            <InputText v-model="registrationNumber" style="background-color: #fbe90a; border-color: #00309a" placeholder="REG"
+              inputClass="'bg-transparent text-900 border-400 border-blue-500'"
+              class="text-5xl w-full text-100 font-bold" @input="registrationNumber.toUpperCase()" />
+          </InputGroup>
+          <!-- <InputGroup class="mb-5">
             <InputText
               v-model="registrationNumber"
               style="background-color: #fbe90a; border-color: #00309a; color: red;"
@@ -339,9 +347,9 @@ onMounted(() => {
               inputClass="'bg-transparent text-900 border-400 border-blue-500'"
               class="text-2xl text-500 font-bold mb-3 w-full"
             />
-            <PrimeButton label="Type and click me" @click="handleRegistrationNumberChange" class="w-full" />
-          </InputGroup>
-
+            
+          </InputGroup> -->
+<PrimeButton label="Type and click me" @click="handleRegistrationNumberChange" class="w-full" />
           <div class="field mt-2"><label>Registration</label><InputText v-model="reg" class="w-full mt-2" /></div>
           <div class="field"><label>Make</label><InputText v-model="make" class="w-full" /></div>
           <div class="field"><label>Model</label><InputText v-model="model" class="w-full" /></div>

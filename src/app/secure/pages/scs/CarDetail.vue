@@ -161,7 +161,7 @@ onMounted(fetchCar);
       <div class="col">
         <div class="field">
           <label>Registration</label>
-          <InputGroup class="w-full md:w-30rem h-5rem flex justify-center">
+          <InputGroup class="w-full h-4rem flex justify-center">
             <InputGroupAddon style="background-color: #00309a; color: #fbe90a">
               GB
             </InputGroupAddon>
