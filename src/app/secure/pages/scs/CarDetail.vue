@@ -1,17 +1,88 @@
+<template>
+  <Toast />
+  <PrimeDialog v-model:visible="confirm" modal header="Delete" :style="{ width: '50vw' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
+    <span class="text-surface-500 dark:text-surface-400 block mb-8">Are you sure you want to remove this image?</span>
+    <div class="flex justify-end gap-2">
+      <PrimeButton type="button" severity="success" label="Cancel" @click="confirm = false"></PrimeButton>
+      <PrimeButton type="button" severity="danger" label="Delete" @click="confirmRemoveImage"></PrimeButton>
+    </div>
+  </PrimeDialog>
+
+  <div class="surface-section px-5 py-5 md:px-6 lg:px-8">
+    <h2 class="text-2xl font-light">Edit Car Listing for <span class="font-bold">{{ form.registration }}</span></h2>
+    <div class="grid">
+      <div class="col-12">
+        <div class="card mb-4">
+          <h3 class="text-lg font-semibold mb-2">Upload New Images</h3>
+          <FileUpload name="images[]" customUpload :auto="false" :multiple="true" accept="image/*"
+                      @uploader="handleFileSelect" chooseLabel="Add Images">
+            <template #empty>
+              <span>Drag and drop files here to upload.</span>
+            </template>
+          </FileUpload>
+        </div>
+
+        <div class="card mb-4">
+          <h3 class="text-lg font-semibold mb-2">Existing Gallery</h3>
+          <div v-if="car?.images?.length" class="flex flex-wrap gap-3">
+            <div v-for="(img, index) in car.images" :key="index" class="relative">
+              <img :src="img" class="thumbnail-image" @click="selectMainImage(img)"
+                   :class="{ 'ring-2 ring-blue-500': mainImage === img }">
+              <button class="remove-btn" @click="showConfirmDialog(img)">x</button>
+              <div v-if="mainImage === img" class="text-xs text-center text-blue-500 mt-1">Main Image</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="grid">
+          <div class="col-12 md:col-6">
+            <div class="field">
+              <label>Registration</label>
+              <InputGroup class="w-full h-4rem flex justify-center">
+                <InputGroupAddon style="background-color: #00309a; color: #fbe90a">
+                  GB
+                </InputGroupAddon>
+                <InputText v-model="registration" style="background-color: #fbe90a; border-color: #00309a"
+                  placeholder="REG" class="text-5xl w-full font-bold" @input="registration.toUpperCase()" />
+              </InputGroup>
+            </div>
+            <div class="field"><label>Make</label><InputText v-model="make" class="w-full" /></div>
+            <div class="field"><label>Model</label><InputText v-model="model" class="w-full" /></div>
+            <div class="field"><label>Variant</label><InputText v-model="variant" class="w-full" /></div>
+            <div class="field"><label>Year</label><InputText v-model="year" type="number" class="w-full" /></div>
+            <div class="field"><label>Price</label><InputText v-model="price" type="number" class="w-full" /></div>
+          </div>
+
+          <div class="col-12 md:col-6">
+            <div class="field"><label>Mileage</label><InputText v-model="mileage" type="number" class="w-full" /></div>
+            <div class="field"><label>Fuel Type</label><InputText v-model="fuel_type" class="w-full" /></div>
+            <div class="field"><label>Colour</label><InputText v-model="colour" class="w-full" /></div>
+            <div class="field"><label>Doors</label><InputText v-model="doors" type="number" class="w-full" /></div>
+            <div class="field"><label>Vehicle Type</label><InputText v-model="veh_type" class="w-full" /></div>
+            <div class="field col-span-2"><label>Description</label><PrimeTextarea v-model="description" class="w-full" rows="3" /></div>
+          </div>
+        </div>
+
+        <PrimeButton label="Update Car Listing" icon="pi pi-check" class="mt-3 w-full" @click="updateCar" />
+      </div>
+    </div>
+  </div>
+</template>
+
 <script setup lang="ts">
-import { onMounted, ref, computed } from 'vue';
+import { onMounted, ref } from 'vue';
 import { useRoute } from 'vue-router';
 import { useToast } from 'primevue/usetoast';
 import axios from 'axios';
 
 const route = useRoute();
 const toast = useToast();
+const confirm = ref(false);
 const seshId = sessionStorage.getItem('token');
 
 const car = ref<any>(null);
 const form = ref<any>({});
 
-// individual form fields
 const make = ref('');
 const model = ref('');
 const variant = ref('');
@@ -29,6 +100,32 @@ const newImages = ref<File[]>([]);
 const removedImages = ref<string[]>([]);
 const mainImage = ref<string>('');
 
+const imageToRemove = ref<string>('');
+
+const showConfirmDialog = (img: string) => {
+  imageToRemove.value = img;
+  confirm.value = true;
+};
+
+const confirmRemoveImage = async () => {
+  try {
+    await axios.post(`${import.meta.env.VITE_API_BASE_URL}/admin/delete-s3-image`, {
+      image_url: imageToRemove.value
+    }, {
+      headers: { Authorization: 'Bearer ' + seshId }
+    });
+
+    // Immediately remove the image from the car.images array
+    car.value.images = car.value.images.filter((img: string) => img !== imageToRemove.value);
+    removedImages.value.push(imageToRemove.value);
+
+    toast.add({ severity: 'success', summary: 'Deleted', detail: 'Image removed from S3', life: 3000 });
+    confirm.value = false;
+  } catch (error) {
+    toast.add({ severity: 'error', summary: 'Error', detail: 'Failed to delete image from S3', life: 3000 });
+  }
+};
+
 const selectMainImage = (imgUrl: string) => {
   mainImage.value = imgUrl;
 };
@@ -36,13 +133,9 @@ const selectMainImage = (imgUrl: string) => {
 const fetchCar = async () => {
   try {
     const id = route.params.id;
-    const config = {
-      headers: {
-        Authorization: 'Bearer ' + seshId,
-        'Content-Type': 'application/json',
-      }
-    };
-    const res = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/get-vehicle-by-id/${id}`, config);
+    const res = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/get-vehicle-by-id/${id}`, {
+      headers: { Authorization: 'Bearer ' + seshId }
+    });
     car.value = res.data.car;
     form.value = { ...res.data.car };
 
@@ -82,7 +175,6 @@ const updateCar = async () => {
       }, {
         headers: { Authorization: `Bearer ${seshId}` }
       });
-
       await axios.put(data.url, file, { headers: { 'Content-Type': file.type } });
       uploadedKeys.push(data.key);
     }
@@ -124,71 +216,6 @@ const updateCar = async () => {
 onMounted(fetchCar);
 </script>
 
-
-<template>
-  <Toast />
-  <div class="surface-section px-5 py-5 md:px-6 lg:px-8">
-    <h2 class="text-2xl font-light">Edit Car Listing for <span class="font-bold">{{ form.registration }}</span></h2>
-    <div class="grid">
-      <div class="col-12">
-        <div class="card mb-4">
-          <h3 class="text-lg font-semibold mb-2">Upload New Images</h3>
-          <FileUpload name="images[]" customUpload :auto="false" :multiple="true" accept="image/*"
-                      @uploader="handleFileSelect" chooseLabel="Add Images">
-            <template #empty>
-              <span>Drag and drop files here to upload.</span>
-            </template>
-          </FileUpload>
-        </div>
-
-        <div class="card mb-4">
-          <h3 class="text-lg font-semibold mb-2">Existing Gallery</h3>
-          <div v-if="car?.images?.length" class="flex flex-wrap gap-3">
-            <div v-for="(img, index) in car.images" :key="index" class="relative">
-              <img :src="img" class="thumbnail-image" @click="selectMainImage(img)"
-                   :class="{ 'ring-2 ring-blue-500': mainImage === img }">
-              <button class="remove-btn" @click="removedImages.push(img)">x</button>
-              <div v-if="mainImage === img" class="text-xs text-center text-blue-500 mt-1">Main Image</div>
-            </div>
-          </div>
-        </div>
-
-        <div class="grid">
-          <div class="col-12 md:col-6">
-            <div class="field">
-              <label>Registration</label>
-              <InputGroup class="w-full h-4rem flex justify-center">
-                <InputGroupAddon style="background-color: #00309a; color: #fbe90a">
-                  GB
-                </InputGroupAddon>
-                <InputText v-model="registration" style="background-color: #fbe90a; border-color: #00309a"
-                  placeholder="REG" class="text-5xl w-full font-bold" @input="registration.toUpperCase()" />
-              </InputGroup>
-            </div>
-            <div class="field"><label>Make</label><InputText v-model="make" class="w-full" /></div>
-            <div class="field"><label>Model</label><InputText v-model="model" class="w-full" /></div>
-            <div class="field"><label>Variant</label><InputText v-model="variant" class="w-full" /></div>
-            <div class="field"><label>Year</label><InputText v-model="year" type="number" class="w-full" /></div>
-            <div class="field"><label>Price</label><InputText v-model="price" type="number" class="w-full" /></div>
-          </div>
-
-          <div class="col-12 md:col-6">
-            <div class="field"><label>Mileage</label><InputText v-model="mileage" type="number" class="w-full" /></div>
-            <div class="field"><label>Fuel Type</label><InputText v-model="fuel_type" class="w-full" /></div>
-            <div class="field"><label>Colour</label><InputText v-model="colour" class="w-full" /></div>
-            <div class="field"><label>Doors</label><InputText v-model="doors" type="number" class="w-full" /></div>
-            <div class="field"><label>Vehicle Type</label><InputText v-model="veh_type" class="w-full" /></div>
-            <div class="field col-span-2"><label>Description</label><PrimeTextarea v-model="description" class="w-full" rows="3" /></div>
-          </div>
-        </div>
-
-        <PrimeButton label="Update Car Listing" icon="pi pi-check" class="mt-3 w-full" @click="updateCar" />
-      </div>
-    </div>
-  </div>
-</template>
-
-
 <style scoped>
 .thumbnail-image {
   width: 120px;
@@ -211,74 +238,5 @@ onMounted(fetchCar);
   line-height: 24px;
   font-size: 14px;
   cursor: pointer;
-}
-/* Your existing styles remain the same */
-.thumbnail-image {
-  width: 120px;
-  height: 90px;
-  object-fit: cover;
-  border-radius: 4px;
-}
-
-.carousel-container {
-  max-width: 600px;
-  margin: 0 auto;
-}
-
-.carousel-image-container {
-  width: 100%;
-  height: 400px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  overflow: hidden;
-}
-
-.carousel-image {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-  border-radius: 8px;
-}
-
-@media (max-width: 768px) {
-  .carousel-image-container {
-    height: 300px;
-  }
-
-  .thumbnail-image {
-    width: 100px;
-    height: 75px;
-  }
-}
-
-.thumbnail-image {
-  width: 120px;
-  height: 120px;
-  object-fit: cover;
-  border-radius: 8px;
-  border: 1px solid #e5e7eb;
-}
-
-.remove-btn {
-  position: absolute;
-  top: -8px;
-  right: -8px;
-  width: 24px;
-  height: 24px;
-  background: rgb(0, 0, 0);
-  border-radius: 50%;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  color: white;
-}
-
-@media (max-width: 480px) {
-  .carousel-image-container {
-    height: 250px;
-  }
-}
-
-.input {
-  @apply w-full border border-gray-300 rounded px-3 py-2;
 }
 </style>

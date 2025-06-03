@@ -39,6 +39,7 @@ import MegaMenu from 'primevue/megamenu';
 import InputGroup from 'primevue/inputgroup';
 import InputGroupAddon from 'primevue/inputgroupaddon';
 import DataView from 'primevue/dataview';
+import Dialog from 'primevue/dialog';
 
 
 
@@ -92,6 +93,7 @@ app.component('ProgressBar', ProgressBar);
 app.component('FileUpload', FileUpload);
 app.component('PrimeMegaMenu', MegaMenu);
 app.component('PrimeDataView', DataView);
+app.component('PrimeDialog', Dialog);
 
 app.config.globalProperties.$filters = {
     currencyGBP(value: number | string) {
