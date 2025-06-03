@@ -64,6 +64,7 @@ const fetchCar = async () => {
 };
 
 const onUpload = async (event: any) => {
+  
   // Prepare form data with all fields
   const formData = new FormData();
   formData.append('make', make.value);
@@ -114,6 +115,11 @@ const onUpload = async (event: any) => {
   }
 };
 
+const submitCar = async () => {
+
+
+}
+
 const uploadUrl = computed(() => {
   return car.value?.id
     ? `${import.meta.env.VITE_API_BASE_URL}/admin/update-car/${car.value.id}`
@@ -130,7 +136,7 @@ onMounted(fetchCar);
     <div class="grid">
       <div class="col-12 md:col-6 lg:col-6">
         <div class="card">
-          <label>Images</label>
+          <h3 class="text-lg font-semibold mb-2">Exsisting Images</h3>
           <Toast />
           <FileUpload name="demo[]" :url="uploadUrl" @upload="onUpload($event)" :multiple="true" accept="image/*"
             :maxFileSize="1000000">
@@ -158,16 +164,17 @@ onMounted(fetchCar);
         </div>
       </div>
       <div class="col-12 md:col-6 lg:col-6">
-
-        <label>Registration</label>
-        <InputGroup class="w-full h-4rem flex justify-center">
-          <InputGroupAddon style="background-color: #00309a; color: #fbe90a">
-            GB
-          </InputGroupAddon>
-          <InputText v-model="registration" style="background-color: #fbe90a; border-color: #00309a" placeholder="REG"
-            inputClass="'bg-transparent text-900 border-400 border-blue-500'" class="text-5xl w-full text-100 font-bold"
-            @input="registration.toUpperCase()" />
-        </InputGroup>
+        <div class="field">
+          <label>Registration</label>
+          <InputGroup class="w-full h-4rem flex justify-center">
+            <InputGroupAddon style="background-color: #00309a; color: #fbe90a">
+              GB
+            </InputGroupAddon>
+            <InputText v-model="registration" style="background-color: #fbe90a; border-color: #00309a" placeholder="REG"
+              inputClass="'bg-transparent text-900 border-400 border-blue-500'"
+              class="text-5xl w-full text-100 font-bold" @input="registration.toUpperCase()" />
+          </InputGroup>
+        </div>
         <div class="field"><label>Make</label>
           <InputText v-model="make" class="w-full" />
         </div>
@@ -202,13 +209,12 @@ onMounted(fetchCar);
           <PrimeTextarea v-model="description" class="w-full" rows="3" />
         </div>
 
-        <!-- <PrimeButton
-            label="Submit Car Listing"
+          <PrimeButton
+            label="Update Car Listing"
             icon="pi pi-check"
             class="mt-3 w-full"
             @click="submitCar"
-            :loading="isUploading"
-          /> -->
+          />
       </div>
     </div>
 
