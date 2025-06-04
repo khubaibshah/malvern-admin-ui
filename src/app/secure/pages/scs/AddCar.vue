@@ -331,6 +331,7 @@ onMounted(() => {
         </div>
 
         <div class="col">
+          <div class="field"><label>Enter Registration</label></div>
           <InputGroup class="w-full h-4rem flex justify-center mb-3">
             <InputGroupAddon style="background-color: #00309a; color: #fbe90a">
               GB
@@ -349,7 +350,7 @@ onMounted(() => {
             />
             
           </InputGroup> -->
-<PrimeButton label="Type and click me" @click="handleRegistrationNumberChange" class="w-full" />
+<PrimeButton label="Generate Car details" @click="handleRegistrationNumberChange" class="w-full" />
           <div class="field mt-2"><label>Registration</label><InputText v-model="reg" class="w-full mt-2" /></div>
           <div class="field"><label>Make</label><InputText v-model="make" class="w-full" /></div>
           <div class="field"><label>Model</label><InputText v-model="model" class="w-full" /></div>
