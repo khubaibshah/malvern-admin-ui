@@ -151,4 +151,13 @@ const router = createRouter({
 //     next();
 //   }
 // });
+router.beforeEach((to, from, next) => {
+  const authStore = useAuthStore();
+
+  if (to.meta.requiresAuth && !authStore.isAuthenticated) {
+    next({ name: 'login' }); // Redirect unauthenticated users to login
+  } else {
+    next();
+  }
+});
 export default router

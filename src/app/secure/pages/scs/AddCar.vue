@@ -153,8 +153,8 @@ const validateForm = () => {
   const missingFields = requiredFields.filter(field => !field.value).map(field => field.name);
 
   if (missingFields.length > 0 || localFiles.value.length === 0) {
-    const missingMessage = missingFields.length > 0 
-      ? `Missing fields: ${missingFields.join(', ')}. ` 
+    const missingMessage = missingFields.length > 0
+      ? `Missing fields: ${missingFields.join(', ')}. `
       : '';
     const imageMessage = localFiles.value.length === 0 ? 'Please select at least one image.' : '';
 
@@ -239,7 +239,7 @@ const submitCar = async () => {
 const removeImage = (index: number) => {
   previewUrls.value.splice(index, 1);
   localFiles.value.splice(index, 1);
-  
+
   // Adjust main image index if needed
   if (mainImageIndex.value === index) {
     mainImageIndex.value = 0; // Reset to first image
@@ -274,50 +274,27 @@ onMounted(() => {
       <div class="grid">
         <div class="col">
           <div class="card">
-            <FileUpload
-              name="car_images"
-              customUpload
-              :auto="false"
-              @uploader="onUpload"
-              :multiple="true"
-              accept="image/*"
-              :disabled="isUploading"
-            >
+            <FileUpload name="car_images" customUpload :auto="false" @uploader="onUpload" :multiple="true"
+              accept="image/*" :disabled="isUploading">
               <template #empty>
                 <p>Drag and drop or browse to select car images. First image will be main by default.</p>
                 <div v-if="previewUrls.length" class="mt-3 grid grid-cols-3 gap-2">
-                  <div 
-                    v-for="(url, index) in previewUrls" 
-                    :key="index" 
-                    class="relative group"
-                    @click="setMainImage(index)"
-                  >
-                    <PrimeImage
-                      :src="url"
-                      width="160px"
-                      height="161px"
-                      preview
+                  <div v-for="(url, index) in previewUrls" :key="index" class="relative group"
+                    @click="setMainImage(index)">
+                    <PrimeImage :src="url" width="160px" height="161px" preview
                       class="border-2 transition-all duration-200 cursor-pointer"
-                      :class="{'border-primary-500 border-4': index === mainImageIndex}"
-                    />
-                    <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                      <PrimeButton
-                        v-if="index !== mainImageIndex"
-                        icon="pi pi-star"
-                        class="p-1 w-2rem h-2rem bg-white border-circle shadow-2"
-                        @click.stop="setMainImage(index)"
-                        severity="secondary"
-                      />
+                      :class="{ 'border-primary-500 border-4': index === mainImageIndex }" />
+                    <div
+                      class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                      <PrimeButton v-if="index !== mainImageIndex" icon="pi pi-star"
+                        class="p-1 w-2rem h-2rem bg-white border-circle shadow-2" @click.stop="setMainImage(index)"
+                        severity="secondary" />
                     </div>
-                    <PrimeButton
-                      icon="pi pi-times"
+                    <PrimeButton icon="pi pi-times"
                       class="absolute top-0 right-0 p-1 w-2rem h-2rem bg-white border-circle shadow-2"
-                      @click.stop="removeImage(index)"
-                    />
-                    <div 
-                      v-if="index === mainImageIndex"
-                      class="absolute top-0 left-0 bg-primary-500 text-white text-xs px-2 py-1 rounded-br"
-                    >
+                      @click.stop="removeImage(index)" />
+                    <div v-if="index === mainImageIndex"
+                      class="absolute top-0 left-0 bg-primary-500 text-white text-xs px-2 py-1 rounded-br">
                       Main Image
                     </div>
                   </div>
@@ -336,28 +313,32 @@ onMounted(() => {
             <InputGroupAddon style="background-color: #00309a; color: #fbe90a">
               GB
             </InputGroupAddon>
-            <InputText v-model="registrationNumber" style="background-color: #fbe90a; border-color: #00309a" placeholder="REG"
-              inputClass="'bg-transparent text-900 border-400 border-blue-500'"
+            <InputText v-model="registrationNumber" style="background-color: #fbe90a; border-color: #00309a"
+              placeholder="REG" inputClass="'bg-transparent text-900 border-400 border-blue-500'"
               class="text-5xl w-full text-100 font-bold" @input="registrationNumber.toUpperCase()" />
           </InputGroup>
-          <!-- <InputGroup class="mb-5">
-            <InputText
-              v-model="registrationNumber"
-              style="background-color: #fbe90a; border-color: #00309a; color: red;"
-              placeholder="Enter the Vehicle Reg"
-              inputClass="'bg-transparent text-900 border-400 border-blue-500'"
-              class="text-2xl text-500 font-bold mb-3 w-full"
-            />
-            
-          </InputGroup> -->
-<PrimeButton label="Generate Car details" @click="handleRegistrationNumberChange" class="w-full" />
-          <div class="field mt-2"><label>Registration</label><InputText v-model="reg" class="w-full mt-2" /></div>
-          <div class="field"><label>Make</label><InputText v-model="make" class="w-full" /></div>
-          <div class="field"><label>Model</label><InputText v-model="model" class="w-full" /></div>
-          <div class="field"><label>Variant</label><InputText v-model="variant" class="w-full" /></div>
-          <div class="field"><label>Year</label><InputText v-model="year" class="w-full" /></div>
-          <div class="field"><label>Price (£)</label><InputText v-model="price" class="w-full" /></div>
-          <div class="field"><label>Was Price (£)</label><InputText v-model="was_price" class="w-full" /></div>
+          <PrimeButton label="Generate Car details" @click="handleRegistrationNumberChange" class="w-full" />
+          <div class="field mt-2"><label>Registration</label>
+            <InputText v-model="reg" class="w-full mt-2" />
+          </div>
+          <div class="field"><label>Make</label>
+            <InputText v-model="make" class="w-full" />
+          </div>
+          <div class="field"><label>Model</label>
+            <InputText v-model="model" class="w-full" />
+          </div>
+          <div class="field"><label>Variant</label>
+            <InputText v-model="variant" class="w-full" />
+          </div>
+          <div class="field"><label>Year</label>
+            <InputText v-model="year" class="w-full" />
+          </div>
+          <div class="field"><label>Price (£)</label>
+            <InputText v-model="price" class="w-full" />
+          </div>
+          <div class="field"><label>Was Price (£)</label>
+            <InputText v-model="was_price" class="w-full" />
+          </div>
 
           <div class="field">
             <label>Mileage</label>
@@ -367,31 +348,30 @@ onMounted(() => {
 
           <div class="field">
             <label>Fuel Type</label>
-            <PrimeDropDown
-              v-model="fuel_type"
-              class="w-full"
-              :options="['Petrol', 'Diesel', 'Hybrid', 'Electric']"
-              placeholder="Select Fuel Type"
-            />
+            <PrimeDropDown v-model="fuel_type" class="w-full" :options="['Petrol', 'Diesel', 'Hybrid', 'Electric']"
+              placeholder="Select Fuel Type" />
           </div>
 
-          <div class="field"><label>Body Style</label><InputText v-model="body_style" class="w-full" /></div>
-          <div class="field"><label>Colour</label><InputText v-model="colour" class="w-full" /></div>
-          <div class="field"><label>Doors</label><InputText v-model="doors" class="w-full" /></div>
-          <div class="field"><label>Vehicle Type</label><InputText v-model="veh_type" class="w-full" /></div>
+          <div class="field"><label>Body Style</label>
+            <InputText v-model="body_style" class="w-full" />
+          </div>
+          <div class="field"><label>Colour</label>
+            <InputText v-model="colour" class="w-full" />
+          </div>
+          <div class="field"><label>Doors</label>
+            <InputText v-model="doors" class="w-full" />
+          </div>
+          <div class="field"><label>Vehicle Type</label>
+            <InputText v-model="veh_type" class="w-full" />
+          </div>
 
           <div class="field col-span-2">
             <label>Description</label>
             <PrimeTextarea v-model="description" class="w-full" rows="3" />
           </div>
 
-          <PrimeButton
-            label="Submit Car Listing"
-            icon="pi pi-check"
-            class="mt-3 w-full"
-            @click="submitCar"
-            :loading="isUploading"
-          />
+          <PrimeButton label="Submit Car Listing" icon="pi pi-check" class="mt-3 w-full" @click="submitCar"
+            :loading="isUploading" />
         </div>
       </div>
     </div>
