@@ -30,7 +30,7 @@ export const useUserStore = defineStore('user', {
       return this.user;
     },
     //allusers
-    setUsers(user) {
+    setUsers(users: User[]) {
       this.users = users;
     },
     clearUsers() {
