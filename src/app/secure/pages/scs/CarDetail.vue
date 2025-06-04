@@ -1,6 +1,7 @@
 <template>
   <Toast />
-  <PrimeDialog v-model:visible="confirm" modal header="Delete" :style="{ width: '50vw' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
+  <PrimeDialog v-model:visible="confirm" modal header="Delete" :style="{ width: '50vw' }"
+    :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
     <span class="text-surface-500 dark:text-surface-400 block mb-8">Are you sure you want to remove this image?</span>
     <div class="flex justify-end gap-2">
       <PrimeButton type="button" severity="success" label="Cancel" @click="confirm = false"></PrimeButton>
@@ -12,36 +13,58 @@
     <h2 class="text-2xl font-light">Edit Car Listing for <span class="font-bold">{{ form.registration }}</span></h2>
     <div class="grid">
       <div class="col-12">
+        <!-- Upload New Images -->
         <div class="card mb-4">
           <h3 class="text-lg font-semibold mb-2">Upload New Images</h3>
           <FileUpload name="images[]" customUpload :auto="false" :multiple="true" accept="image/*"
-                      @uploader="handleFileSelect" chooseLabel="Add Images">
+            @uploader="handleFileSelect" chooseLabel="Add Images">
             <template #empty>
               <span>Drag and drop files here to upload.</span>
+              <div v-if="previewUrls.length" class="mt-3 grid grid-cols-3 gap-2">
+                <div v-for="(url, index) in previewUrls" :key="index" class="relative group"
+                  @click="setMainImage(index)">
+                  <PrimeImage :src="url" width="160px" height="161px" preview
+                    class="border-2 transition-all duration-200 cursor-pointer"
+                    :class="{ 'border-primary-500 border-4': index === mainImageIndex }" />
+                  <div
+                    class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                    <PrimeButton v-if="index !== mainImageIndex" icon="pi pi-star"
+                      class="p-1 w-2rem h-2rem bg-white border-circle shadow-2" @click.stop="setMainImage(index)"
+                      severity="secondary" />
+                  </div>
+                  <PrimeButton icon="pi pi-times"
+                    class="absolute top-0 right-0 p-1 w-2rem h-2rem bg-white border-circle shadow-2"
+                    @click.stop="removeImage(index)" />
+                  <div v-if="index === mainImageIndex"
+                    class="absolute top-0 left-0 bg-primary-500 text-white text-xs px-2 py-1 rounded-br">
+                    Main Image
+                  </div>
+                </div>
+              </div>
             </template>
           </FileUpload>
         </div>
 
+        <!-- Existing Gallery -->
         <div class="card mb-4">
           <h3 class="text-lg font-semibold mb-2">Existing Gallery</h3>
           <div v-if="car?.images?.length" class="flex flex-wrap gap-3">
             <div v-for="(img, index) in car.images" :key="index" class="relative">
               <img :src="img" class="thumbnail-image" @click="selectMainImage(img)"
-                   :class="{ 'ring-2 ring-blue-500': mainImage === img }">
+                :class="{ 'ring-2 ring-blue-500': mainImage === img }">
               <button class="remove-btn" @click="showConfirmDialog(img)">x</button>
               <div v-if="mainImage === img" class="text-xs text-center text-blue-500 mt-1">Main Image</div>
             </div>
           </div>
         </div>
 
+        <!-- Car Info -->
         <div class="grid">
           <div class="col-12 md:col-6">
             <div class="field">
               <label>Registration</label>
               <InputGroup class="w-full h-4rem flex justify-center">
-                <InputGroupAddon style="background-color: #00309a; color: #fbe90a">
-                  GB
-                </InputGroupAddon>
+                <InputGroupAddon style="background-color: #00309a; color: #fbe90a">GB</InputGroupAddon>
                 <InputText v-model="registration" style="background-color: #fbe90a; border-color: #00309a"
                   placeholder="REG" class="text-5xl w-full font-bold" @input="registration.toUpperCase()" />
               </InputGroup>
@@ -70,7 +93,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref } from 'vue';
+import { ref, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
 import { useToast } from 'primevue/usetoast';
 import axios from 'axios';
@@ -80,9 +103,18 @@ const toast = useToast();
 const confirm = ref(false);
 const seshId = sessionStorage.getItem('token');
 
+// Image state
+const localFiles = ref<File[]>([]);
+const previewUrls = ref<string[]>([]);
+const mainImageIndex = ref(0);
+
+// Car data
 const car = ref<any>(null);
 const form = ref<any>({});
+const removedImages = ref<string[]>([]);
+const mainImage = ref<string>('');
 
+// Form fields
 const make = ref('');
 const model = ref('');
 const variant = ref('');
@@ -95,12 +127,47 @@ const colour = ref('');
 const doors = ref<number | null>(null);
 const veh_type = ref('');
 const description = ref('');
-
-const newImages = ref<File[]>([]);
-const removedImages = ref<string[]>([]);
-const mainImage = ref<string>('');
-
 const imageToRemove = ref<string>('');
+
+// Handlers
+const handleFileSelect = (event: any) => {
+  if (event?.files?.length) {
+    for (const file of event.files) {
+      if (file instanceof File) {
+        localFiles.value.push(file);
+        previewUrls.value.push(URL.createObjectURL(file));
+      }
+    }
+    if (localFiles.value.length === event.files.length) {
+      mainImageIndex.value = 0;
+    }
+  }
+};
+
+const removeImage = (index: number) => {
+  previewUrls.value.splice(index, 1);
+  localFiles.value.splice(index, 1);
+  if (mainImageIndex.value === index) {
+    mainImageIndex.value = 0;
+  } else if (mainImageIndex.value > index) {
+    mainImageIndex.value--;
+  }
+  toast.add({ severity: 'info', summary: 'Image Removed', detail: 'The image has been removed', life: 3000 });
+};
+
+const setMainImage = (index: number) => {
+  mainImageIndex.value = index;
+  toast.add({
+    severity: 'success',
+    summary: 'Main Image Set',
+    detail: 'This image will be displayed as the primary image',
+    life: 2000
+  });
+};
+
+const selectMainImage = (imgUrl: string) => {
+  mainImage.value = imgUrl;
+};
 
 const showConfirmDialog = (img: string) => {
   imageToRemove.value = img;
@@ -115,19 +182,13 @@ const confirmRemoveImage = async () => {
       headers: { Authorization: 'Bearer ' + seshId }
     });
 
-    // Immediately remove the image from the car.images array
     car.value.images = car.value.images.filter((img: string) => img !== imageToRemove.value);
     removedImages.value.push(imageToRemove.value);
-
     toast.add({ severity: 'success', summary: 'Deleted', detail: 'Image removed from S3', life: 3000 });
     confirm.value = false;
   } catch (error) {
     toast.add({ severity: 'error', summary: 'Error', detail: 'Failed to delete image from S3', life: 3000 });
   }
-};
-
-const selectMainImage = (imgUrl: string) => {
-  mainImage.value = imgUrl;
 };
 
 const fetchCar = async () => {
@@ -136,9 +197,9 @@ const fetchCar = async () => {
     const res = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/get-vehicle-by-id/${id}`, {
       headers: { Authorization: 'Bearer ' + seshId }
     });
+
     car.value = res.data.car;
     form.value = { ...res.data.car };
-
     make.value = form.value.make || '';
     model.value = form.value.model || '';
     variant.value = form.value.variant || '';
@@ -160,14 +221,11 @@ const fetchCar = async () => {
   }
 };
 
-const handleFileSelect = (event: any) => {
-  event.files.forEach((file: File) => newImages.value.push(file));
-};
-
 const updateCar = async () => {
   try {
     const uploadedKeys: string[] = [];
-    for (const file of newImages.value) {
+
+    for (const file of localFiles.value) {
       const { data } = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/admin/s3-presigned-url`, {
         filename: file.name,
         contentType: file.type,
@@ -175,6 +233,7 @@ const updateCar = async () => {
       }, {
         headers: { Authorization: `Bearer ${seshId}` }
       });
+
       await axios.put(data.url, file, { headers: { 'Content-Type': file.type } });
       uploadedKeys.push(data.key);
     }
@@ -198,7 +257,7 @@ const updateCar = async () => {
       veh_type: veh_type.value,
       description: description.value,
       images: updatedImages,
-      main_image: mainImage.value
+      main_image: uploadedKeys.length ? uploadedKeys[mainImageIndex.value] : mainImage.value
     };
 
     await axios.put(`${import.meta.env.VITE_API_BASE_URL}/admin/update-car/${car.value.id}`, payload, {
