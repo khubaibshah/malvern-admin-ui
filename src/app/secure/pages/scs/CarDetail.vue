@@ -1,5 +1,5 @@
 <template>
-  <Toast />
+<PrimeToast />
   <PrimeDialog v-model:visible="confirm" modal header="Delete" :style="{ width: '50vw' }"
     :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
     <span class="text-surface-500 dark:text-surface-400 block mb-8">Are you sure you want to remove this image?</span>
