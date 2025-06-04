@@ -281,8 +281,8 @@ onMounted(() => {
                 <div v-if="previewUrls.length" class="mt-3 grid grid-cols-3 gap-2">
                   <div v-for="(url, index) in previewUrls" :key="index" class="relative group"
                     @click="setMainImage(index)">
-                    <PrimeImage :src="url" width="160px" height="161px" preview
-                      class="border-2 transition-all duration-200 cursor-pointer"
+                    <PrimeImage :src="url" width="305px" height="250px" preview
+                      class="border-2 transition-all duration-200 cursor-pointer w-full"
                       :class="{ 'border-primary-500 border-4': index === mainImageIndex }" />
                     <div
                       class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
