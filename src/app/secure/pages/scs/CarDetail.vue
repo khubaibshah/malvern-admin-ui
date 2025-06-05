@@ -1,5 +1,5 @@
 <template>
-<PrimeToast />
+  <PrimeToast />
   <PrimeDialog v-model:visible="confirm" modal header="Delete" :style="{ width: '50vw' }"
     :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
     <span class="text-surface-500 dark:text-surface-400 block mb-8">Are you sure you want to remove this image?</span>
@@ -69,20 +69,55 @@
                   placeholder="REG" class="text-5xl w-full font-bold" @input="registration.toUpperCase()" />
               </InputGroup>
             </div>
-            <div class="field"><label>Make</label><InputText v-model="make" class="w-full" /></div>
-            <div class="field"><label>Model</label><InputText v-model="model" class="w-full" /></div>
-            <div class="field"><label>Variant</label><InputText v-model="variant" class="w-full" /></div>
-            <div class="field"><label>Year</label><InputText v-model="year" type="number" class="w-full" /></div>
-            <div class="field"><label>Price</label><InputText v-model="price" type="number" class="w-full" /></div>
+            <div class="field"><label>Make</label>
+              <InputText v-model="make" class="w-full" />
+            </div>
+            <div class="field"><label>Model</label>
+              <InputText v-model="model" class="w-full" />
+            </div>
+            <div class="field"><label>Variant</label>
+              <InputText v-model="variant" class="w-full" />
+            </div>
+            <div class="field"><label>Year</label>
+              <InputText v-model="year" type="number" class="w-full" />
+            </div>
+            <div class="field"><label>Price</label>
+              <InputText v-model="price" type="number" class="w-full" />
+            </div>
           </div>
 
           <div class="col-12 md:col-6">
-            <div class="field"><label>Mileage</label><InputText v-model="mileage" type="number" class="w-full" /></div>
-            <div class="field"><label>Fuel Type</label><InputText v-model="fuel_type" class="w-full" /></div>
-            <div class="field"><label>Colour</label><InputText v-model="colour" class="w-full" /></div>
-            <div class="field"><label>Doors</label><InputText v-model="doors" type="number" class="w-full" /></div>
-            <div class="field"><label>Vehicle Type</label><InputText v-model="veh_type" class="w-full" /></div>
-            <div class="field col-span-2"><label>Description</label><PrimeTextarea v-model="description" class="w-full" rows="3" /></div>
+            <div class="field"><label>Mileage</label>
+              <InputText v-model="mileage" type="number" class="w-full" />
+            </div>
+            <div class="field"><label>Fuel Type</label>
+              <InputText v-model="fuel_type" class="w-full" />
+            </div>
+            <div class="field"><label>Colour</label>
+              <InputText v-model="colour" class="w-full" />
+            </div>
+            <div class="field"><label>Doors</label>
+              <PrimeDropDown v-model="doors" type="number" class="w-full" :options="DOOR_OPTIONS" />
+            </div>
+            <div class="field"><label>Vehicle Type</label>
+              <InputText v-model="veh_type" class="w-full" />
+            </div>
+            <div class="field"><label>Gearbox</label>
+              <PrimeDropDown v-model="gearbox" :options="GEARBOX_OPTIONS" class="w-full" />
+            </div>
+            <div class="field"><label>Keys</label>
+              <PrimeDropDown v-model="keys" :options="KEY_OPTIONS" class="w-full" />
+            </div>
+            <div class="field"><label>Body Style</label>
+              <PrimeDropDown v-model="body_style" :options="BODY_STYLE_OPTIONS" class="w-full" />
+            </div>
+            <div class="field"><label>Registration Date</label>
+              <InputText v-model="registration_date" type="date" class="w-full" />
+            </div>
+
+            <div class="field col-span-2"><label>Description</label>
+              <PrimeTextarea v-model="description" class="w-full" rows="3" />
+            </div>
           </div>
         </div>
 
@@ -97,7 +132,12 @@ import { ref, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
 import { useToast } from 'primevue/usetoast';
 import axios from 'axios';
-
+import {
+  DOOR_OPTIONS,
+  KEY_OPTIONS,
+  GEARBOX_OPTIONS,
+  BODY_STYLE_OPTIONS
+} from '@/constants/enums';
 const route = useRoute();
 const toast = useToast();
 const confirm = ref(false);
@@ -128,6 +168,10 @@ const doors = ref<number | null>(null);
 const veh_type = ref('');
 const description = ref('');
 const imageToRemove = ref<string>('');
+const gearbox = ref('');
+const keys = ref('');
+const registration_date = ref(''); // ISO string like "2024-09-01"
+const body_style = ref('');
 
 // Handlers
 const handleFileSelect = (event: any) => {
@@ -212,6 +256,11 @@ const fetchCar = async () => {
     doors.value = form.value.doors || null;
     veh_type.value = form.value.veh_type || '';
     description.value = form.value.description || '';
+    gearbox.value = form.value.gearbox || '';
+    keys.value = form.value.keys || '';
+    registration_date.value = form.value.registration_date || '';
+    body_style.value = form.value.body_style || '';
+
 
     if (Array.isArray(car.value.images) && car.value.images.length > 0) {
       mainImage.value = car.value.main_image || car.value.images[0];
@@ -257,7 +306,11 @@ const updateCar = async () => {
       veh_type: veh_type.value,
       description: description.value,
       images: updatedImages,
-      main_image: uploadedKeys.length ? uploadedKeys[mainImageIndex.value] : mainImage.value
+      main_image: uploadedKeys.length ? uploadedKeys[mainImageIndex.value] : mainImage.value,
+      keys: keys.value,
+      gearbox: gearbox.value,
+      body_style: body_style.value,
+      registration_date: registration_date.value
     };
 
     await axios.put(`${import.meta.env.VITE_API_BASE_URL}/admin/update-car/${car.value.id}`, payload, {
@@ -284,6 +337,7 @@ onMounted(fetchCar);
   border: 2px solid #e5e7eb;
   cursor: pointer;
 }
+
 .remove-btn {
   position: absolute;
   top: -8px;
