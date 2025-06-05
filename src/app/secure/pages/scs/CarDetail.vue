@@ -184,7 +184,7 @@ const confirmRemoveImage = async () => {
 
     car.value.images = car.value.images.filter((img: string) => img !== imageToRemove.value);
     removedImages.value.push(imageToRemove.value);
-    toast.add({ severity: 'success', summary: 'Deleted', detail: 'Image removed from S3', life: 3000 });
+    toast.add({ severity: 'success', summary: 'Deleted', detail: 'Image removed', life: 3000 });
     confirm.value = false;
   } catch (error) {
     toast.add({ severity: 'error', summary: 'Error', detail: 'Failed to delete image from S3', life: 3000 });
