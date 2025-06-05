@@ -3,15 +3,41 @@ import { ref, onMounted } from 'vue';
 import axios from 'axios';
 import { FilterMatchMode } from 'primevue/api';
 import { useRouter } from 'vue-router';
+import { useToast } from 'primevue/usetoast';
 
-
-const seshId = sessionStorage.getItem('token')
+const seshId = sessionStorage.getItem('token');
 const cars = ref([]);
+const toast = useToast();
+const router = useRouter();
+
 const filters = ref({
   global: { value: null, matchMode: FilterMatchMode.CONTAINS }
 });
 
-const router = useRouter();
+const makeFeatured = async (carId: number) => {
+  try {
+    const config = {
+      headers: {
+        Authorization: 'Bearer ' + seshId,
+        'Content-Type': 'application/json'
+      }
+    };
+
+    await axios.post(`${import.meta.env.VITE_API_BASE_URL}/admin/featured-vehicle`, { id: carId }, config);
+
+    toast.add({ severity: 'success', summary: 'Success', detail: 'Featured vehicle updated!', life: 3000 });
+
+    await getCars(); // Refresh car list
+  } catch (error) {
+    console.error('Failed to set featured car', error);
+    toast.add({
+      severity: 'error',
+      summary: 'Error',
+      detail: 'Could not set featured vehicle. Please try again.',
+      life: 4000
+    });
+  }
+};
 
 const getCars = async () => {
   try {
@@ -21,60 +47,39 @@ const getCars = async () => {
         'Content-Type': 'application/json',
         'Access-Control-Allow-Origin': '*'
       }
-    }
+    };
     const res = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/admin/get-all-vehicles`, config);
-console.log('API response:', res.data);
-cars.value = res.data.cars;   } catch (error) {
+    cars.value = res.data.cars;
+  } catch (error) {
     console.error('Failed to fetch cars', error);
+    toast.add({ severity: 'error', summary: 'Error', detail: 'Failed to load cars.', life: 4000 });
   }
 };
-
-
-// const products = ref();
-// const getSeverity = (product) => {
-//     switch (product.inventoryStatus) {
-//         case 'INSTOCK':
-//             return 'success';
-
-//         case 'LOWSTOCK':
-//             return 'warn';
-
-//         case 'OUTOFSTOCK':
-//             return 'danger';
-
-//         default:
-//             return null;
-//     }
-// };
 
 onMounted(getCars);
 </script>
 
-  
 <template>
+  <PrimeToast />
   <div class="surface-section px-5 py-5 md:px-6 lg:px-12">
+
     <div class="text-3xl font-medium text-900 mb-4">Select Featured Vehicle</div>
 
-    
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-      <PrimeCard
-        v-for="(car, index) in cars"
-        :key="index"
-        class="shadow-2"
-        style="width: 100%; max-width: 24rem"
-      >
+      <PrimeCard v-for="(car, index) in cars" :key="index" class="shadow-2 relative"
+        style="width: 100%; max-width: 24rem">
         <!-- Header (Image) -->
         <template #header>
-          <img
-            :src="car.images?.[0] || 'https://via.placeholder.com/300x180?text=No+Image'"
-            :alt="`${car.make} ${car.model}`"
-            class="w-full h-[180px] object-cover rounded-t"
-          />
+          <PrimeTag v-if="car.featured === 1" value="Featured" severity="success" class="absolute top-2 left-2" />
+          <img :src="car.images?.[0] || 'https://via.placeholder.com/300x180?text=No+Image'"
+            :alt="`${car.make} ${car.model}`" class="w-full h-[180px] object-cover rounded-t" />
+
         </template>
 
         <!-- Title -->
         <template #title>
           {{ car.make }} {{ car.model }}
+
         </template>
 
         <!-- Subtitle -->
@@ -98,17 +103,16 @@ onMounted(getCars);
         </template>
 
         <!-- Footer -->
+        <!-- Footer -->
         <template #footer>
           <div class="flex gap-2">
-            <PrimeButton icon="pi pi-heart" severity="secondary" outlined class="w-full" />
-            <PrimeButton
-              icon="pi pi-plus"
-              label="Make Featured"
-              class="w-full"
-              @click="router.push(`/vehicles/${car.id}`)"
-            />
+            <PrimeButton :icon="car.featured === 1 ? 'pi pi-check-square' : 'pi pi-plus'"
+              :label="car.featured === 1 ? 'Featured' : 'Make Featured'" class="w-full" :disabled="car.featured === 1"
+              :severity="car.featured === 1 ? 'secondary' : 'primary'" @click="makeFeatured(car.id)" />
           </div>
         </template>
+
+
       </PrimeCard>
     </div>
   </div>

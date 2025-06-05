@@ -69,7 +69,7 @@ const getUser = async () => {
                 </div>
                 <div class="mt-3">
                     <ul class="list-none p-3 m-0">
-                        <li>
+                        <!-- <li>
                             <a
                                 v-ripple
                                 @click="router.push({name: 'Userhome'})"
@@ -83,8 +83,8 @@ const getUser = async () => {
                                     >Dashboard</span
                                 >
                             </a>
-                        </li>
-                        <li>
+                        </li> -->
+                        <!-- <li>
                             <a
                                 v-ripple
                                 class="flex flex-row lg:flex-column align-items-center cursor-pointer p-3 lg:justify-content-center hover:bg-gray-800 border-round text-gray-300 hover:text-white transition-duration-150 transition-colors p-ripple"
@@ -98,8 +98,8 @@ const getUser = async () => {
                                     >Create</span
                                 >
                             </a>
-                        </li>
-                        <li>
+                        </li> -->
+                        <!-- <li>
                             <a
                                 v-ripple
                                 class="flex flex-row lg:flex-column align-items-center cursor-pointer p-3 lg:justify-content-center hover:bg-gray-800 border-round text-gray-300 hover:text-white transition-duration-150 transition-colors p-ripple"
@@ -113,7 +113,54 @@ const getUser = async () => {
                                     >Bookings</span
                                 >
                             </a>
+                        </li> -->
+                         <li>
+                            <a
+                            @click="router.push({name : 'scs-car-listings'})"
+                                v-ripple
+                                class="flex flex-row lg:flex-column align-items-center cursor-pointer p-3 lg:justify-content-center hover:bg-gray-800 border-round text-gray-300 hover:text-white transition-duration-150 transition-colors p-ripple"
+                            >
+                                <i
+                                    class="pi pi-list mr-2 lg:mr-0 mb-0 lg:mb-2 text-base lg:text-lg"
+                                ></i>
+                                <span
+                                    class="text-center font-medium inline text-base lg:text-xs lg:block"
+                                    >Car list</span
+                                >
+                            </a>
                         </li>
+                        <li>
+                            <a
+                            @click="router.push({name : 'scs'})"
+                                v-ripple
+                                class="flex flex-row lg:flex-column align-items-center cursor-pointer p-3 lg:justify-content-center hover:bg-gray-800 border-round text-gray-300 hover:text-white transition-duration-150 transition-colors p-ripple"
+                            >
+                                <i
+                                    class="pi pi-car mr-2 lg:mr-0 mb-0 lg:mb-2 text-base lg:text-lg"
+                                ></i>
+                                <span
+                                    class="text-center font-medium inline text-base lg:text-xs lg:block"
+                                    >Add</span
+                                >
+                            </a>
+                        </li>
+                        <li>
+                            <a
+                            @click="router.push({name : 'featured-vehicle'})"
+                                v-ripple
+                                class="flex flex-row lg:flex-column align-items-center cursor-pointer p-3 lg:justify-content-center hover:bg-gray-800 border-round text-gray-300 hover:text-white transition-duration-150 transition-colors p-ripple"
+                            >
+                                <i
+                                    class="pi pi-angle-up mr-2 lg:mr-0 mb-0 lg:mb-2 text-base lg:text-lg"
+                                ></i>
+                                <span
+                                    class="text-center font-medium inline text-base lg:text-xs lg:block"
+                                    >Featured </span
+                                >
+                            </a>
+                        </li>
+                        
+                       
                         <li class="relative">
                             <a
                                 v-ripple
@@ -220,51 +267,6 @@ const getUser = async () => {
                                     </a>
                                 </li>
                             </ul>
-                        </li>
-                        <li>
-                            <a
-                            @click="router.push({name : 'featured-vehicle'})"
-                                v-ripple
-                                class="flex flex-row lg:flex-column align-items-center cursor-pointer p-3 lg:justify-content-center hover:bg-gray-800 border-round text-gray-300 hover:text-white transition-duration-150 transition-colors p-ripple"
-                            >
-                                <i
-                                    class="pi pi-calendar mr-2 lg:mr-0 mb-0 lg:mb-2 text-base lg:text-lg"
-                                ></i>
-                                <span
-                                    class="text-center font-medium inline text-base lg:text-xs lg:block"
-                                    >Featured Vehicle</span
-                                >
-                            </a>
-                        </li>
-                        <li>
-                            <a
-                            @click="router.push({name : 'scs'})"
-                                v-ripple
-                                class="flex flex-row lg:flex-column align-items-center cursor-pointer p-3 lg:justify-content-center hover:bg-gray-800 border-round text-gray-300 hover:text-white transition-duration-150 transition-colors p-ripple"
-                            >
-                                <i
-                                    class="pi pi-car mr-2 lg:mr-0 mb-0 lg:mb-2 text-base lg:text-lg"
-                                ></i>
-                                <span
-                                    class="text-center font-medium inline text-base lg:text-xs lg:block"
-                                    >Add SCS car listing</span
-                                >
-                            </a>
-                        </li>
-                        <li>
-                            <a
-                            @click="router.push({name : 'scs-car-listings'})"
-                                v-ripple
-                                class="flex flex-row lg:flex-column align-items-center cursor-pointer p-3 lg:justify-content-center hover:bg-gray-800 border-round text-gray-300 hover:text-white transition-duration-150 transition-colors p-ripple"
-                            >
-                                <i
-                                    class="pi pi-car mr-2 lg:mr-0 mb-0 lg:mb-2 text-base lg:text-lg"
-                                ></i>
-                                <span
-                                    class="text-center font-medium inline text-base lg:text-xs lg:block"
-                                    >SCS Car List</span
-                                >
-                            </a>
                         </li>
                     </ul>
                 </div>
