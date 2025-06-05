@@ -1,9 +1,20 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, computed } from 'vue';
 import axios from 'axios';
 import { useToast } from 'primevue/usetoast';
 import VehicleService from "@/services/VehicleService";
 import { useVehicleStore } from "@/stores/vehicleData";
+import {
+  DOOR_OPTIONS,
+  KEY_OPTIONS,
+  GEARBOX_OPTIONS,
+  BODY_STYLE_OPTIONS
+} from '@/constants/enums';
+import { getUkRegistrationLabel } from '@/utils/registration';
+const doors = ref();
+const numKeys = ref();
+const gearbox = ref();
+const bodyStyle = ref();
 
 const toast = useToast();
 const vehicleStore = useVehicleStore();
@@ -20,9 +31,7 @@ const price = ref('');
 const was_price = ref('');
 const mileage = ref('');
 const fuel_type = ref('');
-const body_style = ref('');
 const colour = ref('');
-const doors = ref('');
 const veh_type = ref('Car');
 const description = ref('');
 const mileageRange = ref(50000);
@@ -168,7 +177,10 @@ const validateForm = () => {
   }
   return true;
 };
-
+const formattedRegistrationDate = computed(() => {
+  if (!vehicleData.value?.registrationDate) return '';
+  return getUkRegistrationLabel(vehicleData.value.registrationDate);
+});
 const submitCar = async () => {
   if (!validateForm()) return;
   isUploading.value = true;
@@ -191,6 +203,13 @@ const submitCar = async () => {
     formData.append('description', description.value);
     formData.append('registration', registrationNumber.value);
     formData.append('main_image_index', mainImageIndex.value.toString());
+    formData.append('registration_date', vehicleData.value.registrationDate || '');
+    formData.append('was_price', was_price.value || '');
+    formData.append('body_style', bodyStyle.value || '');
+    formData.append('doors', doors.value || '');
+    formData.append('gearbox', gearbox.value || '');
+    formData.append('keys', numKeys.value || '');
+
 
     uploadedKeys.forEach((key, index) => {
       formData.append(`car_images[${index}]`, key);
@@ -256,6 +275,7 @@ const removeImage = (index: number) => {
 };
 
 onMounted(() => {
+  
   const storeData = vehicleStore.getVehicleData;
   if (storeData) {
     vehicleData.value = storeData;
@@ -269,6 +289,7 @@ onMounted(() => {
 <template>
   <div>
     <PrimeToast />
+    <!-- {{ $filters.formatDate(vehicleData.registrationDate) }} -->
     <div class="surface-section px-5 py-5 md:px-6 lg:px-8">
       <div class="text-3xl font-medium text-900 mb-4">Add New Car Listing</div>
       <div class="grid">
@@ -321,6 +342,7 @@ onMounted(() => {
           <div class="field mt-2"><label>Registration</label>
             <InputText v-model="reg" class="w-full mt-2" />
           </div>
+          
           <div class="field"><label>Make</label>
             <InputText v-model="make" class="w-full" />
           </div>
@@ -333,6 +355,11 @@ onMounted(() => {
           <div class="field"><label>Year</label>
             <InputText v-model="year" class="w-full" />
           </div>
+          <div class="field">
+  <label>Registration Date</label>
+  <InputText :value="formattedRegistrationDate" class="w-full" disabled />
+</div>
+
           <div class="field"><label>Price (£)</label>
             <InputText v-model="price" class="w-full" />
           </div>
@@ -351,15 +378,26 @@ onMounted(() => {
             <PrimeDropDown v-model="fuel_type" class="w-full" :options="['Petrol', 'Diesel', 'Hybrid', 'Electric']"
               placeholder="Select Fuel Type" />
           </div>
-
-          <div class="field"><label>Body Style</label>
-            <InputText v-model="body_style" class="w-full" />
-          </div>
           <div class="field"><label>Colour</label>
             <InputText v-model="colour" class="w-full" />
           </div>
-          <div class="field"><label>Doors</label>
-            <InputText v-model="doors" class="w-full" />
+          <div class="field">
+            <label>Doors</label>
+            <PrimeDropDown v-model="doors" :options="DOOR_OPTIONS" class="w-full" placeholder="Select doors" />
+          </div>
+          <div class="field">
+            <label>Number of Keys</label>
+            <PrimeDropDown v-model="numKeys" :options="KEY_OPTIONS" class="w-full" placeholder="Select keys" />
+          </div>
+          <div class="field">
+            <label>Gearbox</label>
+            <PrimeDropDown v-model="gearbox" :options="GEARBOX_OPTIONS" class="w-full" placeholder="Select gearbox" />
+          </div>
+
+          <div class="field">
+            <label>Body Style</label>
+            <PrimeDropDown v-model="bodyStyle" :options="BODY_STYLE_OPTIONS" class="w-full"
+              placeholder="Select body style" />
           </div>
           <div class="field"><label>Vehicle Type</label>
             <InputText v-model="veh_type" class="w-full" />
