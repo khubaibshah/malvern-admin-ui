@@ -1,5 +1,5 @@
 import './assets/style.css'
-import 'primevue/resources/themes/lara-dark-green/theme.css';
+import 'primevue/resources/themes/aura-light-green/theme.css';
 import piniaPluginPersistedState from "pinia-plugin-persistedstate"
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
@@ -55,7 +55,7 @@ import router from './router'
 const app = createApp(App)
 
 app.use(ToastService);
-app.use(PrimeVue, { ripple: true, style: true });
+app.use(PrimeVue, { ripple: true });
 app.use(createPinia())
 pinia.use(piniaPluginPersistedState)
 app.use(router)
