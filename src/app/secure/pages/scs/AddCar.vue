@@ -17,6 +17,7 @@ const doors = ref();
 const numKeys = ref();
 const gearbox = ref();
 const bodyStyle = ref();
+const engineSize = ref();
 
 const toast = useToast();
 const vehicleStore = useVehicleStore();
@@ -133,6 +134,7 @@ const populateVehicleFields = () => {
   registrationNumber.value = vehicleData.value.registration;
   mileage.value = vehicleData.value.motTests?.[0]?.odometerValue?.replace(/[^0-9]/g, '') || '';
   mileageRange.value = parseInt(mileage.value) || 0;
+  engineSize.value = vehicleData.value.engineSize;
   if (!description.value) {
     description.value = DEFAULT_CAR_DESCRIPTION;
   }
@@ -215,6 +217,7 @@ const submitCar = async () => {
     formData.append('doors', doors.value || '');
     formData.append('gearbox', gearbox.value || '');
     formData.append('keys', numKeys.value || '');
+    formData.append('engine_size', engineSize.value || '');
 
 
     uploadedKeys.forEach((key, index) => {
@@ -260,6 +263,12 @@ const submitCar = async () => {
     isUploading.value = false;
   }
 };
+const engineSizeLitres = computed(() => {
+  if (!engineSize.value) return '';
+  const cc = parseInt(engineSize.value);
+  if (isNaN(cc)) return '';
+  return (cc / 1000).toFixed(1) + 'L';
+});
 
 const removeImage = (index: number) => {
   previewUrls.value.splice(index, 1);
@@ -281,7 +290,7 @@ const removeImage = (index: number) => {
 };
 
 onMounted(() => {
-  
+
   const storeData = vehicleStore.getVehicleData;
   if (storeData) {
     vehicleData.value = storeData;
@@ -348,7 +357,7 @@ onMounted(() => {
           <div class="field mt-2"><label>Registration</label>
             <InputText v-model="reg" class="w-full mt-2" />
           </div>
-          
+
           <div class="field"><label>Make</label>
             <InputText v-model="make" class="w-full" />
           </div>
@@ -362,9 +371,9 @@ onMounted(() => {
             <InputText v-model="year" class="w-full" />
           </div>
           <div class="field">
-  <label>Registration Date</label>
-  <InputText :value="formattedRegistrationDate" class="w-full" disabled />
-</div>
+            <label>Registration Date</label>
+            <InputText :value="formattedRegistrationDate" class="w-full" disabled />
+          </div>
 
           <div class="field"><label>Price (£)</label>
             <InputText v-model="price" class="w-full" />
@@ -399,6 +408,11 @@ onMounted(() => {
             <label>Gearbox</label>
             <PrimeDropDown v-model="gearbox" :options="GEARBOX_OPTIONS" class="w-full" placeholder="Select gearbox" />
           </div>
+          <div class="field">
+            <label>Engine Size</label>
+            <InputText v-model="engineSizeLitres" class="w-full" />
+          </div>
+
 
           <div class="field">
             <label>Body Style</label>

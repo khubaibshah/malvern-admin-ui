@@ -105,6 +105,9 @@
             <div class="field"><label>Gearbox</label>
               <PrimeDropDown v-model="gearbox" :options="GEARBOX_OPTIONS" class="w-full" />
             </div>
+            <div class="field"><label>Engine</label>
+              <InputText v-model="engineSize" class="w-full"/>
+            </div>
             <div class="field"><label>Keys</label>
               <PrimeDropDown v-model="keys" :options="KEY_OPTIONS" class="w-full" />
             </div>
@@ -169,6 +172,7 @@ const veh_type = ref('');
 const description = ref('');
 const imageToRemove = ref<string>('');
 const gearbox = ref('');
+const engineSize = ref('');
 const keys = ref('');
 const registration_date = ref(''); // ISO string like "2024-09-01"
 const body_style = ref('');
@@ -257,6 +261,7 @@ const fetchCar = async () => {
     veh_type.value = form.value.veh_type || '';
     description.value = form.value.description || '';
     gearbox.value = form.value.gearbox || '';
+    engineSize.value = form.value.engine_size  || '';
     keys.value = form.value.keys !== null ? parseInt(form.value.keys) : null;
     registration_date.value = form.value.registration_date || '';
     body_style.value = form.value.body_style || '';
@@ -309,6 +314,7 @@ const updateCar = async () => {
       main_image: uploadedKeys.length ? uploadedKeys[mainImageIndex.value] : mainImage.value,
       keys: keys.value,
       gearbox: gearbox.value,
+      engine_size: engineSize.value,
       body_style: body_style.value,
       registration_date: registration_date.value
     };
