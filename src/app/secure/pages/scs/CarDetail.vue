@@ -257,7 +257,7 @@ const fetchCar = async () => {
     veh_type.value = form.value.veh_type || '';
     description.value = form.value.description || '';
     gearbox.value = form.value.gearbox || '';
-    keys.value = form.value.keys || '';
+    keys.value = form.value.keys !== null ? parseInt(form.value.keys) : null;
     registration_date.value = form.value.registration_date || '';
     body_style.value = form.value.body_style || '';
 

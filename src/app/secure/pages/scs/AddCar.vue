@@ -10,6 +10,8 @@ import {
   GEARBOX_OPTIONS,
   BODY_STYLE_OPTIONS
 } from '@/constants/enums';
+import { DEFAULT_CAR_DESCRIPTION } from '@/constants/defaultDescriptions';
+
 import { getUkRegistrationLabel } from '@/utils/registration';
 const doors = ref();
 const numKeys = ref();
@@ -131,6 +133,10 @@ const populateVehicleFields = () => {
   registrationNumber.value = vehicleData.value.registration;
   mileage.value = vehicleData.value.motTests?.[0]?.odometerValue?.replace(/[^0-9]/g, '') || '';
   mileageRange.value = parseInt(mileage.value) || 0;
+  if (!description.value) {
+    description.value = DEFAULT_CAR_DESCRIPTION;
+  }
+
 };
 
 const handleRegistrationNumberChange = async () => {
