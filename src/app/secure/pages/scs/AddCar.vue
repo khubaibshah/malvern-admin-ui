@@ -411,7 +411,8 @@ onMounted(() => {
 
           <div class="field col-span-2">
             <label>Description</label>
-            <PrimeTextarea v-model="description" class="w-full" rows="3" />
+            <!-- <PrimeEditor v-model="description" editorStyle="height: 320px" /> -->
+            <PrimeTextarea v-model="description" class="w-full" rows="10" />
           </div>
 
           <PrimeButton label="Submit Car Listing" icon="pi pi-check" class="mt-3 w-full" @click="submitCar"
