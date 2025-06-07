@@ -151,7 +151,7 @@ const getUser = async () => {
                                 class="flex flex-row lg:flex-column align-items-center cursor-pointer p-3 lg:justify-content-center hover:bg-gray-800 border-round text-gray-300 hover:text-white transition-duration-150 transition-colors p-ripple"
                             >
                                 <i
-                                    class="pi pi-angle-up mr-2 lg:mr-0 mb-0 lg:mb-2 text-base lg:text-lg"
+                                    class="pi pi-image mr-2 lg:mr-0 mb-0 lg:mb-2 text-base lg:text-lg"
                                 ></i>
                                 <span
                                     class="text-center font-medium inline text-base lg:text-xs lg:block"
