@@ -1,7 +1,7 @@
 import axios from 'axios';
 import type { VehicleData } from '../interfaces/VehicleData';
 // import type  DVSAVehicleData  from '../interfaces/DvsaVehicleData';
-
+import { useVehicleStore } from '@/stores/vehicleData'; // adjust path as needed
 interface MappedVehicleData {
   registration_number: string;
   tax_status: string;
@@ -61,6 +61,26 @@ class VehicleService {
       throw error;
     }
   };
+  fetchAllVehicles = async () => {
+    const store = useVehicleStore();
+    if (store.vehData && store.vehData.length > 0) return store.vehData;
+
+    try {
+      const res = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/admin/vehicle-list`, {
+        headers: {
+          Authorization: 'Bearer ' + sessionStorage.getItem('token'),
+          'Content-Type': 'application/json'
+        }
+      });
+
+      store.setVehicleData(res.data);
+      return res.data;
+    } catch (error) {
+      console.error('Failed to fetch vehicles', error);
+      throw error;
+    }
+  };
 }
+
 
 export default new VehicleService();

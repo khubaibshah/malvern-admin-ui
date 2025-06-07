@@ -11,6 +11,7 @@ import AddCar from '@/app/secure/pages/scs/AddCar.vue'
 import ViewAllCarsVue from '@/app/secure/pages/scs/ViewAllCars.vue'
 import CarDetail from '@/app/secure/pages/scs/CarDetail.vue'
 import FeaturedVehicle from '@/app/secure/pages/scs/FeaturedVehicle.vue'
+import ArchiveDelete from '@/app/secure/pages/scs/ArchiveDelete.vue'
 import { useAuthStore } from '@/stores/authStore'
 
 const router = createRouter({
@@ -72,6 +73,12 @@ const router = createRouter({
           path: 'view-listings',
           name: 'scs-car-listings',
           component: ViewAllCarsVue,
+          meta: { requiresAuth: true }
+        },
+        {
+          path: '/archive-delete',
+          name: 'archive-delete',
+          component: ArchiveDelete,
           meta: { requiresAuth: true }
         },
         {

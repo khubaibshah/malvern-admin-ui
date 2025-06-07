@@ -160,6 +160,22 @@ const getUser = async () => {
                             </a>
                         </li>
                         
+                        <li>
+                            <a
+                            @click="router.push({name : 'archive-delete'})"
+                                v-ripple
+                                class="flex flex-row lg:flex-column align-items-center cursor-pointer p-3 lg:justify-content-center hover:bg-gray-800 border-round text-gray-300 hover:text-white transition-duration-150 transition-colors p-ripple"
+                            >
+                                <i
+                                    class="pi pi-trash mr-2 lg:mr-0 mb-0 lg:mb-2 text-base lg:text-lg"
+                                ></i>
+                                <span
+                                    class="text-center font-medium inline text-base lg:text-xs lg:block"
+                                    >Archive </span
+                                >
+                            </a>
+                        </li>
+                        
                        
                         <li class="relative">
                             <a
