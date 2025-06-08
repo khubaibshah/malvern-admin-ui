@@ -3,8 +3,10 @@ import { ref, onMounted } from 'vue';
 import axios from 'axios';
 import { FilterMatchMode } from 'primevue/api';
 import { useRouter } from 'vue-router';
+import VehicleService from '@/services/VehicleService';
+import { useToast } from 'primevue/usetoast';
 
-
+const toast = useToast();
 const seshId = sessionStorage.getItem('token')
 const cars = ref([]);
 const selectedCar = ref(null);
@@ -20,21 +22,16 @@ const goToCarDetail = (event: any) => {
   router.push({ name: 'car-detail', params: { id: car.id } });
 };
 
-const getCars = async () => {
+const getCars = async (refresh = false) => {
   try {
-    const config = {
-      headers: {
-        Authorization: 'Bearer ' + seshId,
-        'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': '*'
-      }
-    }
-    const res = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/admin/vehicle-list`, config);
-    cars.value = res.data;
+    cars.value = await VehicleService.fetchAllVehicles(refresh);
   } catch (error) {
     console.error('Failed to fetch cars', error);
+    toast.add({ severity: 'error', summary: 'Error', detail: 'Failed to load cars.', life: 4000 });
   }
 };
+
+
 
 const clearFilter = () => {
   filters.value = {

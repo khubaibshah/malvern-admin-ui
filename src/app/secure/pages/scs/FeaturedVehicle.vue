@@ -12,7 +12,7 @@ const makeFeatured = async (carId: number) => {
   try {
     await VehicleService.setFeaturedVehicle(carId); // optional: abstract this too
     toast.add({ severity: 'success', summary: 'Success', detail: 'Featured vehicle updated!', life: 3000 });
-    await getCars(); // Refresh car list
+    await getCars(true);
   } catch (error) {
     console.error('Failed to set featured car', error);
     toast.add({
@@ -40,10 +40,15 @@ onMounted(getCars);
 <template>
   <PrimeToast />
   <div class="surface-section px-5 py-5 md:px-6 lg:px-12">
-    <div class="flex justify-between items-center mb-4">
-      <div class="text-3xl font-medium text-900">Select Featured Vehicle</div>
-<PrimeButton label="Refresh" icon="pi pi-refresh" class="p-button-sm" @click="() => getCars(true)" />
-    </div>
+    <div class="flex items-center justify-between mb-4">
+  <div class="text-3xl font-medium text-900">Select Featured Vehicle</div>
+  <PrimeButton
+    icon="pi pi-refresh"
+    class="p-button-sm ml-4"
+    @click="() => getCars(true)"
+  />
+</div>
+
 
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
       <PrimeCard v-for="(car, index) in cars" :key="index" class="shadow-2 relative"
