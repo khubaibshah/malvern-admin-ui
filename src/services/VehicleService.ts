@@ -61,25 +61,39 @@ class VehicleService {
       throw error;
     }
   };
-  fetchAllVehicles = async () => {
+ fetchAllVehicles = async () => {
     const store = useVehicleStore();
+
+    // Return from store if already fetched
     if (store.vehData && store.vehData.length > 0) return store.vehData;
 
     try {
-      const res = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/admin/vehicle-list`, {
+      const res = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/admin/get-all-vehicles`, {
         headers: {
           Authorization: 'Bearer ' + sessionStorage.getItem('token'),
           'Content-Type': 'application/json'
         }
       });
 
-      store.setVehicleData(res.data);
-      return res.data;
+      const cars = res.data.cars;
+
+      store.setVehicleData(cars); // Save full car data including images
+      return cars;
     } catch (error) {
       console.error('Failed to fetch vehicles', error);
       throw error;
     }
   };
+
+  setFeaturedVehicle = async (carId: number) => {
+  await axios.post(`${import.meta.env.VITE_API_BASE_URL}/admin/featured-vehicle`, { id: carId }, {
+    headers: {
+      Authorization: 'Bearer ' + sessionStorage.getItem('token'),
+      'Content-Type': 'application/json'
+    }
+  });
+}
+
 }
 
 

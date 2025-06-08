@@ -1,32 +1,17 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
-import axios from 'axios';
-import { FilterMatchMode } from 'primevue/api';
 import { useRouter } from 'vue-router';
 import { useToast } from 'primevue/usetoast';
+import VehicleService from '@/services/VehicleService';
 
-const seshId = sessionStorage.getItem('token');
 const cars = ref([]);
 const toast = useToast();
 const router = useRouter();
 
-const filters = ref({
-  global: { value: null, matchMode: FilterMatchMode.CONTAINS }
-});
-
 const makeFeatured = async (carId: number) => {
   try {
-    const config = {
-      headers: {
-        Authorization: 'Bearer ' + seshId,
-        'Content-Type': 'application/json'
-      }
-    };
-
-    await axios.post(`${import.meta.env.VITE_API_BASE_URL}/admin/featured-vehicle`, { id: carId }, config);
-
+    await VehicleService.setFeaturedVehicle(carId); // optional: abstract this too
     toast.add({ severity: 'success', summary: 'Success', detail: 'Featured vehicle updated!', life: 3000 });
-
     await getCars(); // Refresh car list
   } catch (error) {
     console.error('Failed to set featured car', error);
@@ -41,15 +26,7 @@ const makeFeatured = async (carId: number) => {
 
 const getCars = async () => {
   try {
-    const config = {
-      headers: {
-        Authorization: 'Bearer ' + seshId,
-        'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': '*'
-      }
-    };
-    const res = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/admin/get-all-vehicles`, config);
-    cars.value = res.data.cars;
+    cars.value = await VehicleService.fetchAllVehicles();
   } catch (error) {
     console.error('Failed to fetch cars', error);
     toast.add({ severity: 'error', summary: 'Error', detail: 'Failed to load cars.', life: 4000 });
@@ -58,6 +35,7 @@ const getCars = async () => {
 
 onMounted(getCars);
 </script>
+
 
 <template>
   <PrimeToast />
