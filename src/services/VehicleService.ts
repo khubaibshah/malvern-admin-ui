@@ -61,29 +61,30 @@ class VehicleService {
       throw error;
     }
   };
- fetchAllVehicles = async () => {
-    const store = useVehicleStore();
+fetchAllVehicles = async (forceRefresh = false) => {
+  const store = useVehicleStore();
 
-    // Return from store if already fetched
-    if (store.vehData && store.vehData.length > 0) return store.vehData;
+  if (!forceRefresh && store.vehData && store.vehData.length > 0) {
+    return store.vehData;
+  }
 
-    try {
-      const res = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/admin/get-all-vehicles`, {
-        headers: {
-          Authorization: 'Bearer ' + sessionStorage.getItem('token'),
-          'Content-Type': 'application/json'
-        }
-      });
+  try {
+    const res = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/admin/get-all-vehicles`, {
+      headers: {
+        Authorization: 'Bearer ' + sessionStorage.getItem('token'),
+        'Content-Type': 'application/json'
+      }
+    });
 
-      const cars = res.data.cars;
+    const cars = res.data.cars || [];
+    store.setVehicleData(cars);
+    return cars;
+  } catch (error) {
+    console.error('Failed to fetch vehicles', error);
+    throw error;
+  }
+};
 
-      store.setVehicleData(cars); // Save full car data including images
-      return cars;
-    } catch (error) {
-      console.error('Failed to fetch vehicles', error);
-      throw error;
-    }
-  };
 
   setFeaturedVehicle = async (carId: number) => {
   await axios.post(`${import.meta.env.VITE_API_BASE_URL}/admin/featured-vehicle`, { id: carId }, {

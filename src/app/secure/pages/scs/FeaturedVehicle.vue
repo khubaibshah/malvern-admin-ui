@@ -24,24 +24,26 @@ const makeFeatured = async (carId: number) => {
   }
 };
 
-const getCars = async () => {
+const getCars = async (refresh = false) => {
   try {
-    cars.value = await VehicleService.fetchAllVehicles();
+    cars.value = await VehicleService.fetchAllVehicles(refresh);
   } catch (error) {
     console.error('Failed to fetch cars', error);
     toast.add({ severity: 'error', summary: 'Error', detail: 'Failed to load cars.', life: 4000 });
   }
 };
 
+
 onMounted(getCars);
 </script>
-
 
 <template>
   <PrimeToast />
   <div class="surface-section px-5 py-5 md:px-6 lg:px-12">
-
-    <div class="text-3xl font-medium text-900 mb-4">Select Featured Vehicle</div>
+    <div class="flex justify-between items-center mb-4">
+      <div class="text-3xl font-medium text-900">Select Featured Vehicle</div>
+<PrimeButton label="Refresh" icon="pi pi-refresh" class="p-button-sm" @click="() => getCars(true)" />
+    </div>
 
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
       <PrimeCard v-for="(car, index) in cars" :key="index" class="shadow-2 relative"
@@ -51,13 +53,11 @@ onMounted(getCars);
           <PrimeTag v-if="car.featured === 1" value="Featured" severity="success" class="absolute top-2 left-2" />
           <img :src="car.images?.[0] || 'https://via.placeholder.com/300x180?text=No+Image'"
             :alt="`${car.make} ${car.model}`" class="w-full h-[180px] object-cover rounded-t" />
-
         </template>
 
         <!-- Title -->
         <template #title>
           {{ car.make }} {{ car.model }}
-
         </template>
 
         <!-- Subtitle -->
@@ -81,7 +81,6 @@ onMounted(getCars);
         </template>
 
         <!-- Footer -->
-        <!-- Footer -->
         <template #footer>
           <div class="flex gap-2">
             <PrimeButton :icon="car.featured === 1 ? 'pi pi-check-square' : 'pi pi-plus'"
@@ -89,9 +88,8 @@ onMounted(getCars);
               :severity="car.featured === 1 ? 'secondary' : 'primary'" @click="makeFeatured(car.id)" />
           </div>
         </template>
-
-
       </PrimeCard>
     </div>
   </div>
 </template>
+
