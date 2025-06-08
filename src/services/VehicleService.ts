@@ -138,6 +138,16 @@ getArchivedVehicles = async () => {
   }
 }
 
+deleteVehicles = async (vehicleIds: number[]) => {
+  return await axios.post(`${import.meta.env.VITE_API_BASE_URL}/admin/delete-vehicles`, {
+    vehicle_ids: vehicleIds
+  }, {
+    headers: {
+      Authorization: 'Bearer ' + sessionStorage.getItem('token'),
+      'Content-Type': 'application/json'
+    }
+  });
+}
 
 }
 

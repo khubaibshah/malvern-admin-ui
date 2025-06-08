@@ -103,6 +103,17 @@
       </div>
     </div>
   </div>
+  <PrimeDialog v-model:visible="confirmDeleteVisible" modal header="Confirm Deletion" :style="{ width: '400px' }">
+    <p class="m-0 text-sm">
+      Are you sure you want to permanently delete the selected vehicle(s)? This action cannot be undone.
+    </p>
+
+    <template #footer>
+      <PrimeButton label="Cancel" icon="pi pi-times" class="p-button-text" @click="confirmDeleteVisible = false" />
+      <PrimeButton label="Delete" icon="pi pi-trash" class="p-button-danger" @click="confirmDelete()" />
+    </template>
+  </PrimeDialog>
+
 </template>
 
 <script setup>
@@ -116,6 +127,8 @@ const cars = ref([]);
 const archiveSelection = ref([]);
 const deleteSelection = ref([]);
 const archivedCars = ref([]);
+const confirmDeleteVisible = ref(false); // dialog visibility
+
 
 const fetchAllData = async (forceRefresh = false) => {
   try {
@@ -201,7 +214,7 @@ const archiveSelected = async () => {
       life: 4000
     });
 
-    // 🔄 Move archived cars from active to archived list
+    // Move archived cars from active to archived list
     archiveSelection.value.forEach(car => {
       const index = cars.value.findIndex(c => c.id === car.id);
       if (index !== -1) {
@@ -223,9 +236,60 @@ const archiveSelected = async () => {
 
 
 
+// Trigger dialog from button
 const deleteSelected = () => {
-  console.log('Deleting:', deleteSelection.value);
+  if (!deleteSelection.value.length) {
+    toast.add({
+      severity: 'warn',
+      summary: 'No Selection',
+      detail: 'Please select vehicle(s) to delete.',
+      life: 3000
+    });
+    return;
+  }
+
+  // Log full vehicle objects
+  console.log('Vehicles selected for deletion:', deleteSelection.value);
+
+  confirmDeleteVisible.value = true;
 };
+
+
+// Handle confirm delete
+const confirmDelete = async () => {
+  try {
+    const vehicleIds = deleteSelection.value.map(car => car.id);
+    
+    console.log('Deleting vehicle IDs:', vehicleIds);
+    console.log('Full vehicle data:', deleteSelection.value);
+
+    await VehicleService.deleteVehicles(vehicleIds);
+
+    toast.add({
+      severity: 'success',
+      summary: 'Deleted',
+      detail: 'Selected vehicle(s) have been deleted permanently.',
+      life: 3000
+    });
+
+    // Remove deleted vehicles from the list
+    deleteSelection.value.forEach(car => {
+      const i = cars.value.findIndex(c => c.id === car.id);
+      if (i !== -1) cars.value.splice(i, 1);
+    });
+
+    deleteSelection.value = [];
+    confirmDeleteVisible.value = false;
+  } catch (error) {
+    toast.add({
+      severity: 'error',
+      summary: 'Delete Failed',
+      detail: 'Could not delete selected vehicles.',
+      life: 4000
+    });
+  }
+};
+
 </script>
 
 
