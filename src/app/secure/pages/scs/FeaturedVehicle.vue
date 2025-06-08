@@ -41,14 +41,9 @@ onMounted(getCars);
   <PrimeToast />
   <div class="surface-section px-5 py-5 md:px-6 lg:px-12">
     <div class="flex items-center justify-between mb-4">
-  <div class="text-3xl font-medium text-900">Select Featured Vehicle</div>
-  <PrimeButton
-    icon="pi pi-refresh"
-    class="p-button-sm ml-4"
-    @click="() => getCars(true)"
-  />
-</div>
-
+      <div class="text-3xl font-medium text-900">Select Featured Vehicle</div>
+      <PrimeButton icon="pi pi-refresh" class="p-button-sm ml-4" @click="() => getCars(true)" />
+    </div>
 
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
       <PrimeCard v-for="(car, index) in cars" :key="index" class="shadow-2 relative"
@@ -97,4 +92,3 @@ onMounted(getCars);
     </div>
   </div>
 </template>
-

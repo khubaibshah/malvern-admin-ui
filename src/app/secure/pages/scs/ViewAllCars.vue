@@ -52,13 +52,24 @@ onMounted(getCars);
         dataKey="id" filterDisplay="row"
         :globalFilterFields="['make', 'model', 'variant', 'price', 'mileage', 'registration']" sortField="id"
         :sortOrder="-1" paginator :rows="10" :metaKeySelection="false" @rowSelect="goToCarDetail">
+        
         <template #header>
+
           <div class="flex justify-content-between">
+
             <PrimeButton type="button" icon="pi pi-filter-slash" label="Clear" outlined @click="clearFilter" />
+            
             <IconField iconPosition="left">
+              
               <InputIcon><i class="pi pi-search" /></InputIcon>
               <InputText v-model="filters['global'].value" placeholder="Search Cars" />
+                                    <PrimeButton
+    icon="pi pi-refresh"
+    class="p-button-sm ml-4"
+    @click="() => getCars(true)"
+  />
             </IconField>
+            
           </div>
         </template>
         <PrimeColumn field="registration" header="Registration" sortable />
