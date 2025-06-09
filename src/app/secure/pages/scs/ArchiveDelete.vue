@@ -96,14 +96,9 @@
               </div>
               <PrimeButton label="Delete Selected" icon="pi pi-trash" class="p-button-danger w-full mt-3"
                 @click="deleteSelected" />
-
             </div>
-
           </div>
-
-
         </div>
-
       </div>
     </div>
   </div>

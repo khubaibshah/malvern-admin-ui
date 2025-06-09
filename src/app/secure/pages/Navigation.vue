@@ -14,12 +14,10 @@ const authStore = useAuthStore();
 const seshId = sessionStorage.getItem('token')
 const name = ref();
 const me = ref();
-console.log('push to userhome if authed already', seshId)
 
 const logout = async () => {
 try {
-    const response = await UserService.logout(seshId);
-    console.log('logout successful', response.data);
+    await UserService.logout(seshId);
     sessionStorage.clear()
     authStore.clearToken(); // Clear token from store
     authStore.setAuthenticated(false); // Set user authentication status to false
