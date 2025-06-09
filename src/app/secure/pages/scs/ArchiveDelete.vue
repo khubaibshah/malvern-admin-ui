@@ -1,4 +1,5 @@
 <template>
+  <PrimeToast severity="contrast"/>
   <div class="p-4">
     <h2 class="text-2xl font-semibold mb-4">Archive</h2>
 
@@ -178,17 +179,18 @@ const restoreVehicle = async (carId) => {
     });
 
     const index = archivedCars.value.findIndex(c => c.id === carId);
+    
     if (index !== -1) {
       const restoredCar = archivedCars.value.splice(index, 1)[0];
       cars.value.push(restoredCar); // 🔁 Add back to active cars
-    }
 
-    toast.add({
-      severity: 'success',
-      summary: 'Restored',
-      detail: `Vehicle ID ${carId} has been restored.`,
-      life: 3000
-    });
+      toast.add({
+        severity: 'success',
+        summary: 'Restored',
+        detail: `${restoredCar.make} ${restoredCar.model} (${restoredCar.registration}) has been restored.`,
+        life: 3000
+      });
+    }
   } catch (error) {
     toast.add({
       severity: 'error',
@@ -200,8 +202,16 @@ const restoreVehicle = async (carId) => {
 };
 
 
+
 const archiveSelected = async () => {
-  if (!archiveSelection.value.length) return;
+  if (!archiveSelection.value.length) {
+     toast.add({
+      severity: 'error',
+      summary: 'Archive Failed',
+      detail: 'Please select a vehicle to archive',
+      life: 4000
+    });
+  };
 
   const vehicleIds = archiveSelection.value.map(car => car.id);
 
@@ -270,10 +280,14 @@ const confirmDelete = async () => {
 
     await VehicleService.deleteVehicles(vehicleIds);
 
+    const deletedNames = deleteSelection.value
+      .map(car => `${car.make} ${car.model} (${car.registration})`)
+      .join(', ');
+
     toast.add({
       severity: 'success',
       summary: 'Deleted',
-      detail: 'Selected vehicle(s) have been deleted permanently.',
+      detail: `Deleted: ${deletedNames}`,
       life: 3000
     });
 
@@ -294,6 +308,7 @@ const confirmDelete = async () => {
     });
   }
 };
+
 
 
 const toggleRestoreSelection = (car) => {
