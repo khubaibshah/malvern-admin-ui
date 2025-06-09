@@ -4,7 +4,7 @@
 
     <div class="grid">
       <!-- Archive Column -->
-      <div class="col-12 md:col-12">
+      <div class="col-12 md:col-6">
         <div class="p-4 border-round shadow-2 bg-white">
           <h3 class="text-xl font-medium mb-3">📦 Archive Items</h3>
           <p class="mb-3 text-sm text-gray-600">
@@ -36,7 +36,7 @@
         </div>
       </div>
       <!-- archived vehicle column -->
-      <div class="col-12">
+      <div class="col-12 md:col-6">
         <div class="p-4 border-round shadow-2 bg-white">
           <h3 class="text-xl font-medium mb-3">🗃️ Archived Vehicles</h3>
           <p class="mb-3 text-sm text-gray-600">Click a vehicle to restore it.</p>
@@ -45,7 +45,12 @@
             <div class="grid">
               <div v-for="car in archivedCars" :key="'archived-' + car.id" class="col-12">
                 <div
-                  class="p-3 border-1 border-round surface-border flex justify-content-between align-items-center transition-all hover:bg-gray-100 cursor-pointer">
+                  class="p-3 border-1 border-round surface-border flex justify-content-between align-items-center transition-all cursor-pointer"
+                  :class="{
+                    'bg-green-100': restoreSelection.includes(car),
+                    'hover:bg-gray-100': !restoreSelection.includes(car)
+                  }" @click="toggleRestoreSelection(car)">
+
                   <div>
                     <h4 class="mb-1 text-md font-semibold text-gray-500">
                       {{ car.make }} {{ car.model }} ({{ car.registration }})
@@ -127,6 +132,7 @@ const archiveSelection = ref([]);
 const deleteSelection = ref([]);
 const archivedCars = ref([]);
 const confirmDeleteVisible = ref(false); // dialog visibility
+const restoreSelection = ref([]);
 
 
 const fetchAllData = async (forceRefresh = false) => {
@@ -286,6 +292,16 @@ const confirmDelete = async () => {
       detail: 'Could not delete selected vehicles.',
       life: 4000
     });
+  }
+};
+
+
+const toggleRestoreSelection = (car) => {
+  const index = restoreSelection.value.findIndex(c => c.id === car.id);
+  if (index >= 0) {
+    restoreSelection.value.splice(index, 1);
+  } else {
+    restoreSelection.value.push(car);
   }
 };
 
