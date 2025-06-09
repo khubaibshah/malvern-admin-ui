@@ -94,12 +94,16 @@
                   </p>
                 </div>
               </div>
+              <PrimeButton label="Delete Selected" icon="pi pi-trash" class="p-button-danger w-full mt-3"
+                @click="deleteSelected" />
+
             </div>
+
           </div>
 
-          <PrimeButton label="Delete Selected" icon="pi pi-trash" class="p-button-danger w-full mt-3"
-            @click="deleteSelected" />
+
         </div>
+
       </div>
     </div>
   </div>
@@ -259,7 +263,7 @@ const deleteSelected = () => {
 const confirmDelete = async () => {
   try {
     const vehicleIds = deleteSelection.value.map(car => car.id);
-    
+
     console.log('Deleting vehicle IDs:', vehicleIds);
     console.log('Full vehicle data:', deleteSelection.value);
 
