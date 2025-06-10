@@ -308,7 +308,7 @@ onMounted(() => {
     <div class="surface-section px-5 py-5 md:px-6 lg:px-8">
       <div class="text-3xl font-medium text-900 mb-4">Add New Car Listing</div>
       <div class="grid">
-        <div class="col">
+        <div class="col-12 lg:col-6">
           <div class="card">
             <FileUpload name="car_images" customUpload :auto="false" @uploader="onUpload" :multiple="true"
               accept="image/*" :disabled="isUploading">
@@ -343,7 +343,7 @@ onMounted(() => {
           </div>
         </div>
 
-        <div class="col">
+        <div class="col-12 lg:col-6">
           <div class="field"><label>Enter Registration</label></div>
           <InputGroup class="w-full h-4rem flex justify-center mb-3">
             <InputGroupAddon style="background-color: #00309a; color: #fbe90a">
