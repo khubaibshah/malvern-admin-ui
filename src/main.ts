@@ -1,5 +1,5 @@
 import './assets/style.css'
-import 'primevue/resources/themes/lara-dark-green/theme.css';
+import 'primevue/resources/themes/aura-dark-noir/theme.css';
 import piniaPluginPersistedState from "pinia-plugin-persistedstate"
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
