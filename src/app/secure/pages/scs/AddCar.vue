@@ -323,8 +323,6 @@ onMounted(() => {
 <template>
   <div>
     <PrimeToast />
-     <PrimeToast />
-
     <PrimeDialog v-model:visible="visible" modal header="Vehicle Already Exists" :style="{ width: '25rem' }">
       <span class="block mb-5">This vehicle is already listed:</span>
       <div class="text-lg font-bold">{{ matchedVehicle?.registration }}</div>
