@@ -20,7 +20,8 @@ const numKeys = ref();
 const gearbox = ref();
 const bodyStyle = ref();
 const engineSize = ref();
-
+const visible = ref(false);
+const matchedVehicle = ref<any>(null);
 const toast = useToast();
 const vehicleStore = useVehicleStore();
 const vehicleData = ref();
@@ -145,25 +146,14 @@ const populateVehicleFields = () => {
 
 const handleRegistrationNumberChange = async () => {
   const inputReg = registrationNumber.value.trim().toUpperCase();
-
-  // 1. Check if any vehicle in storeData matches the reg
   const match = storeData.find(v => v.registration?.toUpperCase() === inputReg);
 
   if (match) {
-    toast.add({
-      severity: 'info',
-      summary: 'Listing Already Exists',
-      detail: 'Redirecting to existing listing...',
-      life: 3000
-    });
-
-
-    setTimeout(() => {
-      router.push({ name: 'car-detail', params: { id: match.id } });
-    }, 1000); // 1000 ms = 1 second delay
+    matchedVehicle.value = match;
+    visible.value = true;
+    return;
   }
 
-  // 2. Otherwise, call DVSA and populate form
   try {
     const res = await VehicleService.getDvsaVehicleByReg(inputReg);
     vehicleData.value = res;
@@ -179,6 +169,13 @@ const handleRegistrationNumberChange = async () => {
     });
     registrationSuccess.value = false;
   }
+};
+
+const goToMatchedVehicle = () => {
+  if (matchedVehicle.value?.id) {
+    router.push({ name: 'car-detail', params: { id: matchedVehicle.value.id } });
+  }
+  visible.value = false;
 };
 
 const validateForm = () => {
@@ -326,6 +323,18 @@ onMounted(() => {
 <template>
   <div>
     <PrimeToast />
+     <PrimeToast />
+
+    <PrimeDialog v-model:visible="visible" modal header="Vehicle Already Exists" :style="{ width: '25rem' }">
+      <span class="block mb-5">This vehicle is already listed:</span>
+      <div class="text-lg font-bold">{{ matchedVehicle?.registration }}</div>
+      <div class="text-sm text-gray-600">{{ matchedVehicle?.make }} {{ matchedVehicle?.model }}</div>
+
+      <div class="flex justify-end gap-2 mt-5">
+        <PrimeButton type="button" label="Cancel" severity="secondary" @click="visible = false" />
+        <PrimeButton type="button" label="View Listing" icon="pi pi-arrow-right" @click="goToMatchedVehicle" />
+      </div>
+    </PrimeDialog>
     <!-- {{ $filters.formatDate(vehicleData.registrationDate) }} -->
     <div class="surface-section px-5 py-5 md:px-6 lg:px-8">
       <div class="text-3xl font-medium text-900 mb-4">Add New Car Listing</div>
@@ -333,7 +342,7 @@ onMounted(() => {
 
       <div class="grid">
         <div class="col-12 lg:col-6">
-          <div class="p-4 border-round shadow-2 bg-white text-gray-600 mb-4">
+          <div class="p-4 border-round shadow-2  border-2 border-dashed border-surface-200 text-gray-600 mb-4">
             <h3 class="text-xl font-medium ">Vehicle images</h3>
 
 
