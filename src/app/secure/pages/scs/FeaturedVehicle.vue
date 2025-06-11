@@ -32,6 +32,47 @@ const getCars = async (refresh = false) => {
     toast.add({ severity: 'error', summary: 'Error', detail: 'Failed to load cars.', life: 4000 });
   }
 };
+const toggleFeatured = async (carId: number) => {
+  const alreadyFeatured = cars.value.filter(car => car.featured === 1);
+  const car = cars.value.find(c => c.id === carId);
+
+  if (!car) return;
+
+  const isCurrentlyFeatured = car.featured === 1;
+
+  // Limit to 3 featured vehicles
+  if (!isCurrentlyFeatured && alreadyFeatured.length >= 3) {
+    toast.add({
+      severity: 'warn',
+      summary: 'Limit reached',
+      detail: 'Only 3 vehicles can be featured at a time.',
+      life: 3000
+    });
+    return;
+  }
+
+  try {
+    await VehicleService.setFeaturedVehicle(carId);
+    await getCars(true);
+
+    toast.add({
+      severity: 'success',
+      summary: isCurrentlyFeatured ? 'Unfeatured' : 'Featured',
+      detail: `${car.make} ${car.model} (${car.registration}) has been ${isCurrentlyFeatured ? 'removed from' : 'added to'} featured vehicles.`,
+      life: 3000
+    });
+  } catch (error) {
+    console.error('Toggle featured failed', error);
+    toast.add({
+      severity: 'error',
+      summary: 'Error',
+      detail: 'Failed to update featured status.',
+      life: 4000
+    });
+  }
+};
+
+
 
 
 onMounted(getCars);
@@ -84,8 +125,9 @@ onMounted(getCars);
         <template #footer>
           <div class="flex gap-2">
             <PrimeButton :icon="car.featured === 1 ? 'pi pi-check-square' : 'pi pi-plus'"
-              :label="car.featured === 1 ? 'Featured' : 'Make Featured'" class="w-full" :disabled="car.featured === 1"
-              :severity="car.featured === 1 ? 'secondary' : 'primary'" @click="makeFeatured(car.id)" />
+              :label="car.featured === 1 ? 'Unfeature' : 'Make Featured'" class="w-full"
+              :severity="car.featured === 1 ? 'warning' : 'primary'" @click="toggleFeatured(car.id)" />
+
           </div>
         </template>
       </PrimeCard>
