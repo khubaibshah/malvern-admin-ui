@@ -108,9 +108,9 @@ onMounted(getCars);
 
         <!-- Content -->
         <template #content>
-          <p class="text-sm text-gray-600 mb-2">
+          <!-- <p class="text-sm text-gray-600 mb-2">
             {{ car.description || 'No description available.' }}
-          </p>
+          </p> -->
           <div class="flex gap-2 text-sm text-gray-800 font-medium flex-wrap">
             <span>Mileage: {{ car.mileage?.toLocaleString() || 'N/A' }} miles</span>
             <span>•</span>

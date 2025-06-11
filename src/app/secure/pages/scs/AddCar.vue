@@ -11,8 +11,10 @@ import {
   BODY_STYLE_OPTIONS
 } from '@/constants/enums';
 import { DEFAULT_CAR_DESCRIPTION } from '@/constants/defaultDescriptions';
-
+import { useRouter } from "vue-router";
 import { getUkRegistrationLabel } from '@/utils/registration';
+
+const router = useRouter();
 const doors = ref();
 const numKeys = ref();
 const gearbox = ref();
@@ -22,7 +24,7 @@ const engineSize = ref();
 const toast = useToast();
 const vehicleStore = useVehicleStore();
 const vehicleData = ref();
-
+const storeData = vehicleStore.getVehicleData;
 // Form fields
 const registrationNumber = ref("");
 const reg = ref('');
@@ -142,8 +144,28 @@ const populateVehicleFields = () => {
 };
 
 const handleRegistrationNumberChange = async () => {
+  const inputReg = registrationNumber.value.trim().toUpperCase();
+
+  // 1. Check if any vehicle in storeData matches the reg
+  const match = storeData.find(v => v.registration?.toUpperCase() === inputReg);
+
+  if (match) {
+    toast.add({
+      severity: 'info',
+      summary: 'Listing Already Exists',
+      detail: 'Redirecting to existing listing...',
+      life: 3000
+    });
+
+    
+    setTimeout(() => {
+      router.push({ name: 'car-detail', params: { id: match.id } });
+    }, 1000); // 1000 ms = 1 second delay
+  }
+
+  // 2. Otherwise, call DVSA and populate form
   try {
-    const res = await VehicleService.getDvsaVehicleByReg(registrationNumber.value);
+    const res = await VehicleService.getDvsaVehicleByReg(inputReg);
     vehicleData.value = res;
     vehicleStore.setVehicleData(res);
     registrationSuccess.value = true;
@@ -291,7 +313,6 @@ const removeImage = (index: number) => {
 
 onMounted(() => {
 
-  const storeData = vehicleStore.getVehicleData;
   if (storeData) {
     vehicleData.value = storeData;
     registrationNumber.value = storeData.registration || "";
@@ -304,6 +325,7 @@ onMounted(() => {
 <template>
   <div>
     <PrimeToast />
+    <!-- {{ storeData }} -->
     <!-- {{ $filters.formatDate(vehicleData.registrationDate) }} -->
     <div class="surface-section px-5 py-5 md:px-6 lg:px-8">
       <div class="text-3xl font-medium text-900 mb-4">Add New Car Listing</div>
