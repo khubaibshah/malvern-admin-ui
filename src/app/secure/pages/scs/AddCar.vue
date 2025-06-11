@@ -43,7 +43,7 @@ const description = ref('');
 const mileageRange = ref(50000);
 const registrationSuccess = ref(false);
 const seshId = sessionStorage.getItem('token');
-
+const archiveVehicleSwitch = ref(true);
 // Image handling
 const previewUrls = ref<string[]>([]);
 const localFiles = ref<File[]>([]);
@@ -237,6 +237,7 @@ const submitCar = async () => {
     formData.append('gearbox', gearbox.value || '');
     formData.append('keys', numKeys.value || '');
     formData.append('engine_size', engineSize.value || '');
+    formData.append('archived', archiveVehicleSwitch.value ? '1' : '0');
 
 
     uploadedKeys.forEach((key, index) => {
@@ -383,11 +384,20 @@ onMounted(() => {
         </div>
 
         <div class="col-12 lg:col-6">
+          <!-- archive vehicle -->
+          <div class="p-4 border-round shadow-2 bg-white mb-4">
+            <h3 class="text-xl text-gray-600 font-medium ">Archive Vehicle</h3>
+
+            <!-- <PrimeInputSwitch v-model="archiveVehicleSwitch" /> -->
+              <PrimeToggleButton v-model="archiveVehicleSwitch" class="w-6rem" onLabel="On" offLabel="Off" />
+          </div>
+
+          <!-- vehicle reg search -->
           <div class="p-4 border-round shadow-2 bg-white mb-4">
             <h3 class="text-xl text-gray-600 font-medium ">Vehicle Details</h3><p class=" text-md text-gray-600">
                 Enter Registration
               </p>
-<InputGroup class="w-full h-4rem flex justify-center mb-3">
+                <InputGroup class="w-full h-4rem flex justify-center mb-3">
                 <InputGroupAddon style="background-color: #00309a; color: #fbe90a">
                   GB
                 </InputGroupAddon>
@@ -498,6 +508,8 @@ onMounted(() => {
               </div>
             </div>
           </div>
+
+          <!-- description section -->
           <div class="p-4 border-round shadow-2 bg-white text-gray-600 mb-4">
             <h3 class="text-xl font-medium ">Description</h3>
             <div class="grid">

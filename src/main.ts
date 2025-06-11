@@ -40,9 +40,9 @@ import InputGroup from 'primevue/inputgroup';
 import InputGroupAddon from 'primevue/inputgroupaddon';
 import DataView from 'primevue/dataview';
 import Dialog from 'primevue/dialog';
-
+import InputSwitch from 'primevue/inputswitch';
 import Editor from 'primevue/editor';
-
+import ToggleButton from 'primevue/togglebutton';
 
 
 
@@ -97,6 +97,8 @@ app.component('PrimeMegaMenu', MegaMenu);
 app.component('PrimeDataView', DataView);
 app.component('PrimeDialog', Dialog);
 app.component('PrimeEditor', Editor);
+app.component('PrimeInputSwitch', InputSwitch);
+app.component('PrimeToggleButton', ToggleButton);
 
 app.config.globalProperties.$filters = {
     currencyGBP(value: number | string) {
