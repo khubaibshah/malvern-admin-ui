@@ -76,6 +76,7 @@ onMounted(getCars);
         <PrimeColumn field="make" header="Make" sortable />
         <PrimeColumn field="model" header="Model" sortable />
         <PrimeColumn field="variant" header="Variant" sortable />
+        <PrimeColumn field="vehicle_status" header="Vehicle Status" sortable />
         <PrimeColumn field="price" header="Price (£)" sortable>
           <template #body="{ data }">
             £{{ data.price ?? 'N/A' }}

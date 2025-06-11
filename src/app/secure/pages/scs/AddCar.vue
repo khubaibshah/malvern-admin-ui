@@ -521,7 +521,10 @@ onMounted(() => {
               </div>
             </div>
           </div>
-          <PrimeButton label="Submit Car Listing" icon="pi pi-check-circle" class="w-full" @click="submitCar"
+          <!-- <PrimeButton label="Submit Car Listing" icon="pi pi-check-circle" class="w-full" @click="submitCar"
+            :loading="isUploading" /> -->
+
+            <PrimeButton label="Submit Car Listing" icon="pi pi-check" class="w-full" @click="submitCar"
             :loading="isUploading" />
         </div>
       </div>
