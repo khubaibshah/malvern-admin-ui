@@ -61,24 +61,6 @@ const responsiveOptions = ref([
   }
 ]);
 
-const positionOptions = ref([
-  {
-    label: 'Bottom',
-    value: 'bottom'
-  },
-  {
-    label: 'Top',
-    value: 'top'
-  },
-  {
-    label: 'Left',
-    value: 'left'
-  },
-  {
-    label: 'Right',
-    value: 'right'
-  }
-]);
 const galleriaImages = computed(() =>
   previewUrls.value.map((url, index) => ({
     itemImageSrc: url,
@@ -86,8 +68,6 @@ const galleriaImages = computed(() =>
     alt: `Image ${index + 1}`
   }))
 );
-
-
 
 const onUpload = (event: any) => {
   const newFiles: File[] = event.files;
@@ -401,7 +381,7 @@ onMounted(() => {
           </div>
 
           <!-- UPLOADING GALLERY -->
-          <div class="col-12 lg:col-12">
+
             <div v-if="previewUrls.length" class="mt-3">
               <PrimeGalleria :value="galleriaImages" :responsiveOptions="responsiveOptions" :numVisible="4"
                 :thumbnailsPosition="position" containerStyle="max-width: 640px" :showThumbnails="true"
@@ -418,7 +398,6 @@ onMounted(() => {
               </PrimeGalleria>
             </div>
           </div>
-        </div>
 
         <div class="col-12 lg:col-6">
           <!-- archive vehicle -->
