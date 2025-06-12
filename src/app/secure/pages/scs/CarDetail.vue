@@ -124,7 +124,8 @@
           </div>
         </div>
 
-        <PrimeButton label="Update Car Listing" icon="pi pi-check" class="mt-3 w-full" @click="updateCar" />
+        <PrimeButton label="Update Car Listing" icon="pi pi-check" class="mt-3 w-full" @click="updateCar" :loading="isUploading"/>
+        
       </div>
     </div>
   </div>
@@ -176,7 +177,7 @@ const engineSize = ref('');
 const keys = ref('');
 const registration_date = ref(''); // ISO string like "2024-09-01"
 const body_style = ref('');
-
+const isUploading = ref(false);
 // Handlers
 const handleFileSelect = (event: any) => {
   if (event?.files?.length) {
