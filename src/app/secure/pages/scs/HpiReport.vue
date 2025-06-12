@@ -68,7 +68,7 @@
                             <InputText v-model="hpiData.mileage" class="w-full" readonly />
                         </div>
 
-                        <div class="col-12">
+                        <div>
                             <label class="block font-medium text-gray-700">Advisories</label>
                             <Textarea v-model="hpiData.advisories" class="w-full" rows="6" readonly />
                         </div>
