@@ -43,6 +43,8 @@ const mileageRange = ref(50000);
 const registrationSuccess = ref(false);
 const seshId = sessionStorage.getItem('token');
 const archiveVehicleSwitch = ref(false);
+const active = ref(0);
+
 // Image handling
 const previewUrls = ref<string[]>([]);
 const localFiles = ref<File[]>([]);
@@ -426,118 +428,100 @@ onMounted(() => {
               severity="info" outlined />
           </div>
 
-          <!-- basic info section card -->
-          <div class="p-4 border-round shadow-2 bg-white text-gray-600 mb-4">
-            <h3 class="text-xl font-medium ">Basic Information</h3>
-            <div class="grid">
-              <div class="col-12  lg:col-6">
-                <div class="field"><label>Registration</label>
-                  <InputText v-model="reg" class="w-full" />
-                </div>
-                <div class="field"><label>Make</label>
-                  <InputText v-model="make" class="w-full" />
-                </div>
-                <div class="field"><label>Model</label>
-                  <InputText v-model="model" class="w-full" />
-                </div>
-              </div>
-              <div class="col-12 md:col-6 lg:col-6">
+<div class="border-round shadow-2  text-black-700 mb-4">
+  <div class="flex mb-3 gap-2 justify-end">
+    <PrimeButton @click="active = 0" rounded label="1" class="w-2rem h-2rem p-0" :outlined="active !== 0" />
+    <PrimeButton @click="active = 1" rounded label="2" class="w-2rem h-2rem p-0" :outlined="active !== 1" />
+    <PrimeButton @click="active = 2" rounded label="3" class="w-2rem h-2rem p-0" :outlined="active !== 2" />
+    <PrimeButton @click="active = 3" rounded label="4" class="w-2rem h-2rem p-0" :outlined="active !== 3" />
+  </div>
 
-
-                <div class="field"><label>Variant</label>
-                  <InputText v-model="variant" class="w-full" />
-                </div>
-                <div class="field"><label>Year</label>
-                  <InputText v-model="year" class="w-full" />
-                </div>
-                <div class="field">
-                  <label>Registration Date</label>
-                  <InputText :value="formattedRegistrationDate" class="w-full" disabled />
-                </div>
-              </div>
-            </div>
+  <PrimeAccordion v-model:activeIndex="active">
+    <!-- Basic Info -->
+    <PrimeAccordionTab header="Basic Information">
+      <div class="grid">
+        <div class="col-12 lg:col-6">
+          <div class="field"><label>Registration</label>
+            <InputText v-model="reg" class="w-full" />
           </div>
-
-          <!-- pricing section -->
-          <div class="p-4 border-round shadow-2 bg-white text-gray-600 mb-4">
-            <h3 class="text-xl font-medium ">Pricing</h3>
-            <div class="grid">
-              <div class="col-12 lg:col-12">
-                <div class="field"><label>Price (£)</label>
-                  <InputText v-model="price" class="w-full" />
-                </div>
-              </div>
-              <!-- <div class="col-12 lg:col-6">
-                <div class="field"><label>Was Price (£)</label>
-                  <InputText v-model="was_price" class="w-full" />
-                </div>
-              </div> -->
-            </div>
+          <div class="field"><label>Make</label>
+            <InputText v-model="make" class="w-full" />
           </div>
-
-          <!-- vehicle deatils/features -->
-          <div class="p-4 border-round shadow-2 bg-white text-gray-600 mb-4">
-            <h3 class="text-xl font-medium ">Pricing</h3>
-            <div class="grid">
-              <div class="col-12 lg:col-6">
-                <div class="field">
-                  <label>Vehicle Details / Features</label>
-                  <!-- <PrimeSlider v-model="mileageRange" :min="0" :max="200000" :step="1000" class="w-full mb-2" /> -->
-                  <InputText v-model="mileageRange" class="w-full" />
-                </div>
-
-                <div class="field">
-                  <label>Fuel Type</label>
-                  <PrimeDropDown v-model="fuel_type" class="w-full"
-                    :options="['Petrol', 'Diesel', 'Hybrid', 'Electric']" placeholder="Select Fuel Type" />
-                </div>
-                <div class="field"><label>Colour</label>
-                  <InputText v-model="colour" class="w-full" />
-                </div>
-                <div class="field">
-                  <label>Body Style</label>
-                  <PrimeDropDown v-model="bodyStyle" :options="BODY_STYLE_OPTIONS" class="w-full"
-                    placeholder="Select body style" />
-                </div>
-                <div class="field"><label>Vehicle Type</label>
-                  <InputText v-model="veh_type" class="w-full" />
-                </div>
-              </div>
-              <div class="col-12 lg:col-6">
-                <div class="field">
-                  <label>Doors</label>
-                  <PrimeDropDown v-model="doors" :options="DOOR_OPTIONS" class="w-full" placeholder="Select doors" />
-                </div>
-                <div class="field">
-                  <label>Number of Keys</label>
-                  <PrimeDropDown v-model="numKeys" :options="KEY_OPTIONS" class="w-full" placeholder="Select keys" />
-                </div>
-                <div class="field">
-                  <label>Gearbox</label>
-                  <PrimeDropDown v-model="gearbox" :options="GEARBOX_OPTIONS" class="w-full"
-                    placeholder="Select gearbox" />
-                </div>
-                <div class="field">
-                  <label>Engine Size</label>
-                  <InputText v-model="engineSizeLitres" class="w-full" />
-                </div>
-
-              </div>
-            </div>
+          <div class="field"><label>Model</label>
+            <InputText v-model="model" class="w-full" />
           </div>
-
-          <!-- description section -->
-          <div class="p-4 border-round shadow-2 bg-white text-gray-600 mb-4">
-            <h3 class="text-xl font-medium ">Description</h3>
-            <div class="grid">
-              <div class="col-12 lg:col-12">
-                <div class="field col-span-2">
-                  <!-- <PrimeEditor v-model="description" editorStyle="height: 320px" /> -->
-                  <PrimeTextarea v-model="description" class="w-full bg-gray-800" rows="15" />
-                </div>
-              </div>
-            </div>
+        </div>
+        <div class="col-12 lg:col-6">
+          <div class="field"><label>Variant</label>
+            <InputText v-model="variant" class="w-full" />
           </div>
+          <div class="field"><label>Year</label>
+            <InputText v-model="year" class="w-full" />
+          </div>
+          <div class="field"><label>Registration Date</label>
+            <InputText :value="formattedRegistrationDate" class="w-full" disabled />
+          </div>
+        </div>
+      </div>
+    </PrimeAccordionTab>
+
+    <!-- Pricing -->
+    <PrimeAccordionTab header="Pricing">
+      <div class="field">
+        <label>Price (£)</label>
+        <InputText v-model="price" class="w-full" />
+      </div>
+    </PrimeAccordionTab>
+
+    <!-- Vehicle Details / Features -->
+    <PrimeAccordionTab header="Vehicle Details / Features">
+      <div class="grid">
+        <div class="col-12 lg:col-6">
+          <div class="field"><label>Mileage</label>
+            <InputText v-model="mileageRange" class="w-full" />
+          </div>
+          <div class="field"><label>Fuel Type</label>
+            <PrimeDropDown v-model="fuel_type" class="w-full"
+              :options="['Petrol', 'Diesel', 'Hybrid', 'Electric']" placeholder="Select Fuel Type" />
+          </div>
+          <div class="field"><label>Colour</label>
+            <InputText v-model="colour" class="w-full" />
+          </div>
+          <div class="field"><label>Body Style</label>
+            <PrimeDropDown v-model="bodyStyle" :options="BODY_STYLE_OPTIONS" class="w-full"
+              placeholder="Select body style" />
+          </div>
+          <div class="field"><label>Vehicle Type</label>
+            <InputText v-model="veh_type" class="w-full" />
+          </div>
+        </div>
+        <div class="col-12 lg:col-6">
+          <div class="field"><label>Doors</label>
+            <PrimeDropDown v-model="doors" :options="DOOR_OPTIONS" class="w-full" placeholder="Select doors" />
+          </div>
+          <div class="field"><label>Number of Keys</label>
+            <PrimeDropDown v-model="numKeys" :options="KEY_OPTIONS" class="w-full" placeholder="Select keys" />
+          </div>
+          <div class="field"><label>Gearbox</label>
+            <PrimeDropDown v-model="gearbox" :options="GEARBOX_OPTIONS" class="w-full" placeholder="Select gearbox" />
+          </div>
+          <div class="field"><label>Engine Size</label>
+            <InputText v-model="engineSizeLitres" class="w-full" />
+          </div>
+        </div>
+      </div>
+    </PrimeAccordionTab>
+
+    <!-- Description -->
+    <PrimeAccordionTab header="Description">
+      <div class="field">
+        <label>Car Description</label>
+        <PrimeTextarea v-model="description" class="w-full bg-gray-800" rows="15" />
+      </div>
+    </PrimeAccordionTab>
+  </PrimeAccordion>
+</div>
+
           <!-- <PrimeButton label="Submit Car Listing" icon="pi pi-check-circle" class="w-full" @click="submitCar"
             :loading="isUploading" /> -->
 
