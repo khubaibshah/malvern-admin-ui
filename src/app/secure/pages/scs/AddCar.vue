@@ -400,7 +400,7 @@ onMounted(() => {
           <div v-if="previewUrls.length" class="mt-3">
             <PrimeGalleria v-model:activeIndex="galleriaActiveIndex" :value="galleriaImages"
               :responsiveOptions="responsiveOptions" :numVisible="4" :thumbnailsPosition="position"
-              containerStyle="max-width: 640px" :showThumbnails="true" :showIndicators="true"
+              containerStyle="max-width: 640px" :showThumbnails="false" :showIndicators="true"
               :changeItemOnIndicatorHover="true" :circular="true"
               :showItemNavigators="true">
 
@@ -425,13 +425,10 @@ onMounted(() => {
 
                 </div>
               </template>
-
-
-
-              <template #thumbnail="slotProps">
+              <!-- <template #thumbnail="slotProps">
                 <img :src="slotProps.item.thumbnailImageSrc" :alt="slotProps.item.alt"
                   style="width: 100px; height: 60px; object-fit: cover; border-radius: 0.5rem" />
-              </template>
+              </template> -->
             </PrimeGalleria>
           </div>
         </div>
@@ -559,10 +556,6 @@ onMounted(() => {
               </PrimeAccordionTab>
             </PrimeAccordion>
           </div>
-
-          <!-- <PrimeButton label="Submit Car Listing" icon="pi pi-check-circle" class="w-full" @click="submitCar"
-            :loading="isUploading" /> -->
-
           <PrimeButton label="Submit Car Listing" icon="pi pi-check" class="w-full" @click="submitCar"
             :loading="isUploading" />
         </div>
