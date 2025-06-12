@@ -44,6 +44,8 @@ import InputSwitch from 'primevue/inputswitch';
 import Editor from 'primevue/editor';
 import ToggleButton from 'primevue/togglebutton';
 
+import Galleria from 'primevue/galleria';
+
 
 
 
@@ -99,6 +101,7 @@ app.component('PrimeDialog', Dialog);
 app.component('PrimeEditor', Editor);
 app.component('PrimeInputSwitch', InputSwitch);
 app.component('PrimeToggleButton', ToggleButton);
+app.component('PrimeGalleria', Galleria);
 
 app.config.globalProperties.$filters = {
     currencyGBP(value: number | string) {

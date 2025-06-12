@@ -49,6 +49,45 @@ const localFiles = ref<File[]>([]);
 const s3ImageKeys = ref<string[]>([]);
 const isUploading = ref(false);
 const mainImageIndex = ref(0); // Track main image index
+const position = ref('bottom');
+const responsiveOptions = ref([
+  {
+    breakpoint: '1300px',
+    numVisible: 4
+  },
+  {
+    breakpoint: '575px',
+    numVisible: 1
+  }
+]);
+
+const positionOptions = ref([
+  {
+    label: 'Bottom',
+    value: 'bottom'
+  },
+  {
+    label: 'Top',
+    value: 'top'
+  },
+  {
+    label: 'Left',
+    value: 'left'
+  },
+  {
+    label: 'Right',
+    value: 'right'
+  }
+]);
+const galleriaImages = computed(() =>
+  previewUrls.value.map((url, index) => ({
+    itemImageSrc: url,
+    thumbnailImageSrc: url, // Use the same image for thumbnails unless you have separate ones
+    alt: `Image ${index + 1}`
+  }))
+);
+
+
 
 const onUpload = (event: any) => {
   const newFiles: File[] = event.files;
@@ -346,10 +385,9 @@ onMounted(() => {
 
       <div class="grid">
         <div class="col-12 lg:col-6">
-          <div class="p-4 border-round shadow-2  border-2 border-dashed border-surface-200 text-gray-600 mb-4">
+          <div class="p-4 border-round shadow-2  border-2 border-dashed border-surface-200 text-gray-600 mb-2">
             <h3 class="text-xl font-medium ">Vehicle images</h3>
-
-
+            <!-- FILE UPLOAD SECTION -->
             <FileUpload name="car_images" customUpload :auto="false" @uploader="onUpload" :multiple="true"
               accept="image/*" :disabled="isUploading">
               <template #empty>
@@ -362,29 +400,23 @@ onMounted(() => {
             </FileUpload>
           </div>
 
-          <div class="col-12 lg:col-6">
-            <div v-if="previewUrls.length" class="mt-3 grid  gap-2">
-              <div v-for="(url, index) in previewUrls" :key="index" class="relative group" @click="setMainImage(index)">
-                <PrimeImage :src="url" width="305px" height="250px" preview
-                  class="border-2 transition-all duration-200 cursor-pointer w-full"
-                  :class="{ 'border-primary-500 border-4': index === mainImageIndex }" />
-                <div
-                  class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                  <PrimeButton v-if="index !== mainImageIndex" icon="pi pi-star"
-                    class="p-1 w-2rem h-2rem bg-white border-circle shadow-2" @click.stop="setMainImage(index)"
-                    severity="secondary" />
-                </div>
-                <PrimeButton icon="pi pi-times"
-                  class="absolute top-0 right-0 p-1 w-2rem h-2rem bg-white border-circle shadow-2"
-                  @click.stop="removeImage(index)" />
-                <div v-if="index === mainImageIndex"
-                  class="absolute top-0 left-0 bg-primary-500 text-white text-xs px-2 py-1 rounded-br">
-                  Main Image
-                </div>
-              </div>
+          <!-- UPLOADING GALLERY -->
+          <div class="col-12 lg:col-12">
+            <div v-if="previewUrls.length" class="mt-3">
+              <PrimeGalleria :value="galleriaImages" :responsiveOptions="responsiveOptions" :numVisible="4"
+                :thumbnailsPosition="position" containerStyle="max-width: 640px" :showThumbnails="true"
+                :showIndicators="true" :changeItemOnIndicatorHover="true" :circular="true">
+                <template #item="slotProps">
+                  <img :src="slotProps.item.itemImageSrc" :alt="slotProps.item.alt"
+                    style="width: 100%; object-fit: cover; border-radius: 1rem" />
+                </template>
+
+                <template #thumbnail="slotProps">
+                  <img :src="slotProps.item.thumbnailImageSrc" :alt="slotProps.item.alt"
+                    style="width: 100px; height: 60px; object-fit: cover; border-radius: 0.5rem" />
+                </template>
+              </PrimeGalleria>
             </div>
-
-
           </div>
         </div>
 
@@ -394,24 +426,25 @@ onMounted(() => {
             <h3 class="text-xl text-gray-600 font-medium ">Archive Vehicle</h3>
 
             <!-- <PrimeInputSwitch v-model="archiveVehicleSwitch" /> -->
-              <PrimeToggleButton v-model="archiveVehicleSwitch" class="w-6rem" onLabel="On" offLabel="Off" />
+            <PrimeToggleButton v-model="archiveVehicleSwitch" class="w-6rem" onLabel="On" offLabel="Off" />
           </div>
 
           <!-- vehicle reg search -->
           <div class="p-4 border-round shadow-2 bg-white mb-4">
-            <h3 class="text-xl text-gray-600 font-medium ">Vehicle Details</h3><p class=" text-md text-gray-600">
-                Enter Registration
-              </p>
-                <InputGroup class="w-full h-4rem flex justify-center mb-3">
-                <InputGroupAddon style="background-color: #00309a; color: #fbe90a">
-                  GB
-                </InputGroupAddon>
-                <InputText v-model="registrationNumber" style="background-color: #fbe90a; border-color: #00309a"
-                  placeholder="REG" inputClass="'bg-transparent text-900 border-400 border-blue-500'"
-                  class="text-5xl w-full text-100 font-bold" @input="registrationNumber.toUpperCase()" />
-              </InputGroup>
-              <PrimeButton label="Generate Car details" @click="handleRegistrationNumberChange" class="w-full"
-                severity="info" outlined />
+            <h3 class="text-xl text-gray-600 font-medium ">Vehicle Details</h3>
+            <p class=" text-md text-gray-600">
+              Enter Registration
+            </p>
+            <InputGroup class="w-full h-4rem flex justify-center mb-3">
+              <InputGroupAddon style="background-color: #00309a; color: #fbe90a">
+                GB
+              </InputGroupAddon>
+              <InputText v-model="registrationNumber" style="background-color: #fbe90a; border-color: #00309a"
+                placeholder="REG" inputClass="'bg-transparent text-900 border-400 border-blue-500'"
+                class="text-5xl w-full text-100 font-bold" @input="registrationNumber.toUpperCase()" />
+            </InputGroup>
+            <PrimeButton label="Generate Car details" @click="handleRegistrationNumberChange" class="w-full"
+              severity="info" outlined />
           </div>
 
           <!-- basic info section card -->
@@ -529,7 +562,7 @@ onMounted(() => {
           <!-- <PrimeButton label="Submit Car Listing" icon="pi pi-check-circle" class="w-full" @click="submitCar"
             :loading="isUploading" /> -->
 
-            <PrimeButton label="Submit Car Listing" icon="pi pi-check" class="w-full" @click="submitCar"
+          <PrimeButton label="Submit Car Listing" icon="pi pi-check" class="w-full" @click="submitCar"
             :loading="isUploading" />
         </div>
       </div>
