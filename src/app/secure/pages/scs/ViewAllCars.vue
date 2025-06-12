@@ -52,31 +52,35 @@ onMounted(getCars);
         dataKey="id" filterDisplay="row"
         :globalFilterFields="['make', 'model', 'variant', 'price', 'mileage', 'registration']" sortField="id"
         :sortOrder="-1" paginator :rows="10" :metaKeySelection="false" @rowSelect="goToCarDetail">
-        
+
         <template #header>
 
           <div class="flex justify-content-between">
 
             <PrimeButton type="button" icon="pi pi-filter-slash" label="Clear" outlined @click="clearFilter" />
-            
+
             <IconField iconPosition="left">
-              
+
               <InputIcon><i class="pi pi-search" /></InputIcon>
               <InputText v-model="filters['global'].value" placeholder="Search Cars" />
-                                    <PrimeButton
-    icon="pi pi-refresh"
-    class="p-button-sm ml-4"
-    @click="() => getCars(true)"
-  />
+              <PrimeButton icon="pi pi-refresh" class="p-button-sm ml-4" @click="() => getCars(true)" />
             </IconField>
-            
+
           </div>
         </template>
         <PrimeColumn field="registration" header="Registration" sortable />
         <PrimeColumn field="make" header="Make" sortable />
         <PrimeColumn field="model" header="Model" sortable />
         <PrimeColumn field="variant" header="Variant" sortable />
-        <PrimeColumn field="vehicle_status" header="Vehicle Status" sortable />
+        <PrimeColumn header="Vehicle Status" sortable>
+  <template #body="{ data }">
+    <span :class="data.deleted_at ? 'text-orange-500' : 'text-green-600'">
+      {{ data.deleted_at ? 'Archived' : 'Live' }}
+    </span>
+  </template>
+</PrimeColumn>
+
+
         <PrimeColumn field="price" header="Price (£)" sortable>
           <template #body="{ data }">
             £{{ data.price ?? 'N/A' }}

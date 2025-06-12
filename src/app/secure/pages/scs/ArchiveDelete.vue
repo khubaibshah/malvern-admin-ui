@@ -138,8 +138,12 @@ const restoreSelection = ref([]);
 
 const fetchAllData = async (forceRefresh = false) => {
   try {
-    cars.value = await VehicleService.fetchAllVehicles(forceRefresh); // force refresh upon change
-    archivedCars.value = await VehicleService.getArchivedVehicles();
+    const allVehicles = await VehicleService.fetchAllVehicles(forceRefresh);
+
+    // Split into active vs archived
+    cars.value = allVehicles.filter(car => !car.deleted_at);
+    archivedCars.value = allVehicles.filter(car => !!car.deleted_at);
+    
   } catch (error) {
     toast.add({
       severity: 'error',

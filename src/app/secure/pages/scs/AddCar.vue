@@ -34,7 +34,6 @@ const model = ref('');
 const variant = ref('');
 const year = ref('');
 const price = ref('');
-const was_price = ref('');
 const mileage = ref('');
 const fuel_type = ref('');
 const colour = ref('');
@@ -43,7 +42,7 @@ const description = ref('');
 const mileageRange = ref(50000);
 const registrationSuccess = ref(false);
 const seshId = sessionStorage.getItem('token');
-const archiveVehicleSwitch = ref(true);
+const archiveVehicleSwitch = ref(false);
 // Image handling
 const previewUrls = ref<string[]>([]);
 const localFiles = ref<File[]>([]);
@@ -146,20 +145,26 @@ const populateVehicleFields = () => {
 
 const handleRegistrationNumberChange = async () => {
   const inputReg = registrationNumber.value.trim().toUpperCase();
-  const match = storeData.find(v => v.registration?.toUpperCase() === inputReg);
-
-  if (match) {
-    matchedVehicle.value = match;
-    visible.value = true;
-    return;
-  }
 
   try {
+    // Fetch all vehicles directly from the backend (bypassing store)
+    const vehicles = await VehicleService.fetchAllVehicles(true);
+
+    // Try to match entered reg with existing vehicles
+    const match = vehicles.find(v => v.registration?.toUpperCase() === inputReg);
+
+    if (match) {
+      matchedVehicle.value = match;
+      visible.value = true;
+      return;
+    }
+
+    // If no match found, call DVSA API
     const res = await VehicleService.getDvsaVehicleByReg(inputReg);
     vehicleData.value = res;
-    vehicleStore.setVehicleData(res);
     registrationSuccess.value = true;
     populateVehicleFields();
+
   } catch (error) {
     toast.add({
       severity: "warn",
@@ -170,6 +175,8 @@ const handleRegistrationNumberChange = async () => {
     registrationSuccess.value = false;
   }
 };
+
+
 
 const goToMatchedVehicle = () => {
   if (matchedVehicle.value?.id) {
@@ -231,13 +238,12 @@ const submitCar = async () => {
     formData.append('registration', registrationNumber.value);
     formData.append('main_image_index', mainImageIndex.value.toString());
     formData.append('registration_date', vehicleData.value.registrationDate || '');
-    formData.append('was_price', was_price.value || '');
     formData.append('body_style', bodyStyle.value || '');
     formData.append('doors', doors.value || '');
     formData.append('gearbox', gearbox.value || '');
     formData.append('keys', numKeys.value || '');
     formData.append('engine_size', engineSize.value || '');
-    formData.append('archived', archiveVehicleSwitch.value ? '1' : '0');
+    formData.append('deleted_at', archiveVehicleSwitch.value ? new Date().toISOString() : '');
 
 
     uploadedKeys.forEach((key, index) => {
@@ -269,7 +275,6 @@ const submitCar = async () => {
       variant.value = '';
       year.value = '';
       price.value = '';
-      was_price.value = '';
     }
   } catch (error) {
     console.error('Upload error:', error);
@@ -445,16 +450,16 @@ onMounted(() => {
           <div class="p-4 border-round shadow-2 bg-white text-gray-600 mb-4">
             <h3 class="text-xl font-medium ">Pricing</h3>
             <div class="grid">
-              <div class="col-12 lg:col-6">
+              <div class="col-12 lg:col-12">
                 <div class="field"><label>Price (£)</label>
                   <InputText v-model="price" class="w-full" />
                 </div>
               </div>
-              <div class="col-12 lg:col-6">
+              <!-- <div class="col-12 lg:col-6">
                 <div class="field"><label>Was Price (£)</label>
                   <InputText v-model="was_price" class="w-full" />
                 </div>
-              </div>
+              </div> -->
             </div>
           </div>
 
