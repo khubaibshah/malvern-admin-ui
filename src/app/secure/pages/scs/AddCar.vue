@@ -390,7 +390,7 @@ onMounted(() => {
               :showIndicators="true" :changeItemOnIndicatorHover="true" :circular="true">
               <template #item="slotProps">
                 <img :src="slotProps.item.itemImageSrc" :alt="slotProps.item.alt"
-                  style="width: 100%; object-fit: cover; border-radius: 1rem" />
+                  style="width: 80%; object-fit: cover; border-radius: 1rem" />
               </template>
 
               <template #thumbnail="slotProps">
