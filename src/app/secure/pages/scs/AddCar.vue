@@ -375,7 +375,7 @@ onMounted(() => {
     </PrimeDialog>
     <!-- {{ $filters.formatDate(vehicleData.registrationDate) }} -->
     <div class="surface-section px-5 py-5 md:px-6 lg:px-8">
-      <div class="text-3xl font-medium text-900 mb-4">Add New Car Listing</div>
+      <div class="text-3xl font-medium text-900 mb-4">Add New Vehicle Listing</div>
 
 
       <div class="grid">
