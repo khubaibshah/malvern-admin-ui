@@ -44,6 +44,7 @@ const registrationSuccess = ref(false);
 const seshId = sessionStorage.getItem('token');
 const archiveVehicleSwitch = ref(false);
 const active = ref(0);
+const galleriaActiveIndex = ref(0);
 
 // Image handling
 const previewUrls = ref<string[]>([]);
@@ -385,18 +386,37 @@ onMounted(() => {
           <!-- UPLOADING GALLERY -->
 
           <div v-if="previewUrls.length" class="mt-3">
-            <PrimeGalleria :value="galleriaImages" :responsiveOptions="responsiveOptions" :numVisible="4"
-              :thumbnailsPosition="position" containerStyle="max-width: 640px" :showThumbnails="true"
-              :showIndicators="true" :changeItemOnIndicatorHover="true" :circular="true">
+            <PrimeGalleria v-model:activeIndex="galleriaActiveIndex" :value="galleriaImages"
+              :responsiveOptions="responsiveOptions" :numVisible="4" :thumbnailsPosition="position"
+              containerStyle="max-width: 640px" :showThumbnails="false" :showIndicators="true"
+              :changeItemOnIndicatorHover="true" :circular="true">
+
               <template #item="slotProps">
-                <img :src="slotProps.item.itemImageSrc" :alt="slotProps.item.alt"
-                  style="width: 80%; object-fit: cover; border-radius: 1rem" />
+                <div class="relative">
+                  <!-- The image -->
+                  <img :src="slotProps.item.itemImageSrc" :alt="slotProps.item.alt"
+                    style="width: 100%; object-fit: cover; border-radius: 1rem" />
+
+                  <!-- Remove Button using PrimeTag -->
+                  <PrimeTag severity="secondary" class="absolute top-2 right-2 z-10 cursor-pointer"
+                    @click.stop="removeImage(galleriaActiveIndex)" title="Remove Image" style="background-color: red;    top: 7px;
+    right: 8px;">
+                    <i class="pi pi-times text-xs"></i>
+                  </PrimeTag>
+
+                  <!-- Primary tag for main image -->
+                  <PrimeTag v-if="galleriaActiveIndex === mainImageIndex" value="Primary" severity="secondary"
+                    class="absolute top-2 left-2 z-10" style="    left: 0px;" />
+
+                </div>
               </template>
 
-              <template #thumbnail="slotProps">
+
+
+              <!-- <template #thumbnail="slotProps">
                 <img :src="slotProps.item.thumbnailImageSrc" :alt="slotProps.item.alt"
                   style="width: 100px; height: 60px; object-fit: cover; border-radius: 0.5rem" />
-              </template>
+              </template> -->
             </PrimeGalleria>
           </div>
         </div>
