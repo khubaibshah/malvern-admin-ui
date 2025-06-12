@@ -318,14 +318,25 @@ const engineSizeLitres = computed(() => {
 });
 
 const removeImage = (index: number) => {
+  // Fix active index first to prevent out-of-bounds rendering
+  if (galleriaActiveIndex.value === index) {
+    // If it's the last image and you're removing it, go back one
+    galleriaActiveIndex.value = index === previewUrls.value.length - 1
+      ? index - 1
+      : index;
+  } else if (galleriaActiveIndex.value > index) {
+    galleriaActiveIndex.value--;
+  }
+
+  // Then safely remove the image
   previewUrls.value.splice(index, 1);
   localFiles.value.splice(index, 1);
 
   // Adjust main image index if needed
   if (mainImageIndex.value === index) {
-    mainImageIndex.value = 0; // Reset to first image
+    mainImageIndex.value = 0;
   } else if (mainImageIndex.value > index) {
-    mainImageIndex.value--; // Decrement if main image was after the removed one
+    mainImageIndex.value--;
   }
 
   toast.add({
@@ -335,6 +346,7 @@ const removeImage = (index: number) => {
     life: 3000
   });
 };
+
 
 onMounted(() => {
 
@@ -388,7 +400,7 @@ onMounted(() => {
           <div v-if="previewUrls.length" class="mt-3">
             <PrimeGalleria v-model:activeIndex="galleriaActiveIndex" :value="galleriaImages"
               :responsiveOptions="responsiveOptions" :numVisible="4" :thumbnailsPosition="position"
-              containerStyle="max-width: 640px" :showThumbnails="false" :showIndicators="true"
+              containerStyle="max-width: 640px" :showThumbnails="true" :showIndicators="true"
               :changeItemOnIndicatorHover="true" :circular="true">
 
               <template #item="slotProps">
@@ -399,8 +411,10 @@ onMounted(() => {
 
                   <!-- Remove Button using PrimeTag -->
                   <PrimeTag severity="secondary" class="absolute top-2 right-2 z-10 cursor-pointer"
-                    @click.stop="removeImage(galleriaActiveIndex)" title="Remove Image" style="background-color: red;    top: 7px;
-    right: 8px;">
+                    @click.stop="removeImage(galleriaActiveIndex)" title="Remove Image" 
+                    style="background-color: red;    
+                    top: 7px;
+                    right: 8px;">
                     <i class="pi pi-times text-xs"></i>
                   </PrimeTag>
 
@@ -413,10 +427,10 @@ onMounted(() => {
 
 
 
-              <!-- <template #thumbnail="slotProps">
+              <template #thumbnail="slotProps">
                 <img :src="slotProps.item.thumbnailImageSrc" :alt="slotProps.item.alt"
                   style="width: 100px; height: 60px; object-fit: cover; border-radius: 0.5rem" />
-              </template> -->
+              </template>
             </PrimeGalleria>
           </div>
         </div>
