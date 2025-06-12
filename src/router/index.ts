@@ -13,6 +13,7 @@ import CarDetail from '@/app/secure/pages/scs/CarDetail.vue'
 import FeaturedVehicle from '@/app/secure/pages/scs/FeaturedVehicle.vue'
 import ArchiveDelete from '@/app/secure/pages/scs/ArchiveDelete.vue'
 import { useAuthStore } from '@/stores/authStore'
+import HpiReport from '@/app/secure/pages/scs/HpiReport.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -91,6 +92,12 @@ const router = createRouter({
           path: '/cars/featured-vehicle',
           name: 'featured-vehicle',
           component: FeaturedVehicle,
+          meta: { requiresAuth: true }
+        },
+        {
+          path: '/cars/hpi-report',
+          name: 'hpi-report',
+          component: HpiReport,
           meta: { requiresAuth: true }
         }
       ],
