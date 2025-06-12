@@ -401,7 +401,8 @@ onMounted(() => {
             <PrimeGalleria v-model:activeIndex="galleriaActiveIndex" :value="galleriaImages"
               :responsiveOptions="responsiveOptions" :numVisible="4" :thumbnailsPosition="position"
               containerStyle="max-width: 640px" :showThumbnails="true" :showIndicators="true"
-              :changeItemOnIndicatorHover="true" :circular="true">
+              :changeItemOnIndicatorHover="true" :circular="true"
+              :showItemNavigators="true">
 
               <template #item="slotProps">
                 <div class="relative">
@@ -572,6 +573,24 @@ onMounted(() => {
 
 
 <style scoped>
+.p-galleria .p-galleria-item-prev,
+.p-galleria .p-galleria-item-next {
+  z-index: 25 !important;
+}
+
+:deep(.p-galleria .p-galleria-item-nav) {
+  z-index: 20;
+}
+
+
+.p-galleria .p-galleria-item-wrapper {
+  position: relative;
+}
+
+/* Set a high z-index on nav buttons */
+.p-galleria .p-galleria-item-nav {
+  z-index: 20 !important;
+}
 .surface-section {
   background: #fff;
   border-radius: 8px;
