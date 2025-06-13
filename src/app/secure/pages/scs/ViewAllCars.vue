@@ -1,37 +1,39 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
-import axios from 'axios';
-import { FilterMatchMode } from 'primevue/api';
 import { useRouter } from 'vue-router';
-import VehicleService from '@/services/VehicleService';
+import { FilterMatchMode } from 'primevue/api';
 import { useToast } from 'primevue/usetoast';
+import { useVehicleStore } from '@/stores/vehicleData';
 
+const vehicleStore = useVehicleStore();
 const toast = useToast();
-const seshId = sessionStorage.getItem('token')
-const cars = ref([]);
-const selectedCar = ref(null);
+const router = useRouter();
 
 const filters = ref({
   global: { value: null, matchMode: FilterMatchMode.CONTAINS }
 });
 
-const router = useRouter();
-
-const goToCarDetail = (event: any) => {
-  const car = event.data;
-  router.push({ name: 'car-detail', params: { id: car.id } });
-};
+const selectedCar = ref(null);
+const cars = ref([]);
 
 const getCars = async (refresh = false) => {
   try {
-    cars.value = await VehicleService.fetchAllVehicles(refresh);
+    if (!vehicleStore.vehiclesLoaded || refresh) {
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/scs/get-all-vehicles`);
+      const data = await response.json();
+      vehicleStore.setVehicles(data.cars || []);
+    }
+    cars.value = vehicleStore.getVehicles;
   } catch (error) {
     console.error('Failed to fetch cars', error);
     toast.add({ severity: 'error', summary: 'Error', detail: 'Failed to load cars.', life: 4000 });
   }
 };
 
-
+const goToCarDetail = (event: any) => {
+  const car = event.data;
+  router.push({ name: 'car-detail', params: { id: car.id } });
+};
 
 const clearFilter = () => {
   filters.value = {
@@ -39,10 +41,9 @@ const clearFilter = () => {
   };
 };
 
-
-onMounted(getCars);
-
+onMounted(() => getCars());
 </script>
+
 
 <template>
   <div>

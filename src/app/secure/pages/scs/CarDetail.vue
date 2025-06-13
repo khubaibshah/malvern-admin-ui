@@ -12,9 +12,10 @@
   <div class="surface-section px-5 py-5 md:px-6 lg:px-8">
     <h2 class="text-2xl font-light">Edit Car Listing for <span class="font-bold">{{ form.registration }}</span></h2>
     <div class="grid">
-      <div class="col-12">
+      <div class="col-12 lg:col-6">
         <!-- Upload New Images -->
-        <div class="card mb-4">
+        <div class="p-4 border-round shadow-2  border-2 border-dashed border-surface-200 text-gray-600 mb-4">
+
           <h3 class="text-lg font-semibold mb-2">Upload New Images</h3>
           <FileUpload name="images[]" customUpload :auto="false" :multiple="true" accept="image/*"
             @uploader="handleFileSelect" chooseLabel="Add Images">
@@ -44,90 +45,160 @@
             </template>
           </FileUpload>
         </div>
+        <div v-if="car?.images?.length" class="mt-3">
+          <!-- <h3 class="text-lg font-semibold mb-2">Image Gallery</h3> -->
+          <PrimeGalleria :value="galleriaImages" responsiveOptions="responsiveOptions" :numVisible="4"
+            :thumbnailsPosition="position" :showThumbnails="false" :showIndicators="true"
+            :changeItemOnIndicatorHover="true" :circular="true" :showItemNavigators="true">
+            <template #item="slotProps">
+              <div class="relative">
+                <!-- The image -->
+                <img :src="slotProps.item.itemImageSrc" :alt="slotProps.item.alt"
+                  style="width: 100%; object-fit: cover; border-radius: 1rem" />
 
-        <!-- Existing Gallery -->
-        <div class="card mb-4">
-          <h3 class="text-lg font-semibold mb-2">Existing Gallery</h3>
-          <div v-if="car?.images?.length" class="flex flex-wrap gap-3">
-            <div v-for="(img, index) in car.images" :key="index" class="relative">
-              <img :src="img" class="thumbnail-image" @click="selectMainImage(img)"
-                :class="{ 'ring-2 ring-blue-500': mainImage === img }">
-              <button class="remove-btn" @click="showConfirmDialog(img)">x</button>
-              <div v-if="mainImage === img" class="text-xs text-center text-blue-500 mt-1">Main Image</div>
-            </div>
-          </div>
+                <PrimeTag severity="secondary" class="absolute top-2 right-2 z-10 cursor-pointer"
+                  @click.stop="removeImage(galleriaActiveIndex)" title="Remove Image" style="background-color: red;    
+                    top: 7px;
+                    right: 8px;">
+                  <i class="pi pi-times text-xs"></i>
+                </PrimeTag>
+
+                <!-- Primary tag for main image -->
+                <PrimeTag v-if="galleriaActiveIndex === mainImageIndex" value="Primary" severity="secondary"
+                  class="absolute top-2 left-2 z-10" style="    left: 0px;" />
+              </div>
+            </template>
+            <template #thumbnail="slotProps">
+              <img :src="slotProps.item.thumbnailImageSrc" :alt="slotProps.item.alt"
+                style="width: 60px; height: 60px; object-fit: cover" />
+            </template>
+          </PrimeGalleria>
         </div>
 
-        <!-- Car Info -->
-        <div class="grid">
-          <div class="col-12 md:col-6">
-            <div class="field">
-              <label>Registration</label>
-              <InputGroup class="w-full h-4rem flex justify-center">
-                <InputGroupAddon style="background-color: #00309a; color: #fbe90a">GB</InputGroupAddon>
-                <InputText v-model="registration" style="background-color: #fbe90a; border-color: #00309a"
-                  placeholder="REG" class="text-5xl w-full font-bold" @input="registration.toUpperCase()" />
-              </InputGroup>
-            </div>
-            <div class="field"><label>Make</label>
-              <InputText v-model="make" class="w-full" />
-            </div>
-            <div class="field"><label>Model</label>
-              <InputText v-model="model" class="w-full" />
-            </div>
-            <div class="field"><label>Variant</label>
-              <InputText v-model="variant" class="w-full" />
-            </div>
-            <div class="field"><label>Year</label>
-              <InputText v-model="year" type="number" class="w-full" />
-            </div>
-            <div class="field"><label>Price</label>
-              <InputText v-model="price" type="number" class="w-full" />
-            </div>
-          </div>
-
-          <div class="col-12 md:col-6">
-            <div class="field"><label>Mileage</label>
-              <InputText v-model="mileage" type="number" class="w-full" />
-            </div>
-            <div class="field"><label>Fuel Type</label>
-              <InputText v-model="fuel_type" class="w-full" />
-            </div>
-            <div class="field"><label>Colour</label>
-              <InputText v-model="colour" class="w-full" />
-            </div>
-            <div class="field"><label>Doors</label>
-              <PrimeDropDown v-model="doors" type="number" class="w-full" :options="DOOR_OPTIONS" />
-            </div>
-            <div class="field"><label>Vehicle Type</label>
-              <InputText v-model="veh_type" class="w-full" />
-            </div>
-            <div class="field"><label>Gearbox</label>
-              <PrimeDropDown v-model="gearbox" :options="GEARBOX_OPTIONS" class="w-full" />
-            </div>
-            <div class="field"><label>Engine</label>
-              <InputText v-model="engineSize" class="w-full"/>
-            </div>
-            <div class="field"><label>Keys</label>
-              <PrimeDropDown v-model="keys" :options="KEY_OPTIONS" class="w-full" />
-            </div>
-            <div class="field"><label>Body Style</label>
-              <PrimeDropDown v-model="body_style" :options="BODY_STYLE_OPTIONS" class="w-full" />
-            </div>
-            <div class="field"><label>Registration Date</label>
-              <InputText v-model="registration_date" type="date" class="w-full" />
-            </div>
-
-            <div class="field col-span-2"><label>Description</label>
-              <PrimeTextarea v-model="description" class="w-full" rows="3" />
-            </div>
-          </div>
-        </div>
-
-        <PrimeButton label="Update Car Listing" icon="pi pi-check" class="mt-3 w-full" @click="updateCar" :loading="isUploading"/>
-        
       </div>
+
+      <!-- Car Info -->
+
+      <div class="col-12 md:col-6">
+        <div class="p-4 border-round shadow-2 bg-white mb-4">
+          <h3 class="text-xl text-gray-600 font-medium ">Archive Vehicle</h3>
+
+          <!-- <PrimeInputSwitch v-model="archiveVehicleSwitch" /> -->
+          <PrimeToggleButton v-model="archiveVehicleSwitch" class="w-6rem" onLabel="On" offLabel="Off" />
+        </div>
+        <div class="p-4 border-round shadow-2 bg-white mb-4">
+          <h3 class="text-xl text-gray-600 font-medium ">Vehicle Details</h3>
+
+          <InputGroup class="w-full h-4rem flex justify-center mb-3">
+            <InputGroupAddon style="background-color: #00309a; color: #fbe90a">
+              GB
+            </InputGroupAddon>
+            <InputText v-model="registration" style="background-color: #fbe90a; border-color: #00309a" placeholder="REG"
+              inputClass="'bg-transparent text-900 border-400 border-blue-500'"
+              class="text-5xl w-full text-100 font-bold" @input="registration.toUpperCase()" />
+          </InputGroup>
+
+        </div>
+        <div class="border-round shadow-2  text-black-700 mb-4">
+          <div class="flex mb-3 gap-2 justify-end">
+            <PrimeButton @click="active = 0" rounded label="1" class="w-2rem h-2rem p-0" :outlined="active !== 0" />
+            <PrimeButton @click="active = 1" rounded label="2" class="w-2rem h-2rem p-0" :outlined="active !== 1" />
+            <PrimeButton @click="active = 2" rounded label="3" class="w-2rem h-2rem p-0" :outlined="active !== 2" />
+            <PrimeButton @click="active = 3" rounded label="4" class="w-2rem h-2rem p-0" :outlined="active !== 3" />
+          </div>
+          <PrimeAccordion v-model:activeIndex="active">
+            <!-- Basic Info -->
+            <PrimeAccordionTab header="Basic Information">
+              <div class="grid">
+                <div class="col-12 lg:col-6">
+
+                  <div class="field"><label>Make</label>
+                    <InputText v-model="make" class="w-full" />
+                  </div>
+                  <div class="field"><label>Model</label>
+                    <InputText v-model="model" class="w-full" />
+                  </div>
+                  <div class="field"><label>Variant</label>
+                    <InputText v-model="variant" class="w-full" />
+                  </div>
+                </div>
+                <div class="col-12 lg:col-6">
+
+                  <div class="field"><label>Year</label>
+                    <InputText v-model="year" class="w-full" />
+                  </div>
+                  <div class="field"><label>Registration Date</label>
+                    <InputText v-model="registration_date" type="date" class="w-full" />
+                  </div>
+                </div>
+              </div>
+            </PrimeAccordionTab>
+            <!-- Pricing and Mileage -->
+            <PrimeAccordionTab header="Pricing">
+              <div class="field">
+                <label>Price (£)</label>
+                <InputText v-model="price" class="w-full" />
+              </div>
+            </PrimeAccordionTab>
+            <!-- Vehicle Details / Features -->
+            <PrimeAccordionTab header="Vehicle Details / Features">
+              <div class="grid">
+                <div class="col-12 lg:col-6">
+                  <div class="field"><label>Mileage</label>
+                    <InputText v-model="mileage" class="w-full" />
+                  </div>
+                  <div class="field"><label>Fuel Type</label>
+                    <PrimeDropDown v-model="fuel_type" class="w-full"
+                      :options="['Petrol', 'Diesel', 'Hybrid', 'Electric']" placeholder="Select Fuel Type" />
+                  </div>
+                  <div class="field"><label>Colour</label>
+                    <InputText v-model="colour" class="w-full" />
+                  </div>
+                  <div class="field"><label>Body Style</label>
+                    <PrimeDropDown v-model="body_style" :options="BODY_STYLE_OPTIONS" class="w-full"
+                      placeholder="Select body style" />
+                  </div>
+                  <div class="field"><label>Vehicle Type</label>
+                    <InputText v-model="veh_type" class="w-full" />
+                  </div>
+                </div>
+                <div class="col-12 lg:col-6">
+                  <div class="field"><label>Doors</label>
+                    <PrimeDropDown v-model="doors" :options="DOOR_OPTIONS" class="w-full" placeholder="Select doors" />
+                  </div>
+                  <div class="field"><label>Number of Keys</label>
+                    <PrimeDropDown v-model="keys" :options="KEY_OPTIONS" class="w-full" placeholder="Select keys" />
+                  </div>
+                  <div class="field"><label>Gearbox</label>
+                    <PrimeDropDown v-model="gearbox" :options="GEARBOX_OPTIONS" class="w-full"
+                      placeholder="Select gearbox" />
+                  </div>
+                  <div class="field"><label>Engine Size</label>
+                    <InputText v-model="engineSize" class="w-full" />
+                  </div>
+                </div>
+              </div>
+            </PrimeAccordionTab>
+            <!-- description -->
+            <PrimeAccordionTab header="Description">
+              <div class="field">
+                <label>Car Description</label>
+
+                <PrimeTextarea v-model="description" class="w-full bg-gray-800" rows="15" />
+              </div>
+            </PrimeAccordionTab>
+          </PrimeAccordion>
+          <div class="field">
+          </div>
+        </div>
+
+        <PrimeButton label="Update Car Listing" icon="pi pi-check" class="mt-3 w-full" @click="updateCar"
+          :loading="isUploading" />
+      </div>
+
     </div>
+
+
   </div>
 </template>
 
@@ -151,13 +222,14 @@ const seshId = sessionStorage.getItem('token');
 const localFiles = ref<File[]>([]);
 const previewUrls = ref<string[]>([]);
 const mainImageIndex = ref(0);
-
+const position = ref('bottom');
 // Car data
 const car = ref<any>(null);
 const form = ref<any>({});
 const removedImages = ref<string[]>([]);
 const mainImage = ref<string>('');
-
+const archiveVehicleSwitch = ref(false);
+const active = ref(0);
 // Form fields
 const make = ref('');
 const model = ref('');
@@ -177,7 +249,10 @@ const engineSize = ref('');
 const keys = ref('');
 const registration_date = ref(''); // ISO string like "2024-09-01"
 const body_style = ref('');
+const deleted_at = ref('');
 const isUploading = ref(false);
+const galleriaActiveIndex = ref(0);
+const galleriaImages = ref<any[]>([]);
 // Handlers
 const handleFileSelect = (event: any) => {
   if (event?.files?.length) {
@@ -192,6 +267,21 @@ const handleFileSelect = (event: any) => {
     }
   }
 };
+
+
+
+
+const prepareGalleriaImages = () => {
+  if (Array.isArray(car.value?.images)) {
+    galleriaImages.value = car.value.images.map((img: string) => ({
+      itemImageSrc: img,
+      thumbnailImageSrc: img, // optional: use a smaller version if you have it
+      alt: `${car.value.make} ${car.value.model}`
+    }));
+  }
+};
+
+
 
 const removeImage = (index: number) => {
   previewUrls.value.splice(index, 1);
@@ -262,11 +352,14 @@ const fetchCar = async () => {
     veh_type.value = form.value.veh_type || '';
     description.value = form.value.description || '';
     gearbox.value = form.value.gearbox || '';
-    engineSize.value = form.value.engine_size  || '';
+    engineSize.value = form.value.engine_size || '';
     keys.value = form.value.keys !== null ? parseInt(form.value.keys) : null;
     registration_date.value = form.value.registration_date || '';
     body_style.value = form.value.body_style || '';
+    deleted_at.value = form.value.deleted_at;
 
+    // ✅ Then set archive switch
+    archiveVehicleSwitch.value = deleted_at.value !== null && deleted_at.value !== ''; prepareGalleriaImages();
 
     if (Array.isArray(car.value.images) && car.value.images.length > 0) {
       mainImage.value = car.value.main_image || car.value.images[0];
@@ -317,7 +410,8 @@ const updateCar = async () => {
       gearbox: gearbox.value,
       engine_size: engineSize.value,
       body_style: body_style.value,
-      registration_date: registration_date.value
+      registration_date: registration_date.value,
+      deleted_at: archiveVehicleSwitch.value ? (deleted_at.value || new Date().toISOString()) : null
     };
 
     await axios.put(`${import.meta.env.VITE_API_BASE_URL}/admin/update-car/${car.value.id}`, payload, {
@@ -326,6 +420,8 @@ const updateCar = async () => {
 
     toast.add({ severity: 'success', summary: 'Updated', detail: 'Vehicle updated successfully', life: 3000 });
     await fetchCar();
+    prepareGalleriaImages(); // <— call this after setting car.value
+
   } catch (err) {
     console.error('Update failed', err);
     toast.add({ severity: 'error', summary: 'Error', detail: 'Failed to update car', life: 3000 });
