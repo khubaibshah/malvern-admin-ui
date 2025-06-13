@@ -3,14 +3,14 @@
     <div>
         <div class="surface-section px-5 py-5 md:px-6 lg:px-8">
             <div class="text-3xl font-medium text-900 mb-4">HPI Report</div>
-           
+
             <FileUpload name="pdf" :auto="true" mode="basic" choose-label="Upload HPI PDF" accept="application/pdf"
                 customUpload @uploader="handleUpload" :disabled="isUploading" />
             <div v-if="pdfPreviewUrl" class="grid my-5">
                 <div class="col-12 lg:col-8">
-                     <div v-if="isUploading" class="mt-4">
-                <ProgressBar mode="indeterminate" />
-            </div>
+                    <div v-if="isUploading" class="mt-4">
+                        <ProgressBar mode="indeterminate" />
+                    </div>
                     <h4 class="text-xl mb-2 font-medium">PDF Preview</h4>
                     <iframe :src="pdfPreviewUrl" class="w-full border border-gray-300 rounded-lg"
                         style="min-height: 600px;"></iframe>
@@ -18,7 +18,7 @@
                 <div class="col-12 lg:col-4">
 
                     <div v-if="hpiData" class=" mt-5">
-                        <div class=" mb-3">
+                        <div class=" mt-6 mb-3">
                             <label class="block font-medium text-gray-700">Registration</label>
                             <InputText v-model="hpiData.registration" class="w-full" readonly />
                         </div>
