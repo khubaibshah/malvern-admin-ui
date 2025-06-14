@@ -53,7 +53,7 @@
                 :thumbnailsPosition="position" :showThumbnails="false" :showIndicators="true"
                 :changeItemOnIndicatorHover="true" :circular="true" :showItemNavigators="true">
                 <template #item="slotProps">
-                  <div class="relative">
+                  <div>
                     <img :src="slotProps.item.itemImageSrc" :alt="slotProps.item.alt"
                       style="width: 100%; object-fit: cover; border-radius: 1rem" />
 
@@ -93,12 +93,16 @@
 
 
 
-                  <template #item="slotProps">
-                    <div class="relative flex justify-center items-center">
-                      <img :src="slotProps.item.itemImageSrc" :alt="slotProps.item.alt"
-                        style="width: 100%; object-fit: cover; border-radius: 1rem" />
-                    </div>
-                  </template>
+                 <template #item="slotProps">
+  <div class=" flex justify-center items-center w-full h-full">
+    <img
+      :src="slotProps.item.itemImageSrc"
+      :alt="slotProps.item.alt"
+      class="max-w-full max-h-[80vh] object-contain rounded-xl"
+    />
+  </div>
+</template>
+
 
                   <template #thumbnail="slotProps">
                     <img :src="slotProps.item.thumbnailImageSrc" :alt="slotProps.item.alt" style="display: block" />
@@ -106,12 +110,15 @@
                 </PrimeGalleria>
 
                 <div v-if="newImages.length" class="grid">
-                  <div v-for="(image, index) of newImages" :key="index" class="col-6">
-                    <img :src="image.thumbnailImageSrc" :alt="image.alt" style="cursor: pointer;     width: 20rem;
-    height: 15rem; object-fit: cover" @click="openNewImagePreview(index)" />
+                  <div v-for="(image, index) of newImages" :key="index"
+                    class="col-12 md:col-6 flex justify-content-center mb-3">
+                    <img :src="image.thumbnailImageSrc" :alt="image.alt"
+                      style="cursor: pointer; width: 18rem; height: 15rem; object-fit: cover"
+                      @click="openNewImagePreview(index)" />
                   </div>
                 </div>
-              </div>
+
+              </div>  
             </PrimeTabPanel>
 
           </PrimeTabView>
@@ -528,6 +535,23 @@ onMounted(fetchCar);
 </script>
 
 <style scoped>
+::v-deep(.p-galleria .p-galleria-item-prev, .p-galleria .p-galleria-item-next) {
+  z-index: 50;
+  background-color: rgba(0, 0, 0, 0.5);
+  width: 2.5rem;
+  height: 2.5rem;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+::v-deep(.p-galleria .p-galleria-item-prev) {
+  left: 1rem;
+}
+
+::v-deep(.p-galleria .p-galleria-item-next) {
+  right: 1rem;
+}
+
 .thumbnail-image {
   width: 120px;
   height: 120px;
