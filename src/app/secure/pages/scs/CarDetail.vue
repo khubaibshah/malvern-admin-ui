@@ -85,33 +85,30 @@
             <PrimeTabPanel header="New Uploads">
               <!-- New selected images will be added to the gallery below. -->
               <div class="flex ">
-                
-                <PrimeGalleria v-model:activeIndex="galleriaActiveIndex" v-model:visible="displayCustom" :value="newImages"
-                   :numVisible="7" containerStyle="max-width: 850px"
-                  :circular="true" :fullScreen="true" :showItemNavigators="true" :showThumbnails="false">
-                  
 
-                    
-                  
+                <PrimeGalleria v-model:activeIndex="galleriaActiveIndex" v-model:visible="displayCustom"
+                  :value="newImages" :numVisible="7" containerStyle="max-width: 850px" :circular="true"
+                  :fullScreen="true" :showItemNavigators="true" :showThumbnails="false">
+
+
+
+
                   <template #item="slotProps">
-  <div class="relative flex justify-center items-center">
-   <img :src="slotProps.item.itemImageSrc" :alt="slotProps.item.alt"
-                      style="width: 100%; object-fit: cover; border-radius: 1rem"/>
-  </div>
-</template>
+                    <div class="relative flex justify-center items-center">
+                      <img :src="slotProps.item.itemImageSrc" :alt="slotProps.item.alt"
+                        style="width: 100%; object-fit: cover; border-radius: 1rem" />
+                    </div>
+                  </template>
 
                   <template #thumbnail="slotProps">
                     <img :src="slotProps.item.thumbnailImageSrc" :alt="slotProps.item.alt" style="display: block" />
                   </template>
                 </PrimeGalleria>
 
-                <div v-if="newImages.length" class="grid" >
+                <div v-if="newImages.length" class="grid">
                   <div v-for="(image, index) of newImages" :key="index" class="col-6">
-                    <img :src="image.thumbnailImageSrc"
-  :alt="image.alt"
-  style="cursor: pointer;     width: 20rem;
-    height: 15rem; object-fit: cover"
-                      @click="openNewImagePreview(index)" />
+                    <img :src="image.thumbnailImageSrc" :alt="image.alt" style="cursor: pointer;     width: 20rem;
+    height: 15rem; object-fit: cover" @click="openNewImagePreview(index)" />
                   </div>
                 </div>
               </div>
