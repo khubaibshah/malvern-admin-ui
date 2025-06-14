@@ -49,6 +49,9 @@ import Galleria from 'primevue/galleria';
 import Accordion from 'primevue/accordion';
 import AccordionTab from 'primevue/accordiontab';
 
+import TabView from 'primevue/tabview';
+import TabPanel from 'primevue/tabpanel';
+
 
 
 
@@ -107,6 +110,8 @@ app.component('PrimeToggleButton', ToggleButton);
 app.component('PrimeGalleria', Galleria);
 app.component('PrimeAccordion', Accordion);
 app.component('PrimeAccordionTab', AccordionTab);
+app.component('PrimeTabView', TabView);
+app.component('PrimeTabPanel', TabPanel);
 
 app.config.globalProperties.$filters = {
     currencyGBP(value: number | string) {

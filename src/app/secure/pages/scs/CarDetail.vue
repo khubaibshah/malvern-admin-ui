@@ -21,7 +21,7 @@
             @uploader="handleFileSelect" chooseLabel="Add Images">
             <template #empty>
               <span>Drag and drop files here to upload.</span>
-              <div v-if="previewUrls.length" class="mt-3 grid grid-cols-3 gap-2">
+              <!-- <div v-if="previewUrls.length" class="mt-3 grid grid-cols-3 gap-2">
                 <div v-for="(url, index) in previewUrls" :key="index" class="relative group"
                   @click="setMainImage(index)">
                   <PrimeImage :src="url" width="160px" height="161px" preview
@@ -41,38 +41,84 @@
                     Main Image
                   </div>
                 </div>
-              </div>
+              </div> -->
             </template>
           </FileUpload>
         </div>
         <div v-if="car?.images?.length" class="mt-3">
           <!-- <h3 class="text-lg font-semibold mb-2">Image Gallery</h3> -->
-          <PrimeGalleria :value="galleriaImages" responsiveOptions="responsiveOptions" :numVisible="4"
-            :thumbnailsPosition="position" :showThumbnails="false" :showIndicators="true"
-            :changeItemOnIndicatorHover="true" :circular="true" :showItemNavigators="true">
-            <template #item="slotProps">
-              <div class="relative">
-                <!-- The image -->
-                <img :src="slotProps.item.itemImageSrc" :alt="slotProps.item.alt"
-                  style="width: 100%; object-fit: cover; border-radius: 1rem" />
+          <PrimeTabView>
+            <PrimeTabPanel header="Existing Gallery">
+              <PrimeGalleria :value="galleriaImages" responsiveOptions="responsiveOptions" :numVisible="4"
+                :thumbnailsPosition="position" :showThumbnails="false" :showIndicators="true"
+                :changeItemOnIndicatorHover="true" :circular="true" :showItemNavigators="true">
+                <template #item="slotProps">
+                  <div class="relative">
+                    <img :src="slotProps.item.itemImageSrc" :alt="slotProps.item.alt"
+                      style="width: 100%; object-fit: cover; border-radius: 1rem" />
 
-                <PrimeTag severity="secondary" class="absolute top-2 right-2 z-10 cursor-pointer"
-                  @click.stop="removeImage(galleriaActiveIndex)" title="Remove Image" style="background-color: red;    
-                    top: 7px;
-                    right: 8px;">
-                  <i class="pi pi-times text-xs"></i>
-                </PrimeTag>
+                    <!-- Delete Button -->
+                    <PrimeTag severity="secondary" class="absolute top-2 right-2 z-10 cursor-pointer"
+                      @click.stop="showConfirmDialog(slotProps.item.itemImageSrc)" title="Remove Image"
+                      style="background-color: red; top: 7px; right: 8px;">
+                      <i class="pi pi-times text-xs"></i>
+                    </PrimeTag>
 
-                <!-- Primary tag for main image -->
-                <PrimeTag v-if="galleriaActiveIndex === mainImageIndex" value="Primary" severity="secondary"
-                  class="absolute top-2 left-2 z-10" style="    left: 0px;" />
+                    <!-- Primary Image Tag -->
+                    <PrimeTag v-if="slotProps.item.itemImageSrc === mainImage" value="Primary" severity="secondary"
+                      class="absolute top-2 left-2 z-10" style="left:0px" />
+
+
+                    <!-- New Image Tag -->
+                    <PrimeTag v-if="slotProps.item.isNew" value="New" severity="info"
+                      class="absolute bottom-2 left-2 z-10" style="    left: 0px;" />
+                  </div>
+                </template>
+
+                <template #thumbnail="slotProps">
+                  <img :src="slotProps.item.thumbnailImageSrc" :alt="slotProps.item.alt"
+                    style="width: 60px; height: 60px; object-fit: cover" />
+                </template>
+
+              </PrimeGalleria>
+            </PrimeTabPanel>
+            <PrimeTabPanel header="New Uploads">
+              <!-- New selected images will be added to the gallery below. -->
+              <div class="flex ">
+                
+                <PrimeGalleria v-model:activeIndex="galleriaActiveIndex" v-model:visible="displayCustom" :value="newImages"
+                   :numVisible="7" containerStyle="max-width: 850px"
+                  :circular="true" :fullScreen="true" :showItemNavigators="true" :showThumbnails="false">
+                  
+
+                    
+                  
+                  <template #item="slotProps">
+  <div class="relative flex justify-center items-center">
+   <img :src="slotProps.item.itemImageSrc" :alt="slotProps.item.alt"
+                      style="width: 100%; object-fit: cover; border-radius: 1rem"/>
+  </div>
+</template>
+
+                  <template #thumbnail="slotProps">
+                    <img :src="slotProps.item.thumbnailImageSrc" :alt="slotProps.item.alt" style="display: block" />
+                  </template>
+                </PrimeGalleria>
+
+                <div v-if="newImages.length" class="grid" >
+                  <div v-for="(image, index) of newImages" :key="index" class="col-6">
+                    <img :src="image.thumbnailImageSrc"
+  :alt="image.alt"
+  style="cursor: pointer;     width: 20rem;
+    height: 15rem; object-fit: cover"
+                      @click="openNewImagePreview(index)" />
+                  </div>
+                </div>
               </div>
-            </template>
-            <template #thumbnail="slotProps">
-              <img :src="slotProps.item.thumbnailImageSrc" :alt="slotProps.item.alt"
-                style="width: 60px; height: 60px; object-fit: cover" />
-            </template>
-          </PrimeGalleria>
+            </PrimeTabPanel>
+
+          </PrimeTabView>
+
         </div>
 
       </div>
@@ -253,15 +299,31 @@ const deleted_at = ref('');
 const isUploading = ref(false);
 const galleriaActiveIndex = ref(0);
 const galleriaImages = ref<any[]>([]);
+const newImages = ref<any[]>([]);
+const displayCustom = ref(false);
 // Handlers
 const handleFileSelect = (event: any) => {
   if (event?.files?.length) {
     for (const file of event.files) {
       if (file instanceof File) {
+        const url = URL.createObjectURL(file);
         localFiles.value.push(file);
-        previewUrls.value.push(URL.createObjectURL(file));
+        previewUrls.value.push(url);
+        newImages.value.push({
+          itemImageSrc: url,
+          thumbnailImageSrc: url,
+          alt: file.name
+        });
+
+        galleriaImages.value.push({
+          itemImageSrc: url,
+          thumbnailImageSrc: url,
+          alt: file.name,
+          isNew: true  // 👈 This flag helps us tag it as a new image
+        });
       }
     }
+
     if (localFiles.value.length === event.files.length) {
       mainImageIndex.value = 0;
     }
@@ -269,21 +331,28 @@ const handleFileSelect = (event: any) => {
 };
 
 
+const openNewImagePreview = (index: number) => {
+  galleriaActiveIndex.value = index;
+  displayCustom.value = true;
+};
 
 
 const prepareGalleriaImages = () => {
   if (Array.isArray(car.value?.images)) {
     galleriaImages.value = car.value.images.map((img: string) => ({
       itemImageSrc: img,
-      thumbnailImageSrc: img, // optional: use a smaller version if you have it
-      alt: `${car.value.make} ${car.value.model}`
+      thumbnailImageSrc: img,
+      alt: `${car.value.make} ${car.value.model}`,
+      isNew: false // existing image
     }));
   }
 };
 
 
 
+
 const removeImage = (index: number) => {
+  confirm.value = true;
   previewUrls.value.splice(index, 1);
   localFiles.value.splice(index, 1);
   if (mainImageIndex.value === index) {
@@ -309,9 +378,36 @@ const selectMainImage = (imgUrl: string) => {
 };
 
 const showConfirmDialog = (img: string) => {
-  imageToRemove.value = img;
-  confirm.value = true;
+  const isLocal = img.startsWith('blob:');
+
+  if (isLocal) {
+    // Remove from local preview + galleria
+    const localIndex = galleriaImages.value.findIndex((i) => i.itemImageSrc === img);
+    if (localIndex !== -1) {
+      galleriaImages.value.splice(localIndex, 1);
+      previewUrls.value.splice(localIndex, 1);
+      localFiles.value.splice(localIndex, 1);
+    }
+
+    toast.add({
+      severity: 'info',
+      summary: 'Image Removed',
+      detail: 'Local image has been removed',
+      life: 3000
+    });
+
+    // If it was mainImage, reset
+    if (mainImage.value === img) {
+      mainImageIndex.value = 0;
+    }
+
+  } else {
+    // Existing image – require confirmation
+    imageToRemove.value = img;
+    confirm.value = true;
+  }
 };
+
 
 const confirmRemoveImage = async () => {
   try {
@@ -323,12 +419,15 @@ const confirmRemoveImage = async () => {
 
     car.value.images = car.value.images.filter((img: string) => img !== imageToRemove.value);
     removedImages.value.push(imageToRemove.value);
+    galleriaImages.value = galleriaImages.value.filter(img => img.itemImageSrc !== imageToRemove.value);
+
     toast.add({ severity: 'success', summary: 'Deleted', detail: 'Image removed', life: 3000 });
     confirm.value = false;
   } catch (error) {
     toast.add({ severity: 'error', summary: 'Error', detail: 'Failed to delete image from S3', life: 3000 });
   }
 };
+
 
 const fetchCar = async () => {
   try {
