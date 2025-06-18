@@ -50,7 +50,6 @@
           <PrimeTabView>
             <PrimeTabPanel header="Existing Gallery">
               <PrimeGalleria :value="galleriaImages" :responsiveOptions="responsiveOptions" :numVisible="2"
-               containerStyle="    max-width: 18rem;" 
                :changeItemOnIndicatorHover="true"
                :showThumbnails="false"
               :circular="true" :showItemNavigators="true">
