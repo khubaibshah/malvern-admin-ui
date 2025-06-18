@@ -5,6 +5,9 @@ import { createApp } from 'vue'
 import { createPinia } from 'pinia'
 const pinia = createPinia();
 import PrimeVue from 'primevue/config';
+import 'swiper/css';
+import 'swiper/css/navigation';
+import 'swiper/css/pagination';
 
 import "primeflex/primeflex.css"
 import 'primeicons/primeicons.css'

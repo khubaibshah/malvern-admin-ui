@@ -49,19 +49,40 @@
           <!-- <h3 class="text-lg font-semibold mb-2">Image Gallery</h3> -->
           <PrimeTabView>
             <PrimeTabPanel header="Existing Gallery">
-              <PrimeGalleria :value="galleriaImages" :responsiveOptions="responsiveOptions" :numVisible="2"
-               :changeItemOnIndicatorHover="true"
-               :showThumbnails="false"
-              :circular="true" :showItemNavigators="true">
-            <template #item="slotProps">
-                <img :src="slotProps.item.itemImageSrc" :alt="slotProps.item.alt" 
-                style="width: 100%; object-fit: cover; border-radius: 1rem"/>
-            </template>
-            <template #thumbnail="slotProps">
-<img :src="slotProps.item.thumbnailImageSrc" :alt="slotProps.item.alt"
-                    style="width: 60px; height: 60px; object-fit: cover" />            </template>
-        </PrimeGalleria>
-              
+<Swiper
+  :modules="[Pagination, Navigation]"
+  :slides-per-view="1"
+  :pagination="{ clickable: true }"
+  :navigation="true"
+  :breakpoints="{
+    640: { slidesPerView: 1 },
+    768: { slidesPerView: 1 },
+    1024: { slidesPerView: 1 }
+  }"
+  class="mySwiper"
+>
+
+  <SwiperSlide v-for="(img, i) in galleriaImages" :key="i">
+    <img
+      :src="img.itemImageSrc"
+      :alt="img.alt"
+      class="w-full h-full object-cover"
+      style="max-height: 300px; object-fit: contain;"
+    />
+  </SwiperSlide>
+</Swiper>
+
+              <!-- <PrimeGalleria :value="galleriaImages" :responsiveOptions="responsiveOptions" :numVisible="2"
+                :changeItemOnIndicatorHover="true" :showThumbnails="false" :circular="true" :showItemNavigators="true">
+                <template #item="slotProps">
+                  <img :src="slotProps.item.itemImageSrc" :alt="slotProps.item.alt"
+                    style="width: 100%; object-fit: cover; border-radius: 1rem" />
+                </template>
+                <template #thumbnail="slotProps">
+                  <img :src="slotProps.item.thumbnailImageSrc" :alt="slotProps.item.alt"
+                    style="width: 60px; height: 60px; object-fit: cover" /> </template>
+              </PrimeGalleria> -->
+
             </PrimeTabPanel>
             <PrimeTabPanel header="New Uploads">
               <!-- New selected images will be added to the gallery below. -->
@@ -230,8 +251,17 @@
 </template>
 
 <script setup lang="ts">
+// script setup
+import { Swiper, SwiperSlide } from 'swiper/vue';
+import { Pagination, Navigation } from 'swiper/modules';
+
+import 'swiper/css';
+import 'swiper/css/pagination';
+import 'swiper/css/navigation';
+
 import { ref, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
+
 import { useToast } from 'primevue/usetoast';
 import axios from 'axios';
 import {
@@ -285,14 +315,14 @@ const displayCustom = ref(false);
 
 
 const responsiveOptions = ref([
-    {
-        breakpoint: '1300px',
-        numVisible: 4
-    },
-    {
-        breakpoint: '575px',
-        numVisible: 1
-    }
+  {
+    breakpoint: '1300px',
+    numVisible: 4
+  },
+  {
+    breakpoint: '575px',
+    numVisible: 1
+  }
 ]);
 
 
@@ -526,6 +556,23 @@ onMounted(fetchCar);
 </script>
 
 <style scoped>
+.mySwiper {
+  width: 100%;
+  max-width: 100%;
+  height: 300px;
+}
+
+.swiper-slide {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.swiper-slide img {
+  max-height: 100%;
+  object-fit: contain;
+}
+
 /* ::v-deep(.p-galleria .p-galleria-item-prev, .p-galleria .p-galleria-item-next) {
   z-index: 50;
   background-color: rgba(0, 0, 0, 0.5);
