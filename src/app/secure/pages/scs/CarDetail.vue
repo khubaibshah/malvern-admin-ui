@@ -49,38 +49,20 @@
           <!-- <h3 class="text-lg font-semibold mb-2">Image Gallery</h3> -->
           <PrimeTabView>
             <PrimeTabPanel header="Existing Gallery">
-              <PrimeGalleria :value="galleriaImages" responsiveOptions="responsiveOptions" :numVisible="4"
-                :thumbnailsPosition="position" :showThumbnails="false" :showIndicators="true"
-                :changeItemOnIndicatorHover="true" :circular="true" :showItemNavigators="true">
-                <template #item="slotProps">
-                  <div>
-                    <img :src="slotProps.item.itemImageSrc" :alt="slotProps.item.alt"
-                      style="width: 100%; object-fit: cover; border-radius: 1rem" />
-
-                    <!-- Delete Button -->
-                    <PrimeTag severity="secondary" class="absolute top-2 right-2 z-10 cursor-pointer"
-                      @click.stop="showConfirmDialog(slotProps.item.itemImageSrc)" title="Remove Image"
-                      style="background-color: red; top: 7px; right: 8px;">
-                      <i class="pi pi-times text-xs"></i>
-                    </PrimeTag>
-
-                    <!-- Primary Image Tag -->
-                    <PrimeTag v-if="slotProps.item.itemImageSrc === mainImage" value="Primary" severity="secondary"
-                      class="absolute top-2 left-2 z-10" style="left:0px" />
-
-
-                    <!-- New Image Tag -->
-                    <PrimeTag v-if="slotProps.item.isNew" value="New" severity="info"
-                      class="absolute bottom-2 left-2 z-10" style="    left: 0px;" />
-                  </div>
-                </template>
-
-                <template #thumbnail="slotProps">
-                  <img :src="slotProps.item.thumbnailImageSrc" :alt="slotProps.item.alt"
-                    style="width: 60px; height: 60px; object-fit: cover" />
-                </template>
-
-              </PrimeGalleria>
+              <PrimeGalleria :value="galleriaImages" :responsiveOptions="responsiveOptions" :numVisible="2"
+               containerStyle="    max-width: 18rem;" 
+               :changeItemOnIndicatorHover="true"
+               :showThumbnails="false"
+              :circular="true" :showItemNavigators="true">
+            <template #item="slotProps">
+                <img :src="slotProps.item.itemImageSrc" :alt="slotProps.item.alt" 
+                style="width: 100%; object-fit: cover; border-radius: 1rem"/>
+            </template>
+            <template #thumbnail="slotProps">
+<img :src="slotProps.item.thumbnailImageSrc" :alt="slotProps.item.alt"
+                    style="width: 60px; height: 60px; object-fit: cover" />            </template>
+        </PrimeGalleria>
+              
             </PrimeTabPanel>
             <PrimeTabPanel header="New Uploads">
               <!-- New selected images will be added to the gallery below. -->
@@ -88,20 +70,16 @@
 
                 <PrimeGalleria v-model:activeIndex="galleriaActiveIndex" v-model:visible="displayCustom"
                   :value="newImages" :numVisible="7" containerStyle="max-width: 850px" :circular="true"
-                  :fullScreen="true" :showItemNavigators="true" :showThumbnails="false">
+                  :fullScreen="true" :showItemNavigators="false" :showThumbnails="false">
 
 
 
-
-                 <template #item="slotProps">
-  <div class=" flex justify-center items-center w-full h-full">
-    <img
-      :src="slotProps.item.itemImageSrc"
-      :alt="slotProps.item.alt"
-      class="max-w-full max-h-[80vh] object-contain rounded-xl"
-    />
-  </div>
-</template>
+                  <template #item="slotProps">
+                    <div class=" flex justify-center items-center w-full h-full">
+                      <img :src="slotProps.item.itemImageSrc" :alt="slotProps.item.alt"
+                        class="max-w-full max-h-[80vh] object-contain rounded-xl" />
+                    </div>
+                  </template>
 
 
                   <template #thumbnail="slotProps">
@@ -118,7 +96,7 @@
                   </div>
                 </div>
 
-              </div>  
+              </div>
             </PrimeTabPanel>
 
           </PrimeTabView>
@@ -305,6 +283,20 @@ const galleriaActiveIndex = ref(0);
 const galleriaImages = ref<any[]>([]);
 const newImages = ref<any[]>([]);
 const displayCustom = ref(false);
+
+
+const responsiveOptions = ref([
+    {
+        breakpoint: '1300px',
+        numVisible: 4
+    },
+    {
+        breakpoint: '575px',
+        numVisible: 1
+    }
+]);
+
+
 // Handlers
 const handleFileSelect = (event: any) => {
   if (event?.files?.length) {
@@ -535,22 +527,22 @@ onMounted(fetchCar);
 </script>
 
 <style scoped>
-::v-deep(.p-galleria .p-galleria-item-prev, .p-galleria .p-galleria-item-next) {
+/* ::v-deep(.p-galleria .p-galleria-item-prev, .p-galleria .p-galleria-item-next) {
   z-index: 50;
   background-color: rgba(0, 0, 0, 0.5);
   width: 2.5rem;
   height: 2.5rem;
   top: 50%;
   transform: translateY(-50%);
-}
+} */
 
-::v-deep(.p-galleria .p-galleria-item-prev) {
+/* ::v-deep(.p-galleria .p-galleria-item-prev) {
   left: 1rem;
 }
 
 ::v-deep(.p-galleria .p-galleria-item-next) {
   right: 1rem;
-}
+} */
 
 .thumbnail-image {
   width: 120px;
