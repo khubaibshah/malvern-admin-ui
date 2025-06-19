@@ -53,7 +53,7 @@
     <swiper
       class="mySwiper"
       :modules="modules"
-      :slides-per-view="3"
+
       :space-between="20"
       :breakpoints="{ 600: { slidesPerView: 2 }, 900: { slidesPerView: 3 }, 1200: { slidesPerView: 4 } }"
       navigation
