@@ -48,42 +48,34 @@
         <div v-if="car?.images?.length" class="mt-3">
           <!-- <h3 class="text-lg font-semibold mb-2">Image Gallery</h3> -->
           <PrimeTabView>
-            <PrimeTabPanel header="Existing Gallery">
-<Swiper
-  :modules="[Pagination, Navigation]"
-  :slides-per-view="1"
-  :pagination="{ clickable: true }"
-  :navigation="true"
-  :breakpoints="{
-    640: { slidesPerView: 1 },
-    768: { slidesPerView: 1 },
-    1024: { slidesPerView: 1 }
-  }"
-  class="mySwiper"
->
+           <PrimeTabPanel header="Existing Gallery">
+  <div class=" overflow-hidden">
+    <swiper
+      class="mySwiper"
+      :modules="modules"
+      :slides-per-view="3"
+      :space-between="20"
+      :breakpoints="{ 600: { slidesPerView: 2 }, 900: { slidesPerView: 3 }, 1200: { slidesPerView: 4 } }"
+      navigation
+      pagination
+      @swiper="onSwiper"
+      @slideChange="onSlideChange"
+    >
+      <swiper-slide
+        v-for="(img, index) in car?.images"
+        :key="index"
+        class="flex items-center justify-center"
+      >
+        <img
+          :src="img"
+          class="object-cover rounded-lg shadow-md  h-[15rem]"
+          :alt="`Car Image ${index + 1}`"
+        />
+      </swiper-slide>
+    </swiper>
+  </div>
+</PrimeTabPanel>
 
-  <SwiperSlide v-for="(img, i) in galleriaImages" :key="i">
-    <img
-      :src="img.itemImageSrc"
-      :alt="img.alt"
-      class="w-full h-full object-cover"
-      style="max-height: 300px; object-fit: contain;"
-    />
-  </SwiperSlide>
-</Swiper>
-
-              <!-- <PrimeGalleria :value="galleriaImages" :responsiveOptions="responsiveOptions" :numVisible="2"
-                :changeItemOnIndicatorHover="true" :showThumbnails="false" :circular="true" :showItemNavigators="true">
-                <template #item="slotProps">
-                  <img :src="slotProps.item.itemImageSrc" :alt="slotProps.item.alt"
-                    style="width: 100%; object-fit: cover; border-radius: 1rem" />
-                </template>
-                <template #thumbnail="slotProps">
-                  <img :src="slotProps.item.thumbnailImageSrc" :alt="slotProps.item.alt"
-                    style="width: 60px; height: 60px; object-fit: cover" /> </template>
-              </PrimeGalleria> -->
-
-            </PrimeTabPanel>
             <PrimeTabPanel header="New Uploads">
               <!-- New selected images will be added to the gallery below. -->
               <div class="flex ">
@@ -251,19 +243,26 @@
 </template>
 
 <script setup lang="ts">
-// script setup
-import { Swiper, SwiperSlide } from 'swiper/vue';
-import { Pagination, Navigation } from 'swiper/modules';
-
-import 'swiper/css';
-import 'swiper/css/pagination';
-import 'swiper/css/navigation';
-
 import { ref, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
 
 import { useToast } from 'primevue/usetoast';
 import axios from 'axios';
+import { Swiper, SwiperSlide } from 'swiper/vue';
+import 'swiper/css';
+import 'swiper/css/navigation';
+import 'swiper/css/pagination';
+import { Navigation, Pagination } from 'swiper/modules';
+const modules = [Navigation, Pagination];
+
+const onSwiper = (swiper: any) => {
+  console.log('Swiper initialized', swiper);
+};
+
+const onSlideChange = () => {
+  console.log('Slide changed');
+};
+
 import {
   DOOR_OPTIONS,
   KEY_OPTIONS,
@@ -558,19 +557,14 @@ onMounted(fetchCar);
 <style scoped>
 .mySwiper {
   width: 100%;
-  max-width: 100%;
-  height: 300px;
+  height: 250px;
 }
 
-.swiper-slide {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
 
-.swiper-slide img {
-  max-height: 100%;
-  object-fit: contain;
+
+.mySwiper {
+  width: 100%;
+  padding: 1rem 0;
 }
 
 /* ::v-deep(.p-galleria .p-galleria-item-prev, .p-galleria .p-galleria-item-next) {
