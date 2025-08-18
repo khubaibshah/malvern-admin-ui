@@ -186,7 +186,7 @@ const restoreVehicle = async (carId) => {
     
     if (index !== -1) {
       const restoredCar = archivedCars.value.splice(index, 1)[0];
-      cars.value.push(restoredCar); // 🔁 Add back to active cars
+      cars.value.push(restoredCar); //Add back to active cars
 
       toast.add({
         severity: 'success',
@@ -325,7 +325,6 @@ const toggleRestoreSelection = (car) => {
 };
 
 </script>
-
 
 
 <style scoped>

@@ -1,31 +1,14 @@
 import axios from 'axios'
 import type { VehicleData } from '../interfaces/VehicleData'
-// import type  DVSAVehicleData  from '../interfaces/DvsaVehicleData';
-import { useVehicleStore } from '@/stores/vehicleData' // adjust path as needed
-interface MappedVehicleData {
-  registration_number: string
-  tax_status: string
-  mot_status: string
-  make: string
-  year_of_manufacture: number
-  engine_capacity: number
-  co2_emissions: number
-  fuel_type: string
-  marked_for_export: boolean
-  colour: string
-  type_approval: string
-  date_of_last_v5c_issued: string
-  mot_expiry_date: string
-  wheelplan: string
-  month_of_first_registration: number
-}
+import { useVehicleStore } from '@/stores/vehicleData' 
+
 
 class VehicleService {
   // Function to fetch vehicle details from DVLA API
   getVehicleDetails = async (registrationNumber: string): Promise<VehicleData> => {
     try {
       const response = await axios.post(
-        `${import.meta.env.VITE_API_BASE_URL}/admin/get-vehicle-details`,
+        `${import.meta.env.VITE_API_BASE_URL}/admin/ves`,
         {
           registrationNumber: registrationNumber
         }
@@ -40,23 +23,10 @@ class VehicleService {
       throw error
     }
   }
-
-  getVehicleByReg = async (registrationNumber: any): Promise<VehicleData> => {
-    try {
-      const response = await axios.get(
-        `${import.meta.env.VITE_API_BASE_URL}/admin/vehicle-details/${registrationNumber}`
-      )
-      console.log('Fetched vehicle data by Registration from db:', response.data)
-      return response.data
-    } catch (error) {
-      console.error(error)
-      throw error
-    }
-  }
   getDvsaVehicleByReg = async (registrationNumber: any) => {
     try {
       const response = await axios.get(
-        `${import.meta.env.VITE_API_BASE_URL}/admin/dvsa-vehicle-details/${registrationNumber}`
+        `${import.meta.env.VITE_API_BASE_URL}/admin/dvsa/${registrationNumber}`
       )
 
       console.log('Fetched vehicle data by Registration from dvsa data:', response.data)
@@ -74,7 +44,7 @@ class VehicleService {
     }
 
     try {
-      const res = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/admin/get-all-vehicles`, {
+      const res = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/admin/vehicles`, {
         headers: {
           Authorization: 'Bearer ' + sessionStorage.getItem('token'),
           'Content-Type': 'application/json'
@@ -103,52 +73,78 @@ class VehicleService {
     )
   }
 
-archiveVehicles = async (payload: { vehicle_ids: number[]; action: string }) => {
-  try {
-    const res = await axios.post(
-      `${import.meta.env.VITE_API_BASE_URL}/admin/archive-vehicles`,
-      payload,
+  archiveVehicles = async (payload: { vehicle_ids: number[]; action: string }) => {
+    try {
+      const res = await axios.post(
+        `${import.meta.env.VITE_API_BASE_URL}/admin/archive-vehicles`,
+        payload,
+        {
+          headers: {
+            Authorization: `Bearer ${sessionStorage.getItem('token')}`,
+            'Content-Type': 'application/json'
+          }
+        }
+      )
+
+      return res.data
+    } catch (error) {
+      console.error('Failed to archive vehicles:', error)
+      throw error
+    }
+  }
+
+  getArchivedVehicles = async () => {
+    try {
+      const res = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/admin/archived-vehicles`, {
+        headers: {
+          Authorization: 'Bearer ' + sessionStorage.getItem('token')
+        }
+      })
+
+      return res.data.vehicles
+    } catch (error) {
+      console.error('Failed to fetch archived vehicles:', error)
+      throw error
+    }
+  }
+
+  deleteVehicles = async (vehicleIds: number[]) => {
+    return await axios.post(
+      `${import.meta.env.VITE_API_BASE_URL}/admin/delete-vehicles`,
+      {
+        vehicle_ids: vehicleIds
+      },
       {
         headers: {
-          Authorization: `Bearer ${sessionStorage.getItem('token')}`,
-          'Content-Type': 'application/json',
-        },
+          Authorization: 'Bearer ' + sessionStorage.getItem('token'),
+          'Content-Type': 'application/json'
+        }
       }
-    );
-
-    return res.data;
-  } catch (error) {
-    console.error('Failed to archive vehicles:', error);
-    throw error;
+    )
   }
-}
 
-getArchivedVehicles = async () => {
-  try {
-    const res = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/admin/archived-vehicles`, {
-      headers: {
-        Authorization: 'Bearer ' + sessionStorage.getItem('token'),
+  getCars = async (forceRefresh = false) => {
+    const store = useVehicleStore()
+
+    try {
+      if (!store.vehiclesLoaded || forceRefresh) {
+        const res = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/admin/vehicles`, {
+          headers: {
+            Authorization: `Bearer ${sessionStorage.getItem('token')}`,
+            'Content-Type': 'application/json'
+          }
+        })
+
+        const cars = res.data.cars || []
+        store.setVehicles(cars)
       }
-    });
 
-    return res.data.vehicles;
-  } catch (error) {
-    console.error('Failed to fetch archived vehicles:', error);
-    throw error;
-  }
-}
-
-deleteVehicles = async (vehicleIds: number[]) => {
-  return await axios.post(`${import.meta.env.VITE_API_BASE_URL}/admin/delete-vehicles`, {
-    vehicle_ids: vehicleIds
-  }, {
-    headers: {
-      Authorization: 'Bearer ' + sessionStorage.getItem('token'),
-      'Content-Type': 'application/json'
+      return store.getVehicles
+    } catch (error) {
+      console.error('Failed to fetch cars', error)
+      throw error
     }
-  });
-}
-
+  }
 }
 
 export default new VehicleService()

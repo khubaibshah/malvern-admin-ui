@@ -4,6 +4,7 @@ import { useRouter } from 'vue-router';
 import { FilterMatchMode } from 'primevue/api';
 import { useToast } from 'primevue/usetoast';
 import { useVehicleStore } from '@/stores/vehicleData';
+import VehicleService from '@/services/VehicleService';
 
 const vehicleStore = useVehicleStore();
 const toast = useToast();
@@ -18,14 +19,10 @@ const cars = ref([]);
 
 const getCars = async (refresh = false) => {
   try {
-    if (!vehicleStore.vehiclesLoaded || refresh) {
-      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/scs/get-all-vehicles`);
-      const data = await response.json();
-      vehicleStore.setVehicles(data.cars || []);
-    }
+    cars.value = await VehicleService.fetchAllVehicles(refresh);
+    vehicleStore.setVehicles(cars.value || []);
     cars.value = vehicleStore.getVehicles;
   } catch (error) {
-    console.error('Failed to fetch cars', error);
     toast.add({ severity: 'error', summary: 'Error', detail: 'Failed to load cars.', life: 4000 });
   }
 };

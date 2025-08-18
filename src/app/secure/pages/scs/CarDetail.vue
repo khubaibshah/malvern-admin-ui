@@ -48,33 +48,41 @@
         <div v-if="car?.images?.length" class="mt-3">
           <!-- <h3 class="text-lg font-semibold mb-2">Image Gallery</h3> -->
           <PrimeTabView>
-           <PrimeTabPanel header="Existing Gallery">
-  <div class=" overflow-hidden">
-    <swiper
-      class="mySwiper"
-      :modules="modules"
+            <PrimeTabPanel header="Existing Gallery">
+              <PrimeGalleria :value="galleriaImages" responsiveOptions="responsiveOptions" :numVisible="4"
+                :thumbnailsPosition="position" :showThumbnails="false" :showIndicators="true"
+                :changeItemOnIndicatorHover="true" :circular="true" :showItemNavigators="true">
+                <template #item="slotProps">
+                  <div class="relative">
+                    <img :src="slotProps.item.itemImageSrc" :alt="slotProps.item.alt"
+                      style="width: 100%; object-fit: cover; border-radius: 1rem" />
 
-      :space-between="20"
-      :breakpoints="{ 600: { slidesPerView: 2 }, 900: { slidesPerView: 3 }, 1200: { slidesPerView: 4 } }"
-      navigation
-      pagination
-      @swiper="onSwiper"
-      @slideChange="onSlideChange"
-    >
-      <swiper-slide
-        v-for="(img, index) in car?.images"
-        :key="index"
-        class="flex items-center justify-center"
-      >
-        <img
-          :src="img"
-          class="object-cover rounded-lg shadow-md  h-[15rem]"
-          :alt="`Car Image ${index + 1}`"
-        />
-      </swiper-slide>
-    </swiper>
-  </div>
-</PrimeTabPanel>
+                    <!-- Delete Button -->
+                    <PrimeTag severity="secondary" class="absolute top-2 right-2 z-10 cursor-pointer"
+                      @click.stop="showConfirmDialog(slotProps.item.itemImageSrc)" title="Remove Image"
+                      style="background-color: red; top: 7px; right: 8px;">
+                      <i class="pi pi-times text-xs"></i>
+                    </PrimeTag>
+
+                    <!-- Primary Image Tag -->
+                    <PrimeTag v-if="slotProps.item.itemImageSrc === mainImage" value="Primary" severity="secondary"
+                      class="absolute top-2 left-2 z-10" style="left:0px" />
+
+
+                    <!-- New Image Tag -->
+                    <PrimeTag v-if="slotProps.item.isNew" value="New" severity="info"
+                      class="absolute bottom-2 left-2 z-10" style="    left: 0px;" />
+                  </div>
+                </template>
+
+                <template #thumbnail="slotProps">
+                  <img :src="slotProps.item.thumbnailImageSrc" :alt="slotProps.item.alt"
+                    style="width: 60px; height: 60px; object-fit: cover" />
+                </template>
+
+              </PrimeGalleria>
+            </PrimeTabPanel>
+
 
             <PrimeTabPanel header="New Uploads">
               <!-- New selected images will be added to the gallery below. -->
@@ -253,6 +261,7 @@ import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
 import { Navigation, Pagination } from 'swiper/modules';
+
 const modules = [Navigation, Pagination];
 
 const onSwiper = (swiper: any) => {
@@ -338,13 +347,6 @@ const handleFileSelect = (event: any) => {
           thumbnailImageSrc: url,
           alt: file.name
         });
-
-        galleriaImages.value.push({
-          itemImageSrc: url,
-          thumbnailImageSrc: url,
-          alt: file.name,
-          isNew: true  // 👈 This flag helps us tag it as a new image
-        });
       }
     }
 
@@ -371,9 +373,6 @@ const prepareGalleriaImages = () => {
     }));
   }
 };
-
-
-
 
 const removeImage = (index: number) => {
   confirm.value = true;
@@ -456,7 +455,7 @@ const confirmRemoveImage = async () => {
 const fetchCar = async () => {
   try {
     const id = route.params.id;
-    const res = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/get-vehicle-by-id/${id}`, {
+    const res = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/admin/get-vehicle-by-id/${id}`, {
       headers: { Authorization: 'Bearer ' + seshId }
     });
 
@@ -481,7 +480,7 @@ const fetchCar = async () => {
     body_style.value = form.value.body_style || '';
     deleted_at.value = form.value.deleted_at;
 
-    // ✅ Then set archive switch
+    //Then set archive switch
     archiveVehicleSwitch.value = deleted_at.value !== null && deleted_at.value !== ''; prepareGalleriaImages();
 
     if (Array.isArray(car.value.images) && car.value.images.length > 0) {
@@ -543,7 +542,7 @@ const updateCar = async () => {
 
     toast.add({ severity: 'success', summary: 'Updated', detail: 'Vehicle updated successfully', life: 3000 });
     await fetchCar();
-    prepareGalleriaImages(); // <— call this after setting car.value
+    prepareGalleriaImages();
 
   } catch (err) {
     console.error('Update failed', err);
@@ -566,23 +565,6 @@ onMounted(fetchCar);
   width: 100%;
   padding: 1rem 0;
 }
-
-/* ::v-deep(.p-galleria .p-galleria-item-prev, .p-galleria .p-galleria-item-next) {
-  z-index: 50;
-  background-color: rgba(0, 0, 0, 0.5);
-  width: 2.5rem;
-  height: 2.5rem;
-  top: 50%;
-  transform: translateY(-50%);
-} */
-
-/* ::v-deep(.p-galleria .p-galleria-item-prev) {
-  left: 1rem;
-}
-
-::v-deep(.p-galleria .p-galleria-item-next) {
-  right: 1rem;
-} */
 
 .thumbnail-image {
   width: 120px;
