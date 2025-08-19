@@ -60,6 +60,25 @@ class VehicleService {
     }
   }
 
+  refreshAutoTraderList = async () => {
+  try {
+    const res = await axios.get(
+      `${import.meta.env.VITE_API_BASE_URL}/admin/at/vehicleList`,
+      {
+        headers: {
+          Authorization: 'Bearer ' + sessionStorage.getItem('token'),
+          'Content-Type': 'application/json'
+        }
+      }
+    )
+
+    return res.data
+  } catch (error) {
+    console.error('Failed to refresh Auto Trader list:', error)
+    throw error
+  }
+}
+
   setFeaturedVehicle = async (carId: number) => {
     await axios.post(
       `${import.meta.env.VITE_API_BASE_URL}/admin/featured-vehicle`,

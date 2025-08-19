@@ -27,6 +27,15 @@ const getCars = async (refresh = false) => {
   }
 };
 
+const refreshAutoTraderList = async () => {
+  try {
+    await VehicleService.refreshAutoTraderList();
+    toast.add({ severity: 'success', summary: 'Success', detail: 'Auto trader list refreshed successfully.', life: 3000 });
+    // await getCars(true);
+  } catch (error) {
+    toast.add({ severity: 'error', summary: 'Error', detail: 'Failed to refresh Auto trader list.', life: 4000 });
+  }
+};
 const goToCarDetail = (event: any) => {
   const car = event.data;
   router.push({ name: 'car-detail', params: { id: car.id } });
@@ -70,7 +79,8 @@ onMounted(() => getCars());
               <IconField iconPosition="left">
                 <InputIcon><i class="pi pi-search" /></InputIcon>
                 <InputText v-model="filters['global'].value" placeholder="Search Cars" />
-                <PrimeButton icon="pi pi-refresh" class="p-button-sm ml-4" @click="() => getCars(true)" />
+                <PrimeButton icon="pi pi-refresh" label="Refresh Local List" class="p-button-sm ml-4" @click="() => getCars(true)" />
+                <PrimeButton icon="pi pi-refresh" label="Refresh Auto trader List" class="p-button-sm ml-4" @click="() => refreshAutoTraderList()" />
               </IconField>
             </div>
           </template>
